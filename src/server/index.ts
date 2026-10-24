@@ -8,13 +8,13 @@ const server = new StudioServer(PORT, SNIFFER_PORT);
 server.start().then(actualPort => {
   const mem = (process.memoryUsage().rss / 1024 / 1024).toFixed(1);
   console.log('='.repeat(65));
-  console.log('  🚀 ReaAPI Studio — Next-Gen Clean-Room API Platform');
+  console.log('  🚀 ReaAPI Studio — Local API Workbench');
   console.log('='.repeat(65));
-  console.log(`  ⚡ Web / Desktop Studio:  http://localhost:${actualPort}`);
+  console.log(`  ⚡ Web / Desktop Studio:  http://localhost:${actualPort}/studio`);
   console.log(`  🛰️ Live Traffic Sniffer:  http://localhost:${SNIFFER_PORT}`);
   console.log(`  💾 Local-First Git Data:  .rea-api/collections/ & .rea-api/environments/`);
-  console.log(`  🏎️ Idle Memory Baseline:  ~${mem} MB (vs Postman ~1.2 GB)`);
-  console.log(`  🔒 Data Privacy:          100% Offline / Zero-Cloud Mandate`);
+  console.log(`  Server RSS:              ${mem} MB (browser memory excluded)`);
+  console.log(`  Local workspace:         No Rea account required`);
   console.log('='.repeat(65));
 }).catch(err => {
   console.error('Failed to launch ReaAPI Studio:', err);

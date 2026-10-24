@@ -14,8 +14,6 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../');
 const publicDir = path.resolve(projectRoot, 'public');
 const storageDir = path.resolve(projectRoot, '.rea-api');
-const collectionsDir = path.resolve(storageDir, 'collections');
-const environmentsDir = path.resolve(storageDir, 'environments');
 
 function findAndUpdateRequest(items: CollectionItem[], req: HttpRequest): boolean {
   for (let i = 0; i < items.length; i++) {
@@ -49,11 +47,17 @@ function findAndDeleteRequest(items: CollectionItem[], reqId: string): boolean {
 export class StudioServer {
   private server: http.Server | null = null;
   private port: number;
+  private storageDir: string;
+  private collectionsDir: string;
+  private environmentsDir: string;
   private sniffer: TrafficSnifferProxy;
   private collections: Map<string, ApiCollection> = new Map();
   private environments: Map<string, Environment> = new Map();
 
-  constructor(port: number = 4040, snifferPort: number = 8085) {
+  constructor(port: number = 4040, snifferPort: number = 8085, workspaceDir: string = storageDir) {
+    this.storageDir = workspaceDir;
+    this.collectionsDir = path.join(workspaceDir, 'collections');
+    this.environmentsDir = path.join(workspaceDir, 'environments');
     this.port = port;
     this.sniffer = new TrafficSnifferProxy(snifferPort);
     this.ensureStorage();
@@ -62,25 +66,25 @@ export class StudioServer {
   }
 
   private ensureStorage() {
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
+    if (!fs.existsSync(this.storageDir)) {
+      fs.mkdirSync(this.storageDir, { recursive: true });
     }
-    if (!fs.existsSync(collectionsDir)) {
-      fs.mkdirSync(collectionsDir, { recursive: true });
+    if (!fs.existsSync(this.collectionsDir)) {
+      fs.mkdirSync(this.collectionsDir, { recursive: true });
     }
-    if (!fs.existsSync(environmentsDir)) {
-      fs.mkdirSync(environmentsDir, { recursive: true });
+    if (!fs.existsSync(this.environmentsDir)) {
+      fs.mkdirSync(this.environmentsDir, { recursive: true });
     }
   }
 
   private loadInitialCollections() {
     // 1. Load multi-file collections from .rea-api/collections/*.json
     try {
-      const files = fs.readdirSync(collectionsDir);
+      const files = fs.readdirSync(this.collectionsDir);
       for (const file of files) {
         if (file.endsWith('.json')) {
           try {
-            const raw = fs.readFileSync(path.join(collectionsDir, file), 'utf8');
+            const raw = fs.readFileSync(path.join(this.collectionsDir, file), 'utf8');
             const col = JSON.parse(raw);
             if (col && col.id) {
               this.collections.set(col.id, col);
@@ -92,7 +96,7 @@ export class StudioServer {
 
     // 2. Fallback to monolithic collections.json for backwards compatibility
     if (this.collections.size === 0) {
-      const collFile = path.join(storageDir, 'collections.json');
+      const collFile = path.join(this.storageDir, 'collections.json');
       if (fs.existsSync(collFile)) {
         try {
           const data = JSON.parse(fs.readFileSync(collFile, 'utf8'));
@@ -115,15 +119,15 @@ export class StudioServer {
         schemaVersion: '2.1.0',
         variables: [
           { key: 'baseUrl', value: 'https://api.github.com', enabled: true },
-          { key: 'repo', value: 'morluto/rea', enabled: true }
+          { key: 'repo', value: 'abrar225/rea-api-studio', enabled: true }
         ],
         items: [
           {
             id: 'req_1',
-            name: 'Get REA Repo Info',
+            name: 'Get Rea repository',
             request: {
               id: 'req_1',
-              name: 'Get REA Repo Info',
+              name: 'Get Rea repository',
               method: 'GET',
               url: '{{baseUrl}}/repos/{{repo}}',
               headers: [{ key: 'User-Agent', value: 'ReaAPI-Studio', enabled: true }],
@@ -137,7 +141,7 @@ export class StudioServer {
 
 pm.test("Has valid repo name", function () {
     var data = pm.response.json();
-    pm.expect(data.name).to.equal("rea");
+    pm.expect(data.name).to.equal("rea-api-studio");
 });`
             }
           },
@@ -157,7 +161,7 @@ pm.test("Has valid repo name", function () {
                   {
                     timestamp: '{{$timestamp}}',
                     client: 'ReaAPI Studio',
-                    message: 'Clean-room reverse-engineered performance'
+                    message: 'Hello from Rea'
                   },
                   null,
                   2
@@ -181,11 +185,11 @@ pm.test("Has valid repo name", function () {
   private loadInitialEnvironments() {
     // 1. Load multi-file environments from .rea-api/environments/*.json
     try {
-      const files = fs.readdirSync(environmentsDir);
+      const files = fs.readdirSync(this.environmentsDir);
       for (const file of files) {
         if (file.endsWith('.json')) {
           try {
-            const raw = fs.readFileSync(path.join(environmentsDir, file), 'utf8');
+            const raw = fs.readFileSync(path.join(this.environmentsDir, file), 'utf8');
             const env = JSON.parse(raw);
             if (env && env.id) {
               this.environments.set(env.id, env);
@@ -197,7 +201,7 @@ pm.test("Has valid repo name", function () {
 
     // 2. Fallback to monolithic environments.json
     if (this.environments.size === 0) {
-      const envFile = path.join(storageDir, 'environments.json');
+      const envFile = path.join(this.storageDir, 'environments.json');
       if (fs.existsSync(envFile)) {
         try {
           const data = JSON.parse(fs.readFileSync(envFile, 'utf8'));
@@ -231,9 +235,9 @@ pm.test("Has valid repo name", function () {
     if (!col) return;
     try {
       const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
-      fs.writeFileSync(path.join(collectionsDir, `${safeId}.json`), JSON.stringify(col, null, 2), 'utf8');
+      fs.writeFileSync(path.join(this.collectionsDir, `${safeId}.json`), JSON.stringify(col, null, 2), 'utf8');
       // Backwards compatibility mirror
-      const collFile = path.join(storageDir, 'collections.json');
+      const collFile = path.join(this.storageDir, 'collections.json');
       fs.writeFileSync(collFile, JSON.stringify(Array.from(this.collections.values()), null, 2), 'utf8');
     } catch (e) {
       console.error('Failed to persist collection:', e);
@@ -250,9 +254,9 @@ pm.test("Has valid repo name", function () {
     this.collections.delete(id);
     try {
       const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
-      const colFile = path.join(collectionsDir, `${safeId}.json`);
+      const colFile = path.join(this.collectionsDir, `${safeId}.json`);
       if (fs.existsSync(colFile)) fs.unlinkSync(colFile);
-      const allFile = path.join(storageDir, 'collections.json');
+      const allFile = path.join(this.storageDir, 'collections.json');
       fs.writeFileSync(allFile, JSON.stringify(Array.from(this.collections.values()), null, 2), 'utf8');
     } catch (e) {
       console.error('Failed to delete collection file:', e);
@@ -264,9 +268,9 @@ pm.test("Has valid repo name", function () {
     if (!env) return;
     try {
       const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
-      fs.writeFileSync(path.join(environmentsDir, `${safeId}.json`), JSON.stringify(env, null, 2), 'utf8');
+      fs.writeFileSync(path.join(this.environmentsDir, `${safeId}.json`), JSON.stringify(env, null, 2), 'utf8');
       // Backwards compatibility mirror
-      const envFile = path.join(storageDir, 'environments.json');
+      const envFile = path.join(this.storageDir, 'environments.json');
       fs.writeFileSync(envFile, JSON.stringify(Array.from(this.environments.values()), null, 2), 'utf8');
     } catch (e) {
       console.error('Failed to persist environment:', e);
@@ -277,9 +281,9 @@ pm.test("Has valid repo name", function () {
     this.environments.delete(id);
     try {
       const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
-      const envFile = path.join(environmentsDir, `${safeId}.json`);
+      const envFile = path.join(this.environmentsDir, `${safeId}.json`);
       if (fs.existsSync(envFile)) fs.unlinkSync(envFile);
-      const allFile = path.join(storageDir, 'environments.json');
+      const allFile = path.join(this.storageDir, 'environments.json');
       fs.writeFileSync(allFile, JSON.stringify(Array.from(this.environments.values()), null, 2), 'utf8');
     } catch (e) {
       console.error('Failed to delete environment file:', e);
@@ -292,17 +296,29 @@ pm.test("Has valid repo name", function () {
 
     return new Promise((resolve, reject) => {
       this.server = http.createServer(async (req, res) => {
-        // Enable CORS
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
+        // Only the local studio may use this API from a browser. Check Host too,
+        // so a foreign hostname resolving to loopback cannot bypass the origin check.
+        const host = req.headers.host || '';
+        const allowedHosts = [`localhost:${this.port}`, `127.0.0.1:${this.port}`];
+        const origin = req.headers.origin;
+        if (!allowedHosts.includes(host) || (origin && !allowedHosts.some(h => origin === `http://${h}`))) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Only the local studio origin is allowed' }));
+          return;
+        }
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Referrer-Policy', 'no-referrer');
+        if (origin) {
+          res.setHeader('Access-Control-Allow-Origin', origin);
+          res.setHeader('Vary', 'Origin');
+        }
         if (req.method === 'OPTIONS') {
+          res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
           res.writeHead(204);
           res.end();
           return;
         }
-
         const urlObj = new URL(req.url || '/', `http://localhost:${this.port}`);
         const pathname = urlObj.pathname;
 
@@ -330,14 +346,14 @@ pm.test("Has valid repo name", function () {
         this.serveStatic(req, res, pathname);
       });
 
-      this.server.listen(this.port, () => {
+      this.server.listen(this.port, '127.0.0.1', () => {
         resolve(this.port);
       });
 
       this.server.on('error', (err: any) => {
         if (err.code === 'EADDRINUSE') {
           this.port += 1;
-          this.server?.listen(this.port);
+          this.server?.listen(this.port, '127.0.0.1');
         } else {
           reject(err);
         }
@@ -672,10 +688,16 @@ pm.test("Has valid repo name", function () {
   }
 
   private serveStatic(req: http.IncomingMessage, res: http.ServerResponse, pathname: string) {
-    let filePath = path.join(publicDir, pathname === '/' ? 'index.html' : pathname);
-
-    if (!fs.existsSync(filePath)) {
-      filePath = path.join(publicDir, 'index.html');
+    let decodedPath: string;
+    try { decodedPath = decodeURIComponent(pathname); } catch {
+      res.writeHead(400); res.end('Invalid path'); return;
+    }
+    const relativePath = decodedPath === '/' ? 'index.html' : decodedPath === '/studio' ? 'studio.html' : decodedPath.replace(/^\/+/, '');
+    const filePath = path.resolve(publicDir, relativePath);
+    if (!filePath.startsWith(publicDir + path.sep) || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+      return;
     }
 
     const ext = path.extname(filePath).toLowerCase();
@@ -685,7 +707,9 @@ pm.test("Has valid repo name", function () {
       '.js': 'application/javascript; charset=utf-8',
       '.json': 'application/json; charset=utf-8',
       '.svg': 'image/svg+xml',
-      '.png': 'image/png'
+      '.png': 'image/png',
+      '.woff2': 'font/woff2',
+      '.woff': 'font/woff'
     };
 
     const contentType = mimeTypes[ext] || 'application/octet-stream';

@@ -1,0 +1,62 @@
+# Verification record
+
+24 October 2026, macOS, Node v24.14.0. Checks below apply to this redesign revision; they do not certify every endpoint, generated SDK, browser, or Postman behavior.
+
+## Clean installation, build and automated tests
+
+Observed after the final application/source changes:
+
+```text
+npm ci
+added 49 packages
+found 0 vulnerabilities
+
+npm run check
+> tsc && node scripts/build-web.mjs
+Test Files  9 passed (9)
+Tests       44 passed (44)
+
+npm audit --audit-level=high
+found 0 vulnerabilities
+```
+
+The original 39 tests remain, with HTTP fixtures moved from the external httpbin service to a real loopback HTTP server. Server tests use temporary storage roots and delete them afterward. Five additional tests exercise homepage/workbench/assets, missing static files, foreign origins, exact local origins, rebinding Host headers, encoded traversal, and proxy browser restrictions. The memory test checks a numeric RSS measurement, not an arbitrary cross-machine limit.
+
+## Browser verification
+
+Ego Lite, one task space. A temporary `StudioServer(4050, 8095, tempDir)` ran separately from the user's workspace. The repeatable script is `scripts/browser-check.mjs`; launch its server with `node scripts/test-server.mjs`, then import the script through Ego's `nodejs -e` command using its absolute file URL.
+
+The final repeatable run reported **14 passing checks**:
+
+1. Homepage sample request switching and sample response.
+2. Homepage desktop axe WCAG 2 A/AA and 2.1 AA scan: zero violations, one incomplete check for manual review.
+3. Homepage at 390px: no horizontal document overflow.
+4. Reduced motion: all hero text visible and Lenis destroyed after the media preference changes.
+5. Homepage resources: no third-party script/font/icon network requests.
+6. Postman import selects the newly imported request.
+7. A real loopback request returns 200 and its `pm.test` assertion passes.
+8. Switching request tabs preserves the selected response tab.
+9. Collection search filters and restores requests.
+10. Code snippet opens; Escape closes the dialog and releases inert background content.
+11. Workbench desktop axe scan: zero violations, two incomplete checks for manual review.
+12. Workbench at 390px: no horizontal document overflow.
+13. Forwarded local HTTP traffic appears in the traffic screen and OpenAPI 3.1 preview.
+14. No observed page errors/unhandled rejections during those studio workflows.
+
+Screenshots were inspected at the browser's original 948px viewport, a 1440 × 1000 desktop emulation and 390 × 844 mobile emulation. Mobile and desktop emulator checks do not substitute for physical device testing. Screenshots in `assets/` show actual UI state and sample/test data, not a performance benchmark.
+
+Additional interactive checks during implementation: cURL import persists to its collection; environment rename survives reopening; environment quick-look works; real response assertions, headers and generated snippets render; modal Escape dismissal; reduced-motion page reload. Changes made to the browser QA collection are cleaned up after the repeatable run. The local test server is disposed separately.
+
+Automated accessibility checks found and prompted fixes for low-contrast line numbers and nested interactive request controls. Remaining axe “incomplete” checks require human judgment, so no WCAG certification is claimed.
+
+## Known limitations reproduced
+
+`node scripts/assessment-probes.mjs` reproduced duplicated query parameters, lost inherited Postman auth, raw text imported as JSON, same-path multi-origin merging, and omitted schema content for `false` bodies. These are documented unresolved product limitations, not features fixed by the visual redesign.
+
+## Deployment scope
+
+GitHub Actions CI checks Node 22 and 24. The Pages workflow builds/tests then uploads only `dist-site/`, containing the informational homepage, local bundles/fonts, identity assets and license notices. It excludes the Node server, workbench page and workspace files. Real API work remains local. See the repository's GitHub Actions runs for remote verification; a local pass is not itself proof of a successful deployment.
+
+VERDICT: PASS
+
+This verdict covers the checks listed above. It does not assert full product parity, complete security, or correctness of all generated contracts and client code.
