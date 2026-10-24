@@ -59,7 +59,16 @@ export class TrafficSnifferProxy {
     return new Promise((resolve, reject) => {
       this.server = http.createServer(async (req, res) => {
         const host = req.headers.host || '';
-        if (![ `localhost:${this.port}`, `127.0.0.1:${this.port}` ].includes(host) || req.headers.origin) {
+        // Absolute-form HTTP proxy requests carry the target Host, not our Host.
+        // Browser-origin requests are still rejected, and origin-form routes must
+        // address the loopback proxy itself (also preventing hostname rebinding).
+        let absoluteForm = false;
+        try {
+          const target = new URL(req.url || '');
+          absoluteForm = ['http:', 'https:'].includes(target.protocol) && host === target.host;
+        } catch {}
+        const localHost = [`localhost:${this.port}`, `127.0.0.1:${this.port}`].includes(host);
+        if ((!localHost && !absoluteForm) || req.headers.origin) {
           res.writeHead(403, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Use the local proxy from a trusted HTTP client' }));
           return;

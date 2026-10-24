@@ -72,6 +72,14 @@ describe("Local studio origin and web boundaries", () => {
     expect(await request("/..%2fpackage.json", "localhost:4498")).toBe(404);
     expect(await request("/%zz", "localhost:4498")).toBe(400);
   });
+  it("accepts standard absolute-form HTTP proxy requests with the target Host", async () => {
+    const status = await new Promise<number>((resolve, reject) => {
+      const request = http.get({hostname:'127.0.0.1',port:8498,path:'http://localhost:4498/api/health',headers:{Host:'localhost:4498'}}, response => {
+        response.resume(); resolve(response.statusCode!);
+      }); request.on('error',reject);
+    });
+    expect(status).toBe(200);
+  });
   it("refuses browser origins and foreign hosts on the traffic proxy", async () => {
     const response = await fetch(
       "http://localhost:8498/http://localhost:4498/api/health",

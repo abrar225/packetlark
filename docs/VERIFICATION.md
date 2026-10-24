@@ -14,13 +14,13 @@ found 0 vulnerabilities
 npm run check
 > tsc && node scripts/build-web.mjs
 Test Files  9 passed (9)
-Tests       44 passed (44)
+Tests       45 passed (45)
 
 npm audit --audit-level=high
 found 0 vulnerabilities
 ```
 
-The original 39 tests remain, with HTTP fixtures moved from the external httpbin service to a real loopback HTTP server. Server tests use temporary storage roots and delete them afterward. Five additional tests exercise homepage/workbench/assets, missing static files, foreign origins, exact local origins, rebinding Host headers, encoded traversal, and proxy browser restrictions. The memory test checks a numeric RSS measurement, not an arbitrary cross-machine limit.
+The original 39 tests remain, with HTTP fixtures moved from the external httpbin service to a real loopback HTTP server. Server tests use temporary storage roots and delete them afterward. Six additional tests exercise homepage/workbench/assets, missing static files, foreign origins, exact local origins, rebinding Host headers, encoded traversal, and proxy browser restrictions. The memory test checks a numeric RSS measurement, not an arbitrary cross-machine limit.
 
 ## Browser verification
 

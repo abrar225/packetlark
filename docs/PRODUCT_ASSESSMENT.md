@@ -112,7 +112,7 @@ Not claimed: full accessibility certification, complete security audit, Postman 
 ## Reproduction and evidence
 
 - Baseline: **39 tests across 8 files passed**, before redesign.
-- Current: **44 tests across 9 files passed** after adding web-boundary regressions; compilation and asset bundling passed.
+- Current: **45 tests across 9 files passed** after adding web-boundary regressions; compilation and asset bundling passed.
 - `node scripts/assessment-probes.mjs` reproduced: `/items?tag=x&tag=x`, inherited auth `none`, raw text imported as `raw-json`, one merged path across two servers, and empty response content for `false` bodies. These probes intentionally document unresolved limitations; they are not a conformance pass.
 - Browser checks used an isolated temporary workspace: real request execution and assertions, cURL import/save, environment rename, independent tabs, snippets, traffic capture/OpenAPI preview, desktop/mobile layout and reduced-motion behavior. Detailed final evidence is in `docs/VERIFICATION.md`.
 - No timing/RAM head-to-head or full manual Postman parity test was conducted.
