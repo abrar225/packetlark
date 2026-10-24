@@ -1,0 +1,8 @@
+{
+  "id": "env_prod_my_platforms",
+  "name": "Production (Firehox & Abrar)",
+  "values": [
+    { "key": "firehoxUrl", "value": "https://firehox.com", "enabled": true },
+    { "key": "abrarUrl", "value": "https://abrarakhunji.com", "enabled": true }
+  ]
+}

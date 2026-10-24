@@ -1,0 +1,77 @@
+{
+  "id": "col_sample_1",
+  "name": "GitHub Public API Sample",
+  "description": "Demonstration collection with variables and assertions.",
+  "schemaVersion": "2.1.0",
+  "variables": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.github.com",
+      "enabled": true
+    },
+    {
+      "key": "repo",
+      "value": "morluto/rea",
+      "enabled": true
+    }
+  ],
+  "items": [
+    {
+      "id": "req_1",
+      "name": "Get REA Repo Info",
+      "request": {
+        "id": "req_1",
+        "name": "Get REA Repo Info",
+        "method": "GET",
+        "url": "{{baseUrl}}/repos/{{repo}}",
+        "headers": [
+          {
+            "key": "User-Agent",
+            "value": "ReaAPI-Studio",
+            "enabled": true
+          }
+        ],
+        "queryParams": [],
+        "body": {
+          "mode": "none"
+        },
+        "auth": {
+          "type": "none"
+        },
+        "testScript": "pm.test(\"Status code is 200\", function () {\n    pm.expect(pm.response.code).to.equal(200);\n});\n\npm.test(\"Has valid repo name\", function () {\n    var data = pm.response.json();\n    pm.expect(data.name).to.equal(\"rea\");\n});"
+      }
+    },
+    {
+      "id": "req_2",
+      "name": "HTTPBin Echo Test",
+      "request": {
+        "id": "req_2",
+        "name": "HTTPBin Echo Test",
+        "method": "POST",
+        "url": "https://httpbin.org/post",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "queryParams": [
+          {
+            "key": "traceId",
+            "value": "{{$guid}}",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw-json",
+          "raw": "{\n  \"timestamp\": \"{{$timestamp}}\",\n  \"client\": \"ReaAPI Studio\",\n  \"message\": \"Clean-room reverse-engineered performance\"\n}"
+        },
+        "auth": {
+          "type": "none"
+        },
+        "testScript": "pm.test(\"Echo response received\", function () {\n    pm.expect(pm.response.code).to.equal(200);\n    var json = pm.response.json();\n    pm.expect(json.json.client).to.equal(\"ReaAPI Studio\");\n});"
+      }
+    }
+  ]
+}

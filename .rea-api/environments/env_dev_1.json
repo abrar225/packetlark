@@ -1,0 +1,26 @@
+{
+  "id": "env_dev_1",
+  "name": "Development",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "https://httpbin.org",
+      "enabled": true
+    },
+    {
+      "key": "apiKey",
+      "value": "dev-secret-token-12345",
+      "enabled": true
+    },
+    {
+      "key": "firehoxUrl",
+      "value": "https://firehox.com",
+      "enabled": true
+    },
+    {
+      "key": "abrarUrl",
+      "value": "https://abrarakhunji.com",
+      "enabled": true
+    }
+  ]
+}

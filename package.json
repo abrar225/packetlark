@@ -1,0 +1,21 @@
+{
+  "name": "rea-api-studio",
+  "version": "1.0.0",
+  "description": "Ultra-fast, Git-native API Studio with automated live traffic reverse-engineering into OpenAPI 3.1",
+  "type": "module",
+  "bin": {
+    "rea-api": "./bin/rea-api.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node dist/server/index.js",
+    "dev": "tsc -w",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.0.0"
+  }
+}

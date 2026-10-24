@@ -1,0 +1,280 @@
+[
+  {
+    "id": "col_my_platforms",
+    "name": "My Platforms (Firehox & Abrar Akhunji)",
+    "description": "Production monitoring, latency benchmarking, and endpoint reverse-engineering for firehox.com and abrarakhunji.com.",
+    "schemaVersion": "2.1.0",
+    "variables": [
+      {
+        "key": "firehoxUrl",
+        "value": "https://firehox.com",
+        "enabled": true
+      },
+      {
+        "key": "abrarUrl",
+        "value": "https://abrarakhunji.com",
+        "enabled": true
+      }
+    ],
+    "items": [
+      {
+        "id": "fh_home",
+        "name": "Firehox — Core Homepage",
+        "request": {
+          "id": "fh_home",
+          "name": "Firehox — Core Homepage",
+          "method": "GET",
+          "url": "{{firehoxUrl}}",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            },
+            {
+              "key": "Accept",
+              "value": "text/html,application/xhtml+xml",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Firehox root status is 200\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});\npm.test(\"CDN response time is healthy (< 8000ms)\", function() {\n  pm.expect(pm.response.responseTime).to.be.below(8000);\n});",
+          "preRequestScript": ""
+        }
+      },
+      {
+        "id": "fh_services",
+        "name": "Firehox — Services & Capabilities",
+        "request": {
+          "id": "fh_services",
+          "name": "Firehox — Services & Capabilities",
+          "method": "GET",
+          "url": "{{firehoxUrl}}/services",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Services catalog is active\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});"
+        }
+      },
+      {
+        "id": "fh_work",
+        "name": "Firehox — Work & Case Studies",
+        "request": {
+          "id": "fh_work",
+          "name": "Firehox — Work & Case Studies",
+          "method": "GET",
+          "url": "{{firehoxUrl}}/work",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Portfolio loaded\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});"
+        }
+      },
+      {
+        "id": "fh_contact",
+        "name": "Firehox — Inbound Contact Gateway",
+        "request": {
+          "id": "fh_contact",
+          "name": "Firehox — Inbound Contact Gateway",
+          "method": "GET",
+          "url": "{{firehoxUrl}}/contact",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Contact route is operational\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});"
+        }
+      },
+      {
+        "id": "aa_home",
+        "name": "Abrar Akhunji — Home & Portfolio",
+        "request": {
+          "id": "aa_home",
+          "name": "Abrar Akhunji — Home & Portfolio",
+          "method": "GET",
+          "url": "{{abrarUrl}}",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Abrar portfolio status is 200\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});"
+        }
+      },
+      {
+        "id": "aa_blog",
+        "name": "Abrar Akhunji — Technical Blog Index",
+        "request": {
+          "id": "aa_blog",
+          "name": "Abrar Akhunji — Technical Blog Index",
+          "method": "GET",
+          "url": "{{abrarUrl}}/blog",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Blog index loaded\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});"
+        }
+      },
+      {
+        "id": "aa_article",
+        "name": "Abrar Akhunji — AI Research Article (Hy-Memory)",
+        "request": {
+          "id": "aa_article",
+          "name": "Abrar Akhunji — AI Research Article (Hy-Memory)",
+          "method": "GET",
+          "url": "{{abrarUrl}}/blog/hy-memory-2-0-tencent-30b-a3b-attributed-reinforcement-learning",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio/1.0",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Article loaded with 200 OK\", function() {\n  pm.expect(pm.response.code).to.equal(200);\n});"
+        }
+      }
+    ]
+  },
+  {
+    "id": "col_sample_1",
+    "name": "GitHub Public API Sample",
+    "description": "Demonstration collection with variables and assertions.",
+    "schemaVersion": "2.1.0",
+    "variables": [
+      {
+        "key": "baseUrl",
+        "value": "https://api.github.com",
+        "enabled": true
+      },
+      {
+        "key": "repo",
+        "value": "morluto/rea",
+        "enabled": true
+      }
+    ],
+    "items": [
+      {
+        "id": "req_1",
+        "name": "Get REA Repo Info",
+        "request": {
+          "id": "req_1",
+          "name": "Get REA Repo Info",
+          "method": "GET",
+          "url": "{{baseUrl}}/repos/{{repo}}",
+          "headers": [
+            {
+              "key": "User-Agent",
+              "value": "ReaAPI-Studio",
+              "enabled": true
+            }
+          ],
+          "queryParams": [],
+          "body": {
+            "mode": "none"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Status code is 200\", function () {\n    pm.expect(pm.response.code).to.equal(200);\n});\n\npm.test(\"Has valid repo name\", function () {\n    var data = pm.response.json();\n    pm.expect(data.name).to.equal(\"rea\");\n});"
+        }
+      },
+      {
+        "id": "req_2",
+        "name": "HTTPBin Echo Test",
+        "request": {
+          "id": "req_2",
+          "name": "HTTPBin Echo Test",
+          "method": "POST",
+          "url": "https://httpbin.org/post",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "enabled": true
+            }
+          ],
+          "queryParams": [
+            {
+              "key": "traceId",
+              "value": "{{$guid}}",
+              "enabled": true
+            }
+          ],
+          "body": {
+            "mode": "raw-json",
+            "raw": "{\n  \"timestamp\": \"{{$timestamp}}\",\n  \"client\": \"ReaAPI Studio\",\n  \"message\": \"Clean-room reverse-engineered performance\"\n}"
+          },
+          "auth": {
+            "type": "none"
+          },
+          "testScript": "pm.test(\"Echo response received\", function () {\n    pm.expect(pm.response.code).to.equal(200);\n    var json = pm.response.json();\n    pm.expect(json.json.client).to.equal(\"ReaAPI Studio\");\n});"
+        }
+      }
+    ]
+  }
+]
