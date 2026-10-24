@@ -1,12 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { startHttpFixture } from './http-fixture.js';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { HttpExecutor, normalizeNetworkError } from '../src/core/engine/HttpExecutor.js';
 import { HttpRequest } from '../src/core/models/types.js';
 
 describe('HttpExecutor Hardening & Error Normalization', () => {
+  let target: Awaited<ReturnType<typeof startHttpFixture>>;
+  beforeAll(async()=>{target=await startHttpFixture();});
+  afterAll(async()=>{await target.stop();});
   it('auto-prefixes http:// for bare URLs without protocol', async () => {
     const req: HttpRequest = {
       method: 'GET',
-      url: 'httpbin.org/get?autoPrefix=true',
+      url: `${target.url.replace('http://', '')}/get?autoPrefix=true`,
       headers: [],
       queryParams: [],
       body: { mode: 'none' },
@@ -29,7 +33,9 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
       auth: { type: 'none' }
     };
 
-    const res = await HttpExecutor.execute(req);
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new TypeError('fetch failed', {cause:{code:'ENOTFOUND'}}));
+    let res;
+    try { res = await HttpExecutor.execute(req); } finally { fetchMock.mockRestore(); }
     expect(res.status).toBe(0);
     expect(res.error).toBeDefined();
     expect(res.error?.category).toMatch(/DNS Resolution Failed|Network Error/);
@@ -59,7 +65,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
     // 1. URL encoded
     const urlEncodedReq: HttpRequest = {
       method: 'POST',
-      url: 'https://httpbin.org/post',
+      url: `${target.url}/post`,
       headers: [],
       queryParams: [],
       body: {
@@ -81,7 +87,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
     // 2. Form data
     const formDataReq: HttpRequest = {
       method: 'POST',
-      url: 'https://httpbin.org/post',
+      url: `${target.url}/post`,
       headers: [],
       queryParams: [],
       body: {
@@ -102,7 +108,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
   it('returns updatedVariables mutated by pre-request and test scripts', async () => {
     const req: HttpRequest = {
       method: 'GET',
-      url: 'https://httpbin.org/get',
+      url: `${target.url}/get`,
       headers: [],
       queryParams: [],
       body: { mode: 'none' },
@@ -136,7 +142,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
   it('normalizes lowercase HTTP methods (e.g. get, post) without throwing', async () => {
     const req: HttpRequest = {
       method: 'get' as any,
-      url: 'https://httpbin.org/get',
+      url: `${target.url}/get`,
       headers: [],
       queryParams: [],
       body: { mode: 'none' },
@@ -150,7 +156,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
   it('removes Content-Type header variants case-insensitively for form-data to preserve boundary', async () => {
     const req: HttpRequest = {
       method: 'POST',
-      url: 'https://httpbin.org/post',
+      url: `${target.url}/post`,
       headers: [{ key: 'CONTENT-TYPE', value: 'application/json', enabled: true }],
       queryParams: [],
       body: {

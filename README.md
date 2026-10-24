@@ -1,185 +1,95 @@
-# ReaAPI Studio 🚀
-### Next-Generation, Git-Native, Zero-Cloud API Platform & Autonomous Traffic Reverse-Engineering Engine
+# Rea API Studio
 
-<p align="center">
-  <img src="assets/preview.png" alt="ReaAPI Studio Live Interface" width="100%" style="border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);" />
-</p>
+A small, local API workbench with HTTP traffic capture and inferred OpenAPI exports. An independent MIT-licensed side project.
 
-<p align="center">
-  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node.js-v20%2B-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" /></a>
-  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
-  <a href="https://vitest.dev"><img src="https://img.shields.io/badge/Tests-39%20Passing%20(100%25)-success?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" /></a>
-  <img src="https://img.shields.io/badge/Memory_Baseline-~39MB_RSS-brightgreen?style=for-the-badge" alt="RAM Baseline" />
-  <img src="https://img.shields.io/badge/Cold_Start-%3C50ms-blue?style=for-the-badge" alt="Cold Start" />
-  <img src="https://img.shields.io/badge/Zero--Cloud_Mandate-100%25_Offline-blueviolet?style=for-the-badge" alt="Zero Cloud" />
-  <img src="https://img.shields.io/badge/UI%2FUX-Awwwards_Grade-orange?style=for-the-badge" alt="Awwwards UI" />
-</p>
+![Rea API Studio](assets/preview.png)
 
----
+## Run locally
 
-## ⚡ Executive Overview
+Requires **Node.js 22+** and npm.
 
-**ReaAPI Studio** is an ultra-fast, local-first API workbench and clean-room reverse-engineering platform. Engineered by senior developers with deep knowledge of Postman's internal business logic, ReaAPI Studio eliminates every single annoyance that has plagued API development for years:
-
-- ❌ **No 1.2 GB Electron bloat**: ReaAPI Studio runs under **40 MB RSS**, starting in less than **50 ms**.
-- ❌ **No mandatory cloud accounts or paywalls**: 100% offline with zero cloud telemetry. Your proprietary endpoints and tokens never touch third-party servers.
-- ❌ **No monolithic Git merge conflicts**: All collections and environments are serialized into clean, multi-file JSON trees (`.rea-api/collections/<id>.json`).
-- ❌ **No manual schema typing**: A built-in high-speed sniffer proxy on port `8085` intercepts live HTTP traffic and automatically infers **OpenAPI 3.1.0 specifications** and **strongly typed TypeScript client SDKs**.
-- 🎨 **Awwwards-Tier Visuals**: Inspired by [Emotion Agency](https://emotion-agency.com/) and [Chande Bootcamp](https://www.chandebootcamp.com/), featuring an Obsidian Dark glassmorphic palette, custom **Quantum Aperture** brand identity, Chande hacker text scrambler, Emotion Agency rolling-text button, Lenis smooth scrolling, and Anime.js kinetic metric counters.
-
----
-
-## 📊 Postman vs. ReaAPI Studio Benchmark
-
-| Metric | Postman Desktop | ReaAPI Studio | Advantage |
-| :--- | :--- | :--- | :--- |
-| **Cold Startup Time** | 5,200 ms – 12,400 ms | **< 50 ms** | ⚡ **99% Faster** |
-| **Idle Memory (RSS)** | 850 MB – 1,450 MB | **~39.9 MB** | 📉 **97% Less RAM** |
-| **Runtime Overhead** | Heavy Electron + Chromium | Lightweight Node.js + Micro-Server | 🪶 **Zero Bloat** |
-| **Data Privacy & Storage** | Proprietary Cloud Sync | **Git-Native Multi-File JSON** | 🔒 **100% Sovereign** |
-| **Merge Conflict Risk** | Monolithic JSON Blobs | **Modular Folder Structure** | 🛡️ **Conflict-Free** |
-| **V8 Sandbox Security** | Prototype Traversal Vulnerable | **Hardened Proxy Membrane** | 🛡️ **RCE Immune** |
-| **Reverse-Engineering** | ❌ Manual typing | **Autonomous Live Traffic Proxy** | ✨ **Auto OpenAPI 3.1** |
-| **Client Code Generation** | Basic cURL / Fetch | **cURL, Fetch, Python, Go, TypeScript SDK** | 📦 **Strongly Typed SDKs** |
-
----
-
-## 🏛️ System Architecture
-
-```
-                               USER INTERFACE (Awwwards Design)
-               ┌──────────────────────────────────────────────────────────────┐
-               │   ReaAPI Studio Web & Desktop UI (http://localhost:4040)     │
-               └──────────────────────────────┬───────────────────────────────┘
-                                              │ REST / WebSocket
-                                              ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                     REA STUDIO SERVER                                        │
-│                                                                                              │
-│   ┌───────────────────────────┐    ┌───────────────────────────┐   ┌─────────────────────┐   │
-│   │   Collections Manager     │    │   Environment Manager     │   │ Top-Level Error     │   │
-│   │  .rea-api/collections/    │    │  .rea-api/environments/   │   │ Normalization Gate  │   │
-│   └─────────────┬─────────────┘    └─────────────┬─────────────┘   └──────────┬──────────┘   │
-│                 │                                │                            │              │
-│                 ▼                                ▼                            ▼              │
-│   ┌──────────────────────────────────────────────────────────────────────────────────────┐   │
-│   │                                   CORE ENGINE                                        │   │
-│   │                                                                                      │   │
-│   │  ┌───────────────────────┐   ┌────────────────────────┐   ┌───────────────────────┐  │   │
-│   │  │   VariableResolver    │──▶│      HttpExecutor      │◀──│     ScriptSandbox     │  │   │
-│   │  │  Whitespace/Recursive │   │  URL Auto-Prefix/Proxy │   │ Sealed Proxy Membrane │  │   │
-│   │  │  Precedence Hierarchy │   │  Multipart & URL-Encode│   │ Postman Chai (`pm.*`) │  │   │
-│   │  └───────────────────────┘   └───────────┬────────────┘   └───────────────────────┘  │   │
-│   │                                          │                                           │   │
-│   └──────────────────────────────────────────┼───────────────────────────────────────────┘   │
-└──────────────────────────────────────────────┼───────────────────────────────────────────────┘
-                                               │ HTTP / HTTPS
-                                               ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────┐
-│                        🛰️ AUTONOMOUS TRAFFIC SNIFFER PROXY (:8085)                           │
-│                                                                                              │
-│   Incoming Target Traffic ──▶ [ Circular FIFO Ring Buffer (Max 500 Records) ]                │
-│                                           │                                                  │
-│                                           ├──▶ Strip Hop-by-Hop & Decompressed Gzip Headers  │
-│                                           │                                                  │
-│                                           ▼                                                  │
-│                     ┌──────────────────────────────────────────┐                             │
-│                     │       REVERSE-ENGINEERING PIPELINE       │                             │
-│                     │                                          │                             │
-│                     │  • Mongo ObjectId & Stripe ID Heuristics │                             │
-│                     │  • Deep Path Parameter Deduplication     │                             │
-│                     │  • Recursive JSON Schema Inference       │                             │
-│                     └─────────────────────┬────────────────────┘                             │
-│                                           │                                                  │
-│                     ┌─────────────────────┴────────────────────┐                             │
-│                     ▼                                          ▼                             │
-│         ✨ OpenAPI 3.1.0 Specification             📦 Strongly Typed TypeScript SDK          │
-│            (Fully Merged Schemas)                     (camelCase, Interfaces & Methods)      │
-└──────────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🎨 Awwwards-Tier UI/UX Experience
-
-### 1. The Quantum Aperture Logo
-An isometric hexagonal quantum aperture formed by three interlocking kinetic gradient vectors:
-- **Cyber Cyan Ribbon (`#00f0ff` $\rightarrow$ `#2563eb`)**: Symbolizes raw HTTP wire packet interception.
-- **Electric Violet Ribbon (`#c084fc` $\rightarrow$ `#7c3aed`)**: Symbolizes the clean-room decompiler engine and Postman Chai sandbox.
-- **Emerald Ribbon (`#34d399` $\rightarrow$ `#059669`)**: Symbolizes clean-room OpenAPI 3.1 and client SDK emission.
-- **Pulsing Radar Center Node**: Continuous breathing radial pulse animation (`@keyframes radarPulse`).
-
-### 2. Micro-Interactions & Motion Choreography
-- **Chande Bootcamp Hacker Text Scrambler (`data-scramble`)**: Hovering over buttons, badges, and headers triggers a dynamic character-by-character decryption effect from cyber symbols (`!<>-_\\/[]{}=+*^?#%&$01`) with locked character widths.
-- **Emotion Agency Rolling-Text Send Button**: Hovering over the Send button smoothly rolls the label upward (`🚀 Send` $\rightarrow$ `⚡ Dispatch Wire` in Cyber Cyan) accompanied by a luminous purple/cyan shadow bloom.
-- **Anime.js Kinetic Numeric Counters**: Response latency (`res-time`) and payload size (`res-size`) count up dynamically with `easeOutExpo` easing over 750ms.
-- **Lenis Smooth Inertial Scrolling**: 60fps momentum scrolling on long JSON responses and traffic tables.
-- **Figma-Style Vector Cursor**: Custom vector arrow cursor with neon border and ambient follower ring (`cursor: text` strictly protected on editors and inputs).
-
----
-
-## 🛠️ Core Engine Highlights
-
-### 1. 🛡️ Hardened RCE-Immune Script Sandbox
-Host objects (`pm`, `console`, `JSON`, `Math`, `Date`) are encapsulated within a secure proxy membrane. Any attempt to traverse `.constructor`, `.__proto__`, or `.prototype` to escape into host `process` or file systems is trapped and blocked immediately. Supports complete Postman Chai assertions:
-```javascript
-pm.test("Status code is 200 OK", function () {
-    pm.response.to.have.status(200);
-    pm.expect(pm.response.code).to.equal(200);
-});
-
-pm.test("Response is valid JSON object", function () {
-    pm.response.to.be.json;
-    const body = pm.response.json();
-    pm.expect(body.data).to.be.an("array");
-});
-```
-
-### 2. ⚡ Crash-Immune HttpExecutor
-Automatically prefixes `http://` for bare URLs (`localhost:3000` $\rightarrow$ `http://localhost:3000`), handles `multipart/form-data` with dynamic boundaries, and maps low-level system errors (`ENOTFOUND`, `ECONNREFUSED`, `ETIMEDOUT`, `CERT_HAS_EXPIRED`) into human-readable cards with actionable debugging advice.
-
-### 3. 🛰️ Live Sniffer & Auto-Reverse-Engineering Proxy
-Route any application or cURL request through `http://localhost:8085`:
-```bash
-curl -x http://localhost:8085 https://api.example.com/v1/users/654c1b2a9e3f1a0012bc4d5e
-```
-The sniffer automatically recognizes path parameters (MongoDB ObjectId, Stripe ID, UUID), collapses duplicate routes, generates complete JSON Schemas, and emits **OpenAPI 3.1.0** and **TypeScript Client SDKs** with one click.
-
----
-
-## 🚀 Quick Start Guide
-
-### 1. Clone & Install
-```bash
+```sh
 git clone https://github.com/abrar225/rea-api-studio.git
 cd rea-api-studio
-npm install
-```
-
-### 2. Launch the Studio
-```bash
+npm ci
+npm run build
 npm start
 ```
-*ReaAPI Studio will automatically launch and open `http://localhost:4040` in your browser!*
 
-### 3. Run Automated Tests
-```bash
-npm test
+Open **http://localhost:4040/studio** for the workbench or **http://localhost:4040/** for the product site. The services bind to `127.0.0.1`. Set `PORT` and `SNIFFER_PORT` to change the defaults (4040 and 8085). If a port is occupied, the service tries the next one; the interface reports the actual proxy port.
+
+The website published on [GitHub Pages](https://abrar225.github.io/rea-api-studio/) contains a clearly labeled sample preview and installation instructions. **GitHub Pages cannot run the Node API or save local collections.**
+
+## What works
+
+- HTTP requests with query parameters, headers, JSON/text, URL-encoded and text multipart bodies.
+- Bearer, Basic, and API-key authentication.
+- Local collections, nested imported folders, environments, and variables.
+- Pre-request JavaScript, response tests using a subset of `pm.*`, and console output.
+- Postman v2.1 collection import/export and basic cURL import.
+- Response search, copy, download, and cURL/Fetch/Python/Go snippets.
+- Forward HTTP traffic through a local proxy; inspect the last 500 records in memory.
+- Infer JSON schemas and common path IDs; preview OpenAPI 3.1 JSON and a TypeScript client draft.
+
+## Capture traffic
+
+Forward to a target with the proxy's path format:
+
+```sh
+curl http://localhost:8085/https://httpbin.org/json
 ```
-*Runs all 39 tests across 8 test suites with Vitest.*
 
----
+Or specify the target in a header:
 
-## 📦 Multi-Language Code Snippet Generator
+```sh
+curl http://localhost:8085/ -H 'X-Target-Url: https://httpbin.org/json'
+```
 
-Export any configured request to production-ready client code with one click:
-- **cURL**: Command line with auto-headers, query params, and body payload.
-- **JavaScript (Fetch)**: Native modern asynchronous fetch with async/await.
-- **Python (requests)**: Clean, idiomatic Python requests script with dictionary headers.
-- **Go (net/http)**: Complete Go package with custom HTTP client and buffer handling.
+For **plain HTTP targets**, a standard HTTP proxy request also works:
 
----
+```sh
+curl -x http://localhost:8085 http://example.com/
+```
 
-## 📄 License
+The proxy does **not** implement HTTPS CONNECT interception. `curl -x ... https://...` is not a supported capture workflow. The path/header format can forward to HTTPS targets, but does not intercept encrypted browser tunnels.
 
-This project is licensed under the [MIT License](LICENSE).
+## Data and trust
+
+Workspace data is stored under `.rea-api/collections/` and `.rea-api/environments/`. Legacy monolithic mirror files remain for compatibility. These files are readable JSON, not encrypted storage, and are ignored by Git by default. If you explicitly version collections, exclude credentials first; files do not make merge conflicts impossible. Existing tracked workspace examples from earlier releases are no longer tracked by this revision; local files are preserved.
+
+After installation/build, fonts, icons, and scripts are served locally. Calls to remote APIs still need a network connection. There is no implemented Rea telemetry service in this source tree.
+
+Only run scripts and imported collection scripts you trust. The current engine uses `node:vm` and a defensive wrapper; this is **not an isolation boundary for hostile code**. The server now rejects foreign browser origins and hosts, but it is not an authenticated multi-user server. Do not expose it publicly. Captured traffic may include credentials; it is held in memory and is not automatically redacted.
+
+## Current limits
+
+This is not a complete Postman replacement. There is no dedicated GraphQL/gRPC/WebSocket/MQTT client, OAuth flow manager, cookie jar, collection runner, monitor, mock server, team sync, role management, or plugin ecosystem. GraphQL can be sent manually as HTTP JSON.
+
+Postman import is partial: inherited auth/scripts and several advanced body/auth modes are unsupported. Imported URLs with a query in both `url.raw` and `url.query` can duplicate parameters. Raw text is currently imported as JSON. Inferred specifications describe observed examples, not a complete contract; falsy JSON bodies and same-path operations from different hosts need particular review. Generated SDKs/snippets need review and do not guarantee production correctness.
+
+See the [product assessment](docs/PRODUCT_ASSESSMENT.md) for evidence, a broad capability inventory, weighted ratings, and priorities. The original speed/memory comparisons with Postman were not reproducible benchmarks and have been removed. Server RSS excludes browser memory.
+
+## Development and checks
+
+```sh
+npm run check        # TypeScript + local web bundles + all tests
+npm audit            # Dependency audit; results vary with advisory updates
+npm run dev          # Build, then restart server when dist changes
+npm run build:web    # Rebundle frontend after changing web/*
+```
+
+Tests use real loopback HTTP fixtures and temporary workspaces. They do not depend on a public echo service or modify your `.rea-api` directory. Frontend CSS and the existing application logic are separate from `studio.html`; editing `public/app.js` or the hand-authored CSS takes effect on reload. Rebuild after changing bundled modules or server TypeScript.
+
+`node scripts/assessment-probes.mjs` reproduces known compatibility/spec limitations; it is diagnostic evidence, not a passing conformance suite.
+
+GitHub Actions builds and tests Node 22 and 24. A separate workflow publishes **only `dist-site/`** to GitHub Pages on updates to `main`.
+
+## Design
+
+[DESIGN.md](DESIGN.md) documents the reference research, chosen palette, original SVG logo, type system, responsive layout, and motion rules. GSAP handles the homepage intro and product reveal, Lenis handles homepage scrolling, and Anime.js handles user-triggered sample/metric transitions. Reduced-motion preferences disable decorative motion. The workbench retains native scrolling.
+
+The reference sites are inspiration, not assets copied into the product. The identity is original vector work; similarity/trademark clearance has not been performed. Third-party package licenses, including GSAP's own license, are listed in [third-party notices](docs/THIRD_PARTY_NOTICES.md).
+
+## License
+
+[MIT](LICENSE) for this project's source. Third-party libraries and fonts retain their respective licenses.

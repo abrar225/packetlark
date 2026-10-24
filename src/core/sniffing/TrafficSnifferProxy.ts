@@ -58,14 +58,19 @@ export class TrafficSnifferProxy {
 
     return new Promise((resolve, reject) => {
       this.server = http.createServer(async (req, res) => {
-        // Handle CORS preflight for browser clients
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', '*');
-        res.setHeader('Access-Control-Allow-Headers', '*');
-
-        if (req.method === 'OPTIONS') {
-          res.writeHead(204);
-          res.end();
+        const host = req.headers.host || '';
+        // Absolute-form HTTP proxy requests carry the target Host, not our Host.
+        // Browser-origin requests are still rejected, and origin-form routes must
+        // address the loopback proxy itself (also preventing hostname rebinding).
+        let absoluteForm = false;
+        try {
+          const target = new URL(req.url || '');
+          absoluteForm = ['http:', 'https:'].includes(target.protocol) && host === target.host;
+        } catch {}
+        const localHost = [`localhost:${this.port}`, `127.0.0.1:${this.port}`].includes(host);
+        if ((!localHost && !absoluteForm) || req.headers.origin) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Use the local proxy from a trusted HTTP client' }));
           return;
         }
 
@@ -215,7 +220,7 @@ export class TrafficSnifferProxy {
         });
       });
 
-      this.server.listen(this.port, () => {
+      this.server.listen(this.port, '127.0.0.1', () => {
         this.isCapturing = true;
         resolve(this.port);
       });
@@ -223,7 +228,7 @@ export class TrafficSnifferProxy {
       this.server.on('error', (err: any) => {
         if (err.code === 'EADDRINUSE') {
           this.port += 1;
-          this.server?.listen(this.port);
+          this.server?.listen(this.port, '127.0.0.1');
         } else {
           reject(err);
         }

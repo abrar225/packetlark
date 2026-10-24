@@ -1,2658 +1,452 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ReaAPI Studio — Next-Gen Clean-Room Reverse Engineering & API Workbench</title>
-  
-  <!-- Modern Typography Pairing: Space Grotesk (Display), Plus Jakarta Sans (UI), JetBrains Mono (Code) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Production Animation & Iconography Libraries with Offline Resilience -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-
-  <style>
-    /* ==========================================================================
-       Awwwards Obsidian Dark & Neon Luminous Design Tokens (Emotion Agency Inspired)
-       ========================================================================== */
-    :root {
-      --bg-abyss: #07080c;
-      --bg-dark: #0a0c13;
-      --bg-card: #10131d;
-      --bg-panel: #141824;
-      --bg-input: #0b0d14;
-      --bg-hover: #1c2233;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-subtle: rgba(255, 255, 255, 0.04);
-      --border-focus: #9047ff;
-      --border-glow: rgba(144, 71, 255, 0.4);
-      --text: #f3f5fa;
-      --text-muted: #848ca2;
-      --text-dim: #545b70;
-      
-      --primary: #9047ff;
-      --primary-rgb: 144, 71, 255;
-      --primary-hover: #a855f7;
-      --primary-glow: rgba(144, 71, 255, 0.35);
-
-      --cyber-cyan: #00f0ff;
-      --cyber-cyan-rgb: 0, 240, 255;
-      --cyber-cyan-glow: rgba(0, 240, 255, 0.35);
-
-      --emerald: #10b981;
-      --emerald-rgb: 16, 185, 129;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', 'Geist Mono', 'Consolas', monospace;
-
-      --radius-xs: 4px;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-pill: 9999px;
-    }
-
-    /* ==========================================================================
-       Sleek Figma-Style Vector Arrow Cursor System
-       ========================================================================== */
-    body {
-      background: var(--bg-abyss);
-      color: var(--text);
-      font-family: var(--font-sans);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 3L11.5 21L14.5 13.5L22 10.5L4 3Z" fill="%230c0e16" stroke="%239047ff" stroke-width="1.8" stroke-linejoin="round"/></svg>'), default;
-    }
-
-    /* Protected Text Cursor on inputs and code editors */
-    input, textarea, .code-editor, .url-input, .kv-input, pre {
-      cursor: text !important;
-    }
-
-    button, select, a, .tab-btn, .nav-btn, .collection-label, .tree-folder-title, .request-item, .icon-btn {
-      cursor: pointer;
-    }
-
-    /* Ambient Cursor Follower */
-    .cursor-follower {
-      position: fixed;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1px solid rgba(144, 71, 255, 0.45);
-      background: radial-gradient(circle, rgba(144, 71, 255, 0.15) 0%, transparent 70%);
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 99999;
-      opacity: 0;
-      transition: opacity 0.25s ease, width 0.2s ease, height 0.2s ease;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    /* Custom Slim Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.15);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(144, 71, 255, 0.4);
-    }
-
-    /* ==========================================================================
-       Top Navigation & Brand Architecture
-       ========================================================================== */
-    header {
-      background: rgba(16, 19, 29, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      flex-shrink: 0;
-      z-index: 100;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      user-select: none;
-    }
-
-    /* Quantum Aperture Brand Logo */
-    .quantum-aperture-logo {
-      width: 32px;
-      height: 32px;
-      flex-shrink: 0;
-      filter: drop-shadow(0 0 10px rgba(144, 71, 255, 0.4));
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .quantum-aperture-logo:hover {
-      transform: scale(1.08) rotate(4deg);
-    }
-
-    @keyframes radarPulse {
-      0% { transform: scale(0.9); opacity: 0.8; filter: drop-shadow(0 0 2px #00f0ff); }
-      50% { transform: scale(1.35); opacity: 1; filter: drop-shadow(0 0 10px #00f0ff); }
-      100% { transform: scale(0.9); opacity: 0.8; filter: drop-shadow(0 0 2px #00f0ff); }
-    }
-    .radar-ping {
-      transform-origin: 24px 24px;
-      animation: radarPulse 2.4s ease-in-out infinite;
-    }
-
-    .brand-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand-name {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.4px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-    }
-
-    .brand-gradient-text {
-      background: linear-gradient(135deg, #00f0ff, #9047ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-right: 4px;
-    }
-
-    .brand-badge {
-      background: rgba(144, 71, 255, 0.15);
-      border: 1px solid rgba(144, 71, 255, 0.4);
-      color: #c084fc;
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: var(--radius-pill);
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .nav-btn {
-      background: rgba(20, 24, 36, 0.7);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 7px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      white-space: nowrap;
-      position: relative;
-    }
-
-    .nav-btn:hover {
-      background: rgba(30, 36, 54, 0.85);
-      border-color: rgba(144, 71, 255, 0.5);
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(144, 71, 255, 0.25);
-      transform: translateY(-1px);
-    }
-
-    .nav-btn.active {
-      background: linear-gradient(135deg, rgba(144, 71, 255, 0.35), rgba(0, 240, 255, 0.2));
-      border-color: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(144, 71, 255, 0.35);
-    }
-
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
-      background: rgba(11, 13, 20, 0.75);
-      padding: 5px 12px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--emerald);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
-      animation: pulse-emerald 2s infinite;
-    }
-
-    @keyframes pulse-emerald {
-      0% { opacity: 0.6; transform: scale(0.9); }
-      50% { opacity: 1; transform: scale(1.2); }
-      100% { opacity: 0.6; transform: scale(0.9); }
-    }
-
-    /* ==========================================================================
-       App Layout & Glassmorphism Panels
-       ========================================================================== */
-    .app-body {
-      display: flex;
-      flex: 1;
-      height: calc(100vh - 56px);
-      overflow: hidden;
-    }
-
-    aside {
-      width: 300px;
-      background: var(--bg-card);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .sidebar-header {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(16, 19, 29, 0.5);
-    }
-
-    .sidebar-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-family: var(--font-display);
-    }
-
-    .icon-btn {
-      background: none;
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: var(--radius-xs);
-      font-size: 13px;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .icon-btn:hover {
-      color: var(--text);
-      background: var(--bg-panel);
-      border-color: var(--border);
-    }
-
-    .collection-tree {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px 8px;
-    }
-
-    .collection-node {
-      margin-bottom: 10px;
-    }
-
-    .collection-label {
-      padding: 7px 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-      user-select: none;
-      transition: all 0.15s ease;
-    }
-
-    .collection-label:hover {
-      background: rgba(255, 255, 255, 0.04);
-      color: #ffffff;
-    }
-
-    .tree-folder {
-      margin-left: 12px;
-      border-left: 1px dashed rgba(255, 255, 255, 0.08);
-      padding-left: 4px;
-    }
-
-    .tree-folder-title {
-      padding: 6px 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: var(--radius-xs);
-      user-select: none;
-      transition: all 0.15s ease;
-    }
-
-    .tree-folder-title:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .request-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      margin-bottom: 2px;
-    }
-
-    .request-item:hover {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .request-item.selected {
-      background: rgba(144, 71, 255, 0.14);
-      border-left: 2px solid var(--primary);
-    }
-
-    .req-main-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      flex: 1;
-    }
-
-    .dirty-dot {
-      color: var(--warning);
-      font-size: 14px;
-      line-height: 1;
-      margin-left: 4px;
-      animation: pulse-dirty 1.5s infinite;
-    }
-
-    @keyframes pulse-dirty {
-      0% { opacity: 0.5; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
-    }
-
-    /* Method Badges */
-    .method-badge {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: var(--radius-xs);
-      letter-spacing: 0.3px;
-      flex-shrink: 0;
-    }
-
-    .method-get {
-      background: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-      border: 1px solid rgba(16, 185, 129, 0.35);
-    }
-    .method-post {
-      background: rgba(0, 240, 255, 0.15);
-      color: #00f0ff;
-      border: 1px solid rgba(0, 240, 255, 0.35);
-    }
-    .method-put {
-      background: rgba(245, 158, 11, 0.15);
-      color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-    .method-delete {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.35);
-    }
-    .method-patch {
-      background: rgba(168, 85, 247, 0.15);
-      color: #c084fc;
-      border: 1px solid rgba(168, 85, 247, 0.35);
-    }
-    .method-options, .method-head {
-      background: rgba(148, 163, 184, 0.15);
-      color: #94a3b8;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-    }
-
-    /* ==========================================================================
-       Main Workspace & Dispatch Bar
-       ========================================================================== */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: var(--bg-abyss);
-    }
-
-    .dispatch-bar {
-      padding: 14px 20px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .method-select {
-      background: var(--bg-input);
-      color: #ffffff;
-      border: 1px solid var(--border);
-      padding: 9px 12px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 13px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .method-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-glow);
-    }
-
-    .url-input {
-      flex: 1;
-      background: var(--bg-input);
-      color: #ffffff;
-      border: 1px solid var(--border);
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-mono);
-      font-size: 13px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .url-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-glow);
-    }
-
-    .save-btn {
-      background: rgba(20, 24, 36, 0.85);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .save-btn:hover {
-      background: rgba(30, 36, 54, 0.95);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .save-btn.is-dirty {
-      border-color: var(--warning);
-      color: #ffffff;
-    }
-
-    /* ==========================================================================
-       Emotion Agency Rolling-Text Send Button
-       ========================================================================== */
-    .send-btn {
-      position: relative;
-      background: linear-gradient(135deg, #7c3aed, #9047ff);
-      color: #ffffff;
-      border: none;
-      border-radius: var(--radius-sm);
-      height: 38px;
-      padding: 0 20px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      overflow: hidden;
-      box-shadow: 0 4px 18px rgba(144, 71, 255, 0.4);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .send-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 25px rgba(144, 71, 255, 0.65), 0 0 16px rgba(0, 240, 255, 0.4);
-    }
-
-    .send-btn:active {
-      transform: translateY(1px);
-    }
-
-    .send-btn-track {
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.35s cubic-bezier(0.625, 0.05, 0, 1);
-      height: 20px;
-      line-height: 20px;
-    }
-
-    .send-btn:hover .send-btn-track {
-      transform: translateY(-20px);
-    }
-
-    .send-btn-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      height: 20px;
-      line-height: 20px;
-      white-space: nowrap;
-    }
-
-    .send-btn-alt {
-      color: var(--cyber-cyan);
-      text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
-    }
-
-    /* ==========================================================================
-       Tab Navigation & Split Workspace
-       ========================================================================== */
-    .tab-nav {
-      background: rgba(16, 19, 29, 0.65);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 16px;
-      height: 42px;
-      flex-shrink: 0;
-    }
-
-    .tab-nav-left {
-      display: flex;
-      gap: 4px;
-      height: 100%;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      padding: 0 14px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      position: relative;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .tab-btn:hover {
-      color: var(--text);
-    }
-
-    .tab-btn.active {
-      color: #ffffff;
-    }
-
-    .tab-btn.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #9047ff, #00f0ff);
-      box-shadow: 0 0 8px rgba(144, 71, 255, 0.8);
-    }
-
-    .split-pane {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .request-pane {
-      flex: 1;
-      border-right: 1px solid var(--border);
-      padding: 16px 20px;
-      overflow-y: auto;
-      background: var(--bg-surface);
-    }
-
-    .response-pane {
-      flex: 1.1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: var(--bg-card);
-    }
-
-    /* Key-Value Tables */
-    .kv-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    .kv-table th {
-      text-align: left;
-      padding: 8px 10px;
-      color: var(--text-muted);
-      font-weight: 600;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .kv-table td {
-      padding: 6px 8px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .kv-input {
-      width: 100%;
-      background: var(--bg-input);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: var(--radius-xs);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      outline: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .kv-input:focus {
-      border-color: var(--primary);
-    }
-
-    .code-editor {
-      width: 100%;
-      background: var(--bg-input);
-      color: #e2e8f0;
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.6;
-      outline: none;
-      resize: vertical;
-      min-height: 160px;
-      white-space: pre;
-      tab-size: 2;
-      transition: border-color 0.2s ease;
-    }
-
-    .code-editor:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-glow);
-    }
-
-    /* Response View Styles */
-    .response-header {
-      padding: 10px 16px;
-      background: rgba(16, 19, 29, 0.7);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .response-stats {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stat-badge {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: var(--radius-xs);
-      font-weight: 600;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-    }
-
-    .stat-status {
-      font-weight: 700;
-    }
-
-    .stat-time {
-      color: var(--cyber-cyan);
-    }
-
-    .stat-size {
-      color: #c084fc;
-    }
-
-    .response-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .response-body-view {
-      flex: 1;
-      padding: 16px;
-      overflow: auto;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-all;
-      background: #090b10;
-      color: #e2e8f0;
-    }
-
-    /* Search Bar in Response */
-    .search-bar-container {
-      display: none;
-      padding: 8px 16px;
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border);
-      align-items: center;
-      gap: 8px;
-    }
-
-    .search-input {
-      flex: 1;
-      background: var(--bg-input);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: var(--radius-xs);
-      font-size: 12px;
-      outline: none;
-    }
-
-    .search-input:focus {
-      border-color: var(--primary);
-    }
-
-    /* Console logs */
-    .console-line {
-      padding: 4px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: #cbd5e1;
-    }
-
-    /* Error Card */
-    .error-card {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 14px;
-      border-radius: var(--radius-sm);
-      margin-bottom: 12px;
-    }
-
-    .error-card-title {
-      font-weight: 700;
-      color: #ef4444;
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-
-    .error-card-msg {
-      font-size: 12px;
-      color: #f87171;
-      margin-bottom: 8px;
-    }
-
-    .error-card-guidance {
-      font-size: 11px;
-      color: #e2e8f0;
-      background: rgba(0, 0, 0, 0.25);
-      padding: 8px;
-      border-radius: var(--radius-xs);
-    }
-
-    /* ==========================================================================
-       Live Sniffer Screen
-       ========================================================================== */
-    #sniffer-screen {
-      display: none;
-      flex-direction: column;
-      flex: 1;
-      background: var(--bg-abyss);
-      overflow: hidden;
-    }
-
-    .sniffer-toolbar {
-      padding: 16px 20px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .traffic-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    .traffic-table th {
-      text-align: left;
-      padding: 10px 14px;
-      background: rgba(16, 19, 29, 0.85);
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-    }
-
-    .traffic-table td {
-      padding: 8px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      cursor: pointer;
-    }
-
-    .traffic-table tr:hover td {
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    /* ==========================================================================
-       Glassmorphic Modal Backdrop & Dialog
-       ========================================================================== */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-box {
-      width: 760px;
-      max-width: 90vw;
-      background: var(--bg-card);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: var(--radius-lg);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(144, 71, 255, 0.2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.96) translateY(10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .modal-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
-      font-size: 14px;
-      background: rgba(16, 19, 29, 0.5);
-    }
-
-    .modal-body {
-      padding: 20px;
-      overflow-y: auto;
-      max-height: 75vh;
-    }
-
-    .modal-footer {
-      padding: 12px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      background: rgba(16, 19, 29, 0.5);
-    }
-  </style>
-</head>
-<body>
-  <!-- Ambient Cursor Follower Ring -->
-  <div id="cursor-follower" class="cursor-follower"></div>
-
-  <!-- Header Navigation -->
-  <header>
-    <div class="brand">
-      <!-- The Quantum Aperture / Interceptor Prism Logo -->
-      <svg class="quantum-aperture-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="gradCyan" x1="6" y1="6" x2="42" y2="24" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#00f0ff" />
-            <stop offset="100%" stop-color="#2563eb" />
-          </linearGradient>
-          <linearGradient id="gradViolet" x1="42" y1="24" x2="16" y2="44" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#c084fc" />
-            <stop offset="100%" stop-color="#7c3aed" />
-          </linearGradient>
-          <linearGradient id="gradEmerald" x1="16" y1="44" x2="6" y2="6" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#34d399" />
-            <stop offset="100%" stop-color="#059669" />
-          </linearGradient>
-          <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        <g filter="url(#neonGlow)">
-          <path d="M24 4 L41.32 14 V24 L24 14 Z" fill="url(#gradCyan)" opacity="0.95" />
-          <path d="M41.32 24 V34 L24 44 L24 34 L35 27.5 Z" fill="url(#gradViolet)" opacity="0.95" />
-          <path d="M24 44 L6.68 34 V14 L18 20.5 V34 Z" fill="url(#gradEmerald)" opacity="0.95" />
-        </g>
-        <circle cx="24" cy="24" r="5" fill="#00f0ff" class="radar-ping" />
-        <circle cx="24" cy="24" r="2.5" fill="#ffffff" />
-      </svg>
-
-      <div class="brand-title-wrap">
-        <span class="brand-name">
-          Rea<span class="brand-gradient-text">API</span> Studio
-        </span>
-        <span class="brand-badge" data-scramble>v2.4 PRO</span>
-      </div>
-    </div>
-
-    <div class="header-actions">
-      <!-- Environment Selector & Quick Look -->
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Env:</span>
-        <select id="env-select" class="method-select" style="padding: 5px 10px; font-size: 11px;" onchange="onEnvironmentSelected(this.value)">
-          <option value="">No Environment</option>
-          <option value="__manage__">⚙️ Manage Environments...</option>
-        </select>
-        <button class="icon-btn" title="Environment Quick Look" onclick="openEnvironmentQuickLook()">👁️</button>
-      </div>
-
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        <span id="health-info" data-scramble>RAM: ~22MB | Zero-Cloud Mandate</span>
-      </div>
-
-      <button class="nav-btn active" id="btn-studio-view" data-scramble onclick="switchView('studio')">
-        Studio Workspace
-      </button>
-
-      <button class="nav-btn" id="btn-sniffer-view" data-scramble onclick="switchView('sniffer')">
-        🛰️ Live Sniffer (<span id="sniff-count">0</span>)
-      </button>
-
-      <button class="nav-btn" data-scramble onclick="openImportModal()">
-        📥 Import
-      </button>
-    </div>
-  </header>
-
-  <div class="app-body">
-    <!-- Studio View -->
-    <div id="studio-view" style="display: flex; flex: 1; width: 100%;">
-      <!-- Sidebar -->
-      <aside>
-        <div class="sidebar-header">
-          <span class="sidebar-title" data-scramble>Collections</span>
-          <div>
-            <button class="icon-btn" title="New Request" onclick="createNewRequest()">➕</button>
-            <button class="icon-btn" title="Export Postman" onclick="exportPostman()">💾</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="An open-source API workbench that stays on your machine. Send requests, capture HTTP traffic, and turn real responses into an OpenAPI starting point."
+    />
+    <meta name="theme-color" content="#101016" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      property="og:title"
+      content="Rea API Studio — Make sense of every request."
+    />
+    <meta
+      property="og:description"
+      content="Your APIs. Your machine. A little more clarity."
+    />
+    <meta property="og:type" content="website" />
+    <title>Rea API Studio — Make sense of every request.</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/landing.css" />
+    <link rel="stylesheet" href="landing.css" />
+    <script defer src="assets/landing.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="#" aria-label="Rea API Studio home"
+        ><img src="brand/rea-symbol.svg" width="40" height="40" alt="" /><span
+          >rea<span class="wordmark-detail"> / api studio</span></span
+        ></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#workbench">Workbench</a><a href="#capture">Traffic to spec</a
+        ><a href="#principles">Why Rea</a>
+      </nav>
+      <a class="header-github" href="https://github.com/abrar225/rea-api-studio"
+        ><i data-lucide="github"></i><span>GitHub</span
+        ><i data-lucide="arrow-up-right"></i
+      ></a>
+    </header>
+    <main id="main">
+      <section class="hero wrap">
+        <div class="hero-topline">
+          <span
+            ><span class="signal-dot"></span>A local space for your APIs</span
+          ><span class="release-note">Open source. Still taking shape.</span>
+        </div>
+        <div class="hero-composition">
+          <div class="hero-copy">
+            <h1>
+              <span>Make sense</span><span>of every</span><span>request.</span>
+            </h1>
+            <p>
+              From the first HTTP call to the shape of an API.<br />A focused
+              workbench, right on your machine.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#start"
+                ><span>Start building locally</span
+                ><i data-lucide="arrow-up-right"></i></a
+              ><a class="quiet-link" href="#workbench"
+                >Take a look inside<i data-lucide="arrow-down"></i
+              ></a>
+            </div>
+          </div>
+          <div class="signal-art" aria-hidden="true">
+            <div class="orbit-label label-request">
+              <span class="tiny-dot"></span>request.out
+            </div>
+            <svg class="signal-svg" viewBox="0 0 560 560" fill="none">
+              <defs>
+                <linearGradient
+                  id="ribbon"
+                  x1="110"
+                  y1="110"
+                  x2="460"
+                  y2="450"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stop-color="#ece5ff" />
+                  <stop offset=".4" stop-color="#bda9ff" />
+                  <stop offset="1" stop-color="#6e50bd" />
+                </linearGradient>
+                <pattern
+                  id="grid"
+                  width="35"
+                  height="35"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path d="M35 0H0V35" stroke="#bda9ff" stroke-opacity=".10" />
+                </pattern>
+              </defs>
+              <circle
+                cx="280"
+                cy="280"
+                r="251"
+                stroke="#bda9ff"
+                stroke-opacity=".12"
+              />
+              <circle
+                cx="280"
+                cy="280"
+                r="188"
+                stroke="#bda9ff"
+                stroke-opacity=".15"
+                stroke-dasharray="2 7"
+              />
+              <path
+                d="M0 280H560M280 0V560"
+                stroke="#bda9ff"
+                stroke-opacity=".1"
+              />
+              <circle cx="280" cy="280" r="250" fill="url(#grid)" />
+              <g class="signal-glyph">
+                <path
+                  d="M144 155h154c76 0 115 40 115 96s-39 96-115 96H203"
+                  stroke="#5e448f"
+                  stroke-width="58"
+                  transform="translate(12 17)"
+                />
+                <path
+                  d="M144 155h154c76 0 115 40 115 96s-39 96-115 96H203"
+                  stroke="url(#ribbon)"
+                  stroke-width="58"
+                />
+                <path
+                  d="M144 411V251h93M295 347l104 96"
+                  stroke="#5e448f"
+                  stroke-width="58"
+                  transform="translate(12 17)"
+                />
+                <path
+                  d="M144 411V251h93M295 347l104 96"
+                  stroke="url(#ribbon)"
+                  stroke-width="58"
+                />
+                <path
+                  d="m402 100 40 40-40 40"
+                  stroke="#f4f1ff"
+                  stroke-width="12"
+                />
+              </g>
+              <circle
+                class="packet packet-a"
+                cx="280"
+                cy="29"
+                r="5"
+                fill="#bda9ff"
+              />
+              <circle
+                class="packet packet-b"
+                cx="531"
+                cy="280"
+                r="4"
+                fill="#bda9ff"
+              />
+            </svg>
+            <div class="orbit-label label-response">
+              <span class="tiny-dot success"></span>response.in
+              <span>200 OK</span>
+            </div>
+            <div class="art-caption">
+              A little signal. A lot of possibility.
+            </div>
           </div>
         </div>
-        <div class="collection-tree" id="collection-tree">
-          <!-- Populated dynamically -->
+        <div class="hero-bottom">
+          <div><i data-lucide="hard-drive"></i>Local storage</div>
+          <div><i data-lucide="braces"></i>OpenAPI 3.1 export</div>
+          <div><i data-lucide="git-branch"></i>JSON you can version</div>
+          <a href="#workbench"
+            >Explore the workbench <i data-lucide="arrow-down"></i
+          ></a>
         </div>
-      </aside>
-
-      <!-- Main Workspace -->
-      <main>
-        <!-- URL dispatch bar -->
-        <div class="dispatch-bar">
-          <select class="method-select" id="req-method" onchange="markDirty()">
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="DELETE">DELETE</option>
-            <option value="PATCH">PATCH</option>
-            <option value="OPTIONS">OPTIONS</option>
-            <option value="HEAD">HEAD</option>
-          </select>
-          <input type="text" class="url-input" id="req-url" oninput="markDirty()" placeholder="https://api.example.com/v1/resource or {{baseUrl}}/endpoint" />
-
-          <button class="save-btn" id="btn-save-req" title="Save changes to collection (Ctrl+S)" onclick="saveActiveRequest()">
-            💾 Save <span id="dirty-badge" class="dirty-dot" style="display: none;">•</span>
-          </button>
-
-          <button class="nav-btn" title="Generate code snippet" data-scramble onclick="openCodeGeneratorModal()">
-            &lt;/&gt; Code
-          </button>
-
-          <!-- Emotion Agency Rolling-Text Send Button -->
-          <button class="send-btn" id="btn-send-main" onclick="sendActiveRequest()">
-            <span class="send-btn-track">
-              <span class="send-btn-label">🚀 Send <span style="font-size: 10px; opacity: 0.75;">(Ctrl+↵)</span></span>
-              <span class="send-btn-label send-btn-alt">⚡ Dispatch Wire</span>
-            </span>
-          </button>
-        </div>
-
-        <!-- Request Tabs -->
-        <div class="tab-nav">
-          <div class="tab-nav-left">
-            <button class="tab-btn active" onclick="switchReqTab('params')">Params</button>
-            <button class="tab-btn" onclick="switchReqTab('headers')">Headers (<span id="headers-count">0</span>)</button>
-            <button class="tab-btn" onclick="switchReqTab('body')">Body</button>
-            <button class="tab-btn" onclick="switchReqTab('auth')">Auth</button>
-            <button class="tab-btn" onclick="switchReqTab('scripts')">Scripts & Tests</button>
+      </section>
+      <section class="workbench-section" id="workbench">
+        <div class="wrap">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">The workbench</span>
+              <h2>Less between you<br />and the response.</h2>
+            </div>
+            <p>
+              Compose a request. Inspect the answer. <br />Keep your collections
+              close. <br />No account needed to begin.
+            </p>
           </div>
-        </div>
-
-        <!-- Split Pane: Request Config / Response -->
-        <div class="split-pane">
-          <div class="request-pane">
-            <!-- Params Tab -->
-            <div id="tab-params">
-              <table class="kv-table" id="params-table">
-                <thead>
-                  <tr>
-                    <th style="width: 30px;"></th>
-                    <th>Key</th>
-                    <th>Value</th>
-                    <th style="width: 30px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="params-tbody"></tbody>
-              </table>
-              <button class="nav-btn" style="margin-top: 12px;" onclick="addParamRow()">+ Add Parameter</button>
+          <div class="product-window">
+            <div class="window-top">
+              <div class="window-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span>Rea API Studio</span
+              ><span class="window-local"
+                ><span class="tiny-dot success"></span>Local workspace</span
+              >
             </div>
-
-            <!-- Headers Tab -->
-            <div id="tab-headers" style="display: none;">
-              <table class="kv-table" id="headers-table">
-                <thead>
-                  <tr>
-                    <th style="width: 30px;"></th>
-                    <th>Header</th>
-                    <th>Value</th>
-                    <th style="width: 30px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="headers-tbody"></tbody>
-              </table>
-              <button class="nav-btn" style="margin-top: 12px;" onclick="addHeaderRow()">+ Add Header</button>
-            </div>
-
-            <!-- Body Tab -->
-            <div id="tab-body" style="display: none;">
-              <div style="display: flex; gap: 16px; margin-bottom: 14px; font-size: 12px;">
-                <label><input type="radio" name="body-mode" value="none" checked onchange="changeBodyMode('none')"> none</label>
-                <label><input type="radio" name="body-mode" value="raw-json" onchange="changeBodyMode('raw-json')"> raw (JSON)</label>
-                <label><input type="radio" name="body-mode" value="raw-text" onchange="changeBodyMode('raw-text')"> raw (Text)</label>
-                <label><input type="radio" name="body-mode" value="form-data" onchange="changeBodyMode('form-data')"> form-data</label>
-                <label><input type="radio" name="body-mode" value="x-www-form-urlencoded" onchange="changeBodyMode('x-www-form-urlencoded')"> x-www-form-urlencoded</label>
-              </div>
-
-              <!-- Raw Textarea -->
-              <div id="body-raw-container">
-                <textarea class="code-editor" id="req-body-raw" oninput="markDirty()" placeholder='{\n  "key": "value"\n}'></textarea>
-              </div>
-
-              <!-- Key-Value Table for form-data and x-www-form-urlencoded -->
-              <div id="body-formdata-container" style="display: none;">
-                <table class="kv-table" id="formdata-table">
-                  <thead>
-                    <tr>
-                      <th style="width: 30px;"></th>
-                      <th>Key</th>
-                      <th>Value</th>
-                      <th style="width: 30px;"></th>
-                    </tr>
-                  </thead>
-                  <tbody id="formdata-tbody"></tbody>
-                </table>
-                <button class="nav-btn" style="margin-top: 12px;" onclick="addFormDataRow()">+ Add Form Field</button>
-              </div>
-            </div>
-
-            <!-- Auth Tab -->
-            <div id="tab-auth" style="display: none;">
-              <div style="margin-bottom: 14px;">
-                <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Type: </label>
-                <select class="method-select" id="auth-type" onchange="changeAuthType()">
-                  <option value="none">No Auth</option>
-                  <option value="bearer">Bearer Token</option>
-                  <option value="basic">Basic Auth</option>
-                  <option value="apikey">API Key</option>
-                </select>
-              </div>
-              <div id="auth-fields"></div>
-            </div>
-
-            <!-- Scripts Tab -->
-            <div id="tab-scripts" style="display: none;">
-              <div style="margin-bottom: 16px;">
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Pre-request Script (executed before dispatch):</div>
-                <textarea class="code-editor" style="height: 120px;" id="req-prerequest-script" oninput="markDirty()" placeholder='pm.environment.set("timestamp", Date.now());'></textarea>
-              </div>
-              <div>
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Test Scripts & Assertions (Postman Chai Compatible):</div>
-                <textarea class="code-editor" style="height: 180px;" id="req-test-script" oninput="markDirty()" placeholder='pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n    pm.expect(pm.response.code).to.equal(200);\n});\n\npm.test("Response is JSON", function () {\n    pm.response.to.be.json;\n});'></textarea>
+            <div class="demo-shell">
+              <aside class="demo-sidebar">
+                <span class="demo-section-title"
+                  >Collections <i data-lucide="plus"></i></span
+                ><span class="demo-folder"
+                  ><i data-lucide="folder"></i>My first API</span
+                ><button class="demo-request selected" data-demo="profile">
+                  <span>GET</span>Get a profile</button
+                ><button class="demo-request" data-demo="projects">
+                  <span>GET</span>List projects</button
+                ><span class="demo-storage"
+                  ><i data-lucide="hard-drive"></i>Saved on your machine</span
+                >
+              </aside>
+              <div class="demo-main">
+                <div class="demo-breadcrumb">
+                  My first API <span>/</span>
+                  <strong id="demo-title">Get a profile</strong
+                  ><span class="demo-badge">Interactive preview</span>
+                </div>
+                <div class="demo-url">
+                  <span>GET</span
+                  ><code id="demo-url">https://api.example.com/v1/profile</code
+                  ><button id="demo-send">
+                    Send<i data-lucide="arrow-up-right"></i>
+                  </button>
+                </div>
+                <div class="demo-tabs">
+                  <span class="active">Response</span><span>JSON</span
+                  ><span class="demo-status" id="demo-status" role="status"
+                    >Sample response</span
+                  >
+                </div>
+                <div class="demo-code">
+                  <div class="line-numbers" aria-hidden="true">
+                    1<br />2<br />3<br />4<br />5<br />6<br />7<br />8<br />9
+                  </div>
+                  <pre id="demo-code">{
+  <span class="code-key">"name"</span>: <span class="code-string">"Alex Morgan"</span>,
+  <span class="code-key">"role"</span>: <span class="code-string">"Developer"</span>,
+  <span class="code-key">"workspace"</span>: {
+    <span class="code-key">"name"</span>: <span class="code-string">"A good place to build"</span>,
+    <span class="code-key">"local"</span>: <span class="code-bool">true</span>
+  },
+  <span class="code-key">"ready"</span>: <span class="code-bool">true</span>
+}</pre>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- Response Pane -->
-          <div class="response-pane">
-            <div class="response-header">
-              <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); font-family: var(--font-display);">RESPONSE</span>
-              <div class="response-stats">
-                <span class="stat-badge stat-status" id="res-status">-</span>
-                <span class="stat-badge stat-time" id="res-time">- ms</span>
-                <span class="stat-badge stat-size" id="res-size">- KB</span>
-              </div>
-              <div class="response-actions">
-                <button class="icon-btn" title="Search in Response (Ctrl+F)" onclick="toggleResponseSearch()">🔍</button>
-                <button class="icon-btn" title="Copy Response Body" onclick="copyResponseBody()">📋</button>
-                <button class="icon-btn" title="Download Response" onclick="downloadResponseBody()">💾</button>
-              </div>
-            </div>
-
-            <!-- Inline Search Bar -->
-            <div class="search-bar-container" id="res-search-container">
-              <input type="text" class="search-input" id="res-search-input" placeholder="Search in response..." oninput="filterResponseSearch(this.value)">
-              <button class="icon-btn" onclick="toggleResponseSearch()">✕</button>
-            </div>
-
-            <div class="tab-nav">
-              <div class="tab-nav-left">
-                <button class="tab-btn active" onclick="switchResTab('body')">Body</button>
-                <button class="tab-btn" onclick="switchResTab('headers')">Headers</button>
-                <button class="tab-btn" onclick="switchResTab('tests')">Test Results (<span id="tests-count">0</span>)</button>
-                <button class="tab-btn" onclick="switchResTab('logs')">Console (<span id="logs-count">0</span>)</button>
-              </div>
-            </div>
-
-            <div class="response-body-view" id="res-body">Send a request to inspect response details.</div>
-            <div class="response-body-view" id="res-headers" style="display: none;"></div>
-            <div class="response-body-view" id="res-tests" style="display: none;"></div>
-            <div class="response-body-view" id="res-logs" style="display: none;"></div>
+          <div class="preview-caption">
+            <span
+              >Try the preview: switch requests and press Send. Sample data
+              stays in this page.</span
+            ><a class="local-studio-link" href="studio.html"
+              >Open your local studio <i data-lucide="arrow-up-right"></i
+            ></a>
+          </div>
+          <div class="feature-notes">
+            <article>
+              <i data-lucide="send"></i>
+              <h3>Make the call.</h3>
+              <p>
+                HTTP methods, query parameters, headers, request bodies, and
+                everyday authentication.
+              </p>
+            </article>
+            <article>
+              <i data-lucide="flask-conical"></i>
+              <h3>Check your assumptions.</h3>
+              <p>
+                Pre-request JavaScript and response assertions, with a familiar
+                subset of the pm API.
+              </p>
+            </article>
+            <article>
+              <i data-lucide="folder-git-2"></i>
+              <h3>Keep the context.</h3>
+              <p>
+                Collections and environments in readable local JSON. Import
+                Postman collections or cURL.
+              </p>
+            </article>
           </div>
         </div>
-      </main>
-    </div>
-
-    <!-- Live Sniffer Screen -->
-    <div id="sniffer-screen">
-      <div class="sniffer-toolbar">
-        <div>
-          <h2 style="font-family: var(--font-display); font-size: 16px; margin-bottom: 4px; font-weight: 700;">🛰️ Live Traffic Sniffer & Auto-Reverse-Engineering</h2>
-          <p style="font-size: 12px; color: var(--text-muted);">
-            Listening on <code style="color: var(--cyber-cyan); font-family: var(--font-mono);">http://localhost:8085</code>. Forward traffic to automatically reconstruct schemas & client SDK.
+      </section>
+      <section class="capture-section wrap" id="capture">
+        <div class="capture-intro">
+          <span class="section-kicker">Traffic to spec</span>
+          <h2>Real traffic.<br />A clearer picture.</h2>
+          <p>
+            Working with an undocumented HTTP API? Forward calls through the
+            local proxy and turn the responses you observe into something you
+            can build on.
+          </p>
+          <a class="quiet-link" href="#start"
+            >Try it with your API<i data-lucide="arrow-up-right"></i
+          ></a>
+        </div>
+        <div class="pipeline">
+          <div class="pipeline-row">
+            <span class="step-number">1</span>
+            <div>
+              <h3>Capture a conversation</h3>
+              <p>Forward HTTP requests through port 8085.</p>
+            </div>
+            <i data-lucide="radio"></i>
+          </div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-row">
+            <span class="step-number">2</span>
+            <div>
+              <h3>Find the shape</h3>
+              <p>Infer JSON schemas and recognize common IDs.</p>
+            </div>
+            <i data-lucide="scan-line"></i>
+          </div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-row output">
+            <span class="step-number">3</span>
+            <div>
+              <h3>Take it into your project</h3>
+              <p>Export OpenAPI 3.1 or a TypeScript client draft.</p>
+            </div>
+            <i data-lucide="file-code-2"></i>
+          </div>
+          <p class="capture-limit">
+            A starting point, shaped by what you capture. Review generated
+            schemas and code before use. HTTPS CONNECT interception is not
+            supported.
           </p>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <button class="nav-btn" data-scramble onclick="clearSniffedTraffic()">🗑️ Clear</button>
-          <button class="nav-btn" data-scramble onclick="exportOpenApi()">✨ Export to OpenAPI 3.1</button>
-          <button class="nav-btn" data-scramble onclick="exportTypeScriptSdk()">📦 Generate Client SDK</button>
+      </section>
+      <section class="principles-section" id="principles">
+        <div class="wrap principles-grid">
+          <h2>Your APIs.<br />Your machine.<br />Your pace.</h2>
+          <div class="principles-copy">
+            <p class="large-copy">Good tools give you room to think.</p>
+            <p>
+              Rea is an independent, open-source side project for developers who
+              want a small, understandable HTTP workspace. It stores its
+              workspace locally and doesn't require a Rea account.
+            </p>
+            <p>
+              It’s early. It doesn’t replace Postman’s collaboration, protocol
+              coverage, or automation platform. If a focused local workflow fits
+              you, there’s something useful here.
+            </p>
+            <a
+              href="https://github.com/abrar225/rea-api-studio"
+              class="quiet-link"
+              >Explore the source<i data-lucide="arrow-up-right"></i
+            ></a>
+          </div>
         </div>
+      </section>
+      <section class="start-section wrap" id="start">
+        <div>
+          <span class="section-kicker">Build something</span>
+          <h2>A fresh workspace.<br />On familiar ground.</h2>
+          <p>Node.js 22 or newer. A terminal. Your next idea.</p>
+          <a class="button button-primary local-studio-link" href="studio.html"
+            >Open local studio<i data-lucide="arrow-up-right"></i
+          ></a>
+        </div>
+        <div class="install-block">
+          <div class="install-heading">
+            <span>Start on your machine</span
+            ><button id="copy-install" aria-label="Copy installation commands">
+              <i data-lucide="copy"></i><span>Copy</span>
+            </button>
+          </div>
+          <pre><code id="install-code">git clone https://github.com/abrar225/rea-api-studio.git
+cd rea-api-studio
+npm ci
+npm run build
+npm start</code></pre>
+          <div class="install-foot">
+            <span class="tiny-dot success"></span>Then open localhost:4040
+            <span>→</span>
+          </div>
+        </div>
+      </section>
+      <section class="faq-section wrap">
+        <h2>A few things to know.</h2>
+        <div class="faqs">
+          <details>
+            <summary>
+              Is Rea a replacement for Postman?<i data-lucide="plus"></i>
+            </summary>
+            <p>
+              For basic local HTTP requests, collections, and scripts, it may
+              fit. For OAuth flows, gRPC, WebSockets, team collaboration,
+              monitors, mock servers, or mature CI workflows, use a tool with
+              those capabilities. Rea’s most interesting workflow is capturing
+              HTTP traffic and inferring a spec.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Does the studio work without the internet?<i
+                data-lucide="plus"
+              ></i>
+            </summary>
+            <p>
+              The interface, fonts, icons, and workspace run locally after
+              installation. Calling a remote API still requires a network
+              connection. Collections and environment values are plain files, so
+              keep credentials out of Git and only run scripts you trust.
+            </p>
+          </details>
+          <details>
+            <summary>
+              What does the traffic proxy capture?<i data-lucide="plus"></i>
+            </summary>
+            <p>
+              HTTP requests explicitly routed through it, including HTTPS
+              targets using the /https://target path or X-Target-Url header. It
+              doesn’t decrypt browser HTTPS CONNECT tunnels. Traffic is held in
+              memory, capped at 500 records, and can contain sensitive data.
+            </p>
+          </details>
+          <details>
+            <summary>Can I contribute?<i data-lucide="plus"></i></summary>
+            <p>
+              Yes. Rea is MIT licensed. Read the source, try it against your own
+              API, and share an issue or a pull request on
+              <a href="https://github.com/abrar225/rea-api-studio">GitHub</a>.
+              Reliability, migration compatibility, and everyday usability are
+              especially valuable contributions.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer wrap">
+      <a class="wordmark" href="#" aria-label="Back to top"
+        ><img src="brand/rea-symbol.svg" alt="" width="36" height="36" /><span
+          >rea</span
+        ></a
+      ><span>Made for the curious. Built in the open.</span>
+      <div>
+        <a href="https://github.com/abrar225/rea-api-studio"
+          >GitHub<i data-lucide="arrow-up-right"></i></a
+        ><a href="https://github.com/abrar225/rea-api-studio/blob/main/LICENSE"
+          >MIT license</a
+        >
       </div>
-
-      <table class="traffic-table">
-        <thead>
-          <tr>
-            <th style="width: 90px;">Method</th>
-            <th>Path & Target URL</th>
-            <th style="width: 90px;">Status</th>
-            <th style="width: 110px;">Duration</th>
-            <th style="width: 140px;">Timestamp</th>
-          </tr>
-        </thead>
-        <tbody id="traffic-tbody">
-          <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No traffic intercepted yet. Send requests through port 8085.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Reusable Glass Modal -->
-  <div class="modal-backdrop" id="modal-backdrop">
-    <div class="modal-box">
-      <div class="modal-header">
-        <span id="modal-title">Modal Title</span>
-        <button class="icon-btn" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body" id="modal-body"></div>
-      <div class="modal-footer" id="modal-footer">
-        <button class="nav-btn" onclick="closeModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* ==========================================================================
-       Chande Bootcamp Hacker Text Scrambler Engine
-       ========================================================================== */
-    class HackerTextScrambler {
-      constructor() {
-        this.chars = '!<>-_\\/[]{}=+*^?#%&$01';
-        this.init();
-      }
-
-      init() {
-        document.querySelectorAll('[data-scramble]').forEach(el => {
-          el.addEventListener('mouseenter', () => this.scramble(el));
-        });
-      }
-
-      scramble(el) {
-        const originalText = el.getAttribute('data-original-text') || el.innerText.trim();
-        if (!el.hasAttribute('data-original-text')) {
-          el.setAttribute('data-original-text', originalText);
-        }
-        if (el._scrambleInterval) clearInterval(el._scrambleInterval);
-
-        let iteration = 0;
-        const maxIterations = Math.max(12, originalText.length * 2);
-
-        el._scrambleInterval = setInterval(() => {
-          el.innerText = originalText
-            .split('')
-            .map((char, index) => {
-              if (char === ' ') return ' ';
-              if (index < iteration / 2) return originalText[index];
-              return this.chars[Math.floor(Math.random() * this.chars.length)];
-            })
-            .join('');
-
-          if (iteration >= maxIterations) {
-            clearInterval(el._scrambleInterval);
-            el.innerText = originalText;
-          }
-          iteration++;
-        }, 25);
-      }
-    }
-
-    /* ==========================================================================
-       Ambient Cursor Follower
-       ========================================================================== */
-    function initCursorFollower() {
-      const follower = document.getElementById('cursor-follower');
-      if (!follower) return;
-
-      let mouseX = -100, mouseY = -100;
-      let posX = -100, posY = -100;
-
-      window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        follower.style.opacity = '1';
-      });
-
-      window.addEventListener('mouseleave', () => {
-        follower.style.opacity = '0';
-      });
-
-      function renderCursor() {
-        posX += (mouseX - posX) * 0.18;
-        posY += (mouseY - posY) * 0.18;
-        follower.style.left = posX + 'px';
-        follower.style.top = posY + 'px';
-        requestAnimationFrame(renderCursor);
-      }
-      requestAnimationFrame(renderCursor);
-    }
-
-    /* ==========================================================================
-       Lenis Smooth Inertial Scrolling Engine
-       ========================================================================== */
-    function initLenisScroll() {
-      if (typeof Lenis !== 'undefined') {
-        try {
-          const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-            infinite: false,
-          });
-
-          function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-          }
-          requestAnimationFrame(raf);
-        } catch (e) {
-          console.warn('Lenis initialization skipped:', e);
-        }
-      }
-    }
-
-    /* ==========================================================================
-       Lucide Vector Iconography System
-       ========================================================================== */
-    function refreshIcons() {
-      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-        lucide.createIcons();
-      }
-    }
-
-    /* ==========================================================================
-       ReaAPI Studio Core Interactive State & Runtime
-       ========================================================================== */
-    let collections = [];
-    let environments = [];
-    let activeEnvironmentId = '';
-    let activeCollection = null;
-    let activeRequest = null;
-    let activeReqTab = 'params';
-    let activeResTab = 'body';
-    let currentResponseData = null;
-    let isDirty = false;
-    let textScrambler = null;
-
-    async function init() {
-      textScrambler = new HackerTextScrambler();
-      initCursorFollower();
-      initLenisScroll();
-      refreshIcons();
-
-      await loadEnvironments();
-      await loadCollections();
-      await updateHealth();
-
-      setInterval(pollSnifferTraffic, 2000);
-      setInterval(updateHealth, 10000);
-
-      // Keyboard shortcuts
-      window.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-          e.preventDefault();
-          sendActiveRequest();
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
-          e.preventDefault();
-          saveActiveRequest();
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
-          if (document.getElementById('studio-view').style.display !== 'none') {
-            e.preventDefault();
-            toggleResponseSearch();
-          }
-        }
-      });
-    }
-
-    async function updateHealth() {
-      try {
-        const res = await fetch('/api/health');
-        const data = await res.json();
-        const healthEl = document.getElementById('health-info');
-        healthEl.textContent = `RAM: ~${data.memoryRssMb}MB | Zero-Cloud Mandate`;
-        healthEl.setAttribute('data-original-text', healthEl.textContent);
-      } catch (e) {}
-    }
-
-    async function loadEnvironments() {
-      try {
-        const res = await fetch('/api/environments');
-        environments = await res.json();
-        renderEnvironmentSelector();
-      } catch (e) {
-        console.error('Failed to load environments:', e);
-      }
-    }
-
-    function renderEnvironmentSelector() {
-      const select = document.getElementById('env-select');
-      select.innerHTML = '<option value="">No Environment</option>';
-      for (const env of environments) {
-        const opt = document.createElement('option');
-        opt.value = env.id;
-        opt.textContent = env.name;
-        if (env.id === activeEnvironmentId) opt.selected = true;
-        select.appendChild(opt);
-      }
-      const manageOpt = document.createElement('option');
-      manageOpt.value = '__manage__';
-      manageOpt.textContent = '⚙️ Manage Environments...';
-      select.appendChild(manageOpt);
-    }
-
-    function onEnvironmentSelected(val) {
-      if (val === '__manage__') {
-        openEnvironmentManager();
-        renderEnvironmentSelector();
-      } else {
-        activeEnvironmentId = val;
-      }
-    }
-
-    async function loadCollections() {
-      try {
-        const res = await fetch('/api/collections');
-        collections = await res.json();
-        renderCollectionsTree();
-        if (!activeRequest && collections.length > 0 && collections[0].items.length > 0) {
-          const firstReqItem = findFirstRequestItem(collections[0].items);
-          if (firstReqItem) {
-            selectRequest(firstReqItem.request, collections[0]);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function findFirstRequestItem(items) {
-      for (const item of items) {
-        if (item.request) return item;
-        if (item.isFolder && item.items) {
-          const found = findFirstRequestItem(item.items);
-          if (found) return found;
-        }
-      }
-      return null;
-    }
-
-    function markDirty() {
-      isDirty = true;
-      document.getElementById('dirty-badge').style.display = 'inline';
-      document.getElementById('btn-save-req').classList.add('is-dirty');
-      renderCollectionsTree();
-    }
-
-    function markClean() {
-      isDirty = false;
-      document.getElementById('dirty-badge').style.display = 'none';
-      document.getElementById('btn-save-req').classList.remove('is-dirty');
-      renderCollectionsTree();
-    }
-
-    function renderCollectionsTree() {
-      const tree = document.getElementById('collection-tree');
-      tree.innerHTML = '';
-
-      collections.forEach(col => {
-        const colDiv = document.createElement('div');
-        colDiv.className = 'collection-node';
-
-        const label = document.createElement('div');
-        label.className = 'collection-label';
-        label.innerHTML = `📁 <span>${escapeHtml(col.name)}</span>`;
-        colDiv.appendChild(label);
-
-        renderTreeItems(col.items, colDiv, col, 0);
-        tree.appendChild(colDiv);
-      });
-      refreshIcons();
-    }
-
-    function renderTreeItems(items, parentEl, col, depth) {
-      if (!Array.isArray(items)) return;
-
-      items.forEach(item => {
-        if (item.isFolder) {
-          const folderDiv = document.createElement('div');
-          folderDiv.className = 'tree-folder';
-          folderDiv.style.marginLeft = `${depth > 0 ? 12 : 8}px`;
-
-          const title = document.createElement('div');
-          title.className = 'tree-folder-title';
-          title.innerHTML = `📂 <span>${escapeHtml(item.name)}</span>`;
-          const childrenDiv = document.createElement('div');
-
-          title.onclick = () => {
-            const isHidden = childrenDiv.style.display === 'none';
-            childrenDiv.style.display = isHidden ? 'block' : 'none';
-            title.innerHTML = `${isHidden ? '📂' : '📁'} <span>${escapeHtml(item.name)}</span>`;
-          };
-
-          folderDiv.appendChild(title);
-          renderTreeItems(item.items || [], childrenDiv, col, depth + 1);
-          folderDiv.appendChild(childrenDiv);
-          parentEl.appendChild(folderDiv);
-        } else if (item.request) {
-          const reqDiv = document.createElement('div');
-          const isSelected = activeRequest?.id === item.request.id;
-          reqDiv.className = `request-item ${isSelected ? 'selected' : ''}`;
-          if (depth > 0) reqDiv.style.paddingLeft = `${14 + depth * 8}px`;
-
-          const mClass = `method-${item.request.method.toLowerCase()}`;
-          const isCurrentDirty = isSelected && isDirty;
-
-          reqDiv.innerHTML = `
-            <div class="req-main-info">
-              <span class="method-badge ${mClass}">${escapeHtml(item.request.method)}</span>
-              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(item.request.name || item.request.url)}</span>
-              ${isCurrentDirty ? '<span class="dirty-dot">•</span>' : ''}
-            </div>
-            <button class="icon-btn" title="Delete Request" onclick="event.stopPropagation(); deleteRequest('${item.request.id}', '${col.id}')">✕</button>
-          `;
-          reqDiv.onclick = () => selectRequest(item.request, col);
-          parentEl.appendChild(reqDiv);
-        }
-      });
-    }
-
-    function selectRequest(req, col) {
-      if (isDirty && activeRequest && activeCollection) {
-        saveActiveRequest();
-      } else {
-        syncCurrentFieldsToActiveRequest();
-      }
-      activeRequest = JSON.parse(JSON.stringify(req));
-      activeCollection = col;
-      markClean();
-
-      document.getElementById('req-method').value = activeRequest.method || 'GET';
-      document.getElementById('req-url').value = activeRequest.url || '';
-
-      renderParamsTable();
-      renderHeadersTable();
-      renderBodyView();
-      renderAuthView();
-
-      document.getElementById('req-prerequest-script').value = activeRequest.preRequestScript || '';
-      document.getElementById('req-test-script').value = activeRequest.testScript || '';
-
-      renderCollectionsTree();
-    }
-
-    function syncCurrentFieldsToActiveRequest() {
-      if (!activeRequest) return;
-      activeRequest.method = document.getElementById('req-method').value;
-      activeRequest.url = document.getElementById('req-url').value;
-      if (activeRequest.body?.mode === 'raw-json' || activeRequest.body?.mode === 'raw-text') {
-        activeRequest.body.raw = document.getElementById('req-body-raw').value;
-      }
-      activeRequest.preRequestScript = document.getElementById('req-prerequest-script').value;
-      activeRequest.testScript = document.getElementById('req-test-script').value;
-    }
-
-    async function saveActiveRequest() {
-      if (!activeRequest || !activeCollection) return;
-      syncCurrentFieldsToActiveRequest();
-
-      try {
-        const res = await fetch(`/api/collections/${activeCollection.id}/requests`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ request: activeRequest })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          markClean();
-          await loadCollections();
-          const btn = document.getElementById('btn-save-req');
-          const originalText = btn.innerHTML;
-          btn.innerHTML = '✅ Saved';
-          setTimeout(() => { btn.innerHTML = originalText; }, 1200);
-        }
-      } catch (err) {
-        alert('Failed to save request: ' + err.message);
-      }
-    }
-
-    async function createNewRequest() {
-      if (!activeCollection && collections.length > 0) {
-        activeCollection = collections[0];
-      }
-      if (!activeCollection) {
-        alert('Please create or import a collection first.');
-        return;
-      }
-
-      const reqName = prompt('Enter request name:', 'New Request');
-      if (!reqName) return;
-
-      const newReq = {
-        id: 'req_' + Date.now(),
-        name: reqName,
-        method: 'GET',
-        url: 'https://httpbin.org/get',
-        headers: [],
-        queryParams: [],
-        body: { mode: 'none' },
-        auth: { type: 'none' },
-        testScript: `pm.test("Status code is 200", function () {\n    pm.response.to.have.status(200);\n});`
-      };
-
-      try {
-        const res = await fetch(`/api/collections/${activeCollection.id}/requests`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ request: newReq })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          await loadCollections();
-          selectRequest(newReq, activeCollection);
-        }
-      } catch (e) {
-        alert('Failed to create request: ' + e.message);
-      }
-    }
-
-    async function deleteRequest(reqId, colId) {
-      if (!confirm('Are you sure you want to delete this request?')) return;
-      try {
-        const res = await fetch(`/api/collections/${colId}/requests/${reqId}`, {
-          method: 'DELETE'
-        });
-        const data = await res.json();
-        if (data.ok) {
-          if (activeRequest?.id === reqId) {
-            activeRequest = null;
-          }
-          await loadCollections();
-        }
-      } catch (e) {
-        alert('Failed to delete request: ' + e.message);
-      }
-    }
-
-    async function exportPostman() {
-      if (!activeCollection) {
-        if (collections.length > 0) activeCollection = collections[0];
-        else {
-          alert('No collection available to export.');
-          return;
-        }
-      }
-
-      try {
-        const res = await fetch(`/api/collections/${activeCollection.id}/export/postman`);
-        if (!res.ok) {
-          throw new Error(`Export failed with status ${res.status}`);
-        }
-        const postmanData = await res.json();
-        const blob = new Blob([JSON.stringify(postmanData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${(activeCollection.name || 'collection').replace(/[^a-zA-Z0-9_-]/g, '_')}.postman_collection.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        alert('Failed to export Postman collection: ' + err.message);
-      }
-    }
-
-    /* Params Table */
-    function renderParamsTable() {
-      const tbody = document.getElementById('params-tbody');
-      tbody.innerHTML = '';
-      (activeRequest.queryParams || []).forEach((q, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="checkbox" ${q.enabled !== false ? 'checked' : ''} onchange="toggleParam(${idx})"></td>
-          <td><input type="text" class="kv-input" value="${escapeHtml(q.key)}" oninput="updateParam(${idx}, 'key', this.value)" placeholder="Key"></td>
-          <td><input type="text" class="kv-input" value="${escapeHtml(q.value)}" oninput="updateParam(${idx}, 'value', this.value)" placeholder="Value"></td>
-          <td><button class="icon-btn" onclick="removeParam(${idx})">✕</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function addParamRow() {
-      if (!activeRequest.queryParams) activeRequest.queryParams = [];
-      activeRequest.queryParams.push({ key: '', value: '', enabled: true });
-      markDirty();
-      renderParamsTable();
-    }
-
-    function updateParam(idx, field, val) {
-      activeRequest.queryParams[idx][field] = val;
-      markDirty();
-    }
-
-    function toggleParam(idx) {
-      activeRequest.queryParams[idx].enabled = !activeRequest.queryParams[idx].enabled;
-      markDirty();
-    }
-
-    function removeParam(idx) {
-      activeRequest.queryParams.splice(idx, 1);
-      markDirty();
-      renderParamsTable();
-    }
-
-    /* Headers Table */
-    function renderHeadersTable() {
-      const tbody = document.getElementById('headers-tbody');
-      tbody.innerHTML = '';
-      const list = activeRequest.headers || [];
-      document.getElementById('headers-count').textContent = list.length;
-      list.forEach((h, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="checkbox" ${h.enabled !== false ? 'checked' : ''} onchange="toggleHeader(${idx})"></td>
-          <td><input type="text" class="kv-input" value="${escapeHtml(h.key)}" oninput="updateHeader(${idx}, 'key', this.value)" placeholder="Header"></td>
-          <td><input type="text" class="kv-input" value="${escapeHtml(h.value)}" oninput="updateHeader(${idx}, 'value', this.value)" placeholder="Value"></td>
-          <td><button class="icon-btn" onclick="removeHeader(${idx})">✕</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function addHeaderRow() {
-      if (!activeRequest.headers) activeRequest.headers = [];
-      activeRequest.headers.push({ key: '', value: '', enabled: true });
-      markDirty();
-      renderHeadersTable();
-    }
-
-    function updateHeader(idx, field, val) {
-      activeRequest.headers[idx][field] = val;
-      markDirty();
-    }
-
-    function toggleHeader(idx) {
-      activeRequest.headers[idx].enabled = !activeRequest.headers[idx].enabled;
-      markDirty();
-    }
-
-    function removeHeader(idx) {
-      activeRequest.headers.splice(idx, 1);
-      markDirty();
-      renderHeadersTable();
-    }
-
-    /* Body View & Mode Management */
-    function renderBodyView() {
-      const mode = activeRequest.body?.mode || 'none';
-      const radios = document.getElementsByName('body-mode');
-      for (const r of radios) {
-        r.checked = r.value === mode;
-      }
-
-      const rawContainer = document.getElementById('body-raw-container');
-      const formdataContainer = document.getElementById('body-formdata-container');
-
-      if (mode === 'none') {
-        rawContainer.style.display = 'none';
-        formdataContainer.style.display = 'none';
-      } else if (mode === 'raw-json' || mode === 'raw-text') {
-        rawContainer.style.display = 'block';
-        formdataContainer.style.display = 'none';
-        document.getElementById('req-body-raw').value = activeRequest.body?.raw || '';
-      } else if (mode === 'form-data' || mode === 'x-www-form-urlencoded') {
-        rawContainer.style.display = 'none';
-        formdataContainer.style.display = 'block';
-        renderFormDataTable();
-      }
-    }
-
-    function changeBodyMode(mode) {
-      if (!activeRequest.body) activeRequest.body = { mode: 'none' };
-      activeRequest.body.mode = mode;
-      markDirty();
-      renderBodyView();
-    }
-
-    function renderFormDataTable() {
-      const tbody = document.getElementById('formdata-tbody');
-      tbody.innerHTML = '';
-      (activeRequest.body?.formData || []).forEach((p, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="checkbox" ${p.enabled !== false ? 'checked' : ''} onchange="toggleFormData(${idx})"></td>
-          <td><input type="text" class="kv-input" value="${escapeHtml(p.key)}" oninput="updateFormData(${idx}, 'key', this.value)" placeholder="Key"></td>
-          <td><input type="text" class="kv-input" value="${escapeHtml(p.value)}" oninput="updateFormData(${idx}, 'value', this.value)" placeholder="Value"></td>
-          <td><button class="icon-btn" onclick="removeFormData(${idx})">✕</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function addFormDataRow() {
-      if (!activeRequest.body) activeRequest.body = { mode: 'form-data' };
-      if (!activeRequest.body.formData) activeRequest.body.formData = [];
-      activeRequest.body.formData.push({ key: '', value: '', enabled: true });
-      markDirty();
-      renderFormDataTable();
-    }
-
-    function updateFormData(idx, field, val) {
-      activeRequest.body.formData[idx][field] = val;
-      markDirty();
-    }
-
-    function toggleFormData(idx) {
-      activeRequest.body.formData[idx].enabled = !activeRequest.body.formData[idx].enabled;
-      markDirty();
-    }
-
-    function removeFormData(idx) {
-      activeRequest.body.formData.splice(idx, 1);
-      markDirty();
-      renderFormDataTable();
-    }
-
-    /* Auth Tab */
-    function renderAuthView() {
-      const auth = activeRequest.auth || { type: 'none' };
-      document.getElementById('auth-type').value = auth.type;
-      const fields = document.getElementById('auth-fields');
-
-      if (auth.type === 'bearer') {
-        fields.innerHTML = `
-          <div style="font-size: 12px; margin-bottom: 6px; font-weight: 600;">Token:</div>
-          <input type="text" class="url-input" style="width: 100%;" value="${escapeHtml(auth.bearerToken || '')}" oninput="activeRequest.auth.bearerToken = this.value; markDirty();" placeholder="Bearer Token (supports {{variable}})" />
-        `;
-      } else if (auth.type === 'basic') {
-        fields.innerHTML = `
-          <div style="display: flex; gap: 12px;">
-            <div style="flex: 1;">
-              <div style="font-size: 12px; margin-bottom: 6px; font-weight: 600;">Username:</div>
-              <input type="text" class="url-input" style="width: 100%;" value="${escapeHtml(auth.basicUsername || '')}" oninput="activeRequest.auth.basicUsername = this.value; markDirty();" />
-            </div>
-            <div style="flex: 1;">
-              <div style="font-size: 12px; margin-bottom: 6px; font-weight: 600;">Password:</div>
-              <input type="password" class="url-input" style="width: 100%;" value="${escapeHtml(auth.basicPassword || '')}" oninput="activeRequest.auth.basicPassword = this.value; markDirty();" />
-            </div>
-          </div>
-        `;
-      } else if (auth.type === 'apikey') {
-        fields.innerHTML = `
-          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-            <div style="flex: 1;">
-              <div style="font-size: 12px; margin-bottom: 6px; font-weight: 600;">Key:</div>
-              <input type="text" class="url-input" style="width: 100%;" value="${escapeHtml(auth.apiKeyName || 'X-API-Key')}" oninput="activeRequest.auth.apiKeyName = this.value; markDirty();" placeholder="e.g. X-API-Key" />
-            </div>
-            <div style="flex: 1;">
-              <div style="font-size: 12px; margin-bottom: 6px; font-weight: 600;">Value:</div>
-              <input type="text" class="url-input" style="width: 100%;" value="${escapeHtml(auth.apiKeyValue || '')}" oninput="activeRequest.auth.apiKeyValue = this.value; markDirty();" placeholder="Secret Key (supports {{apiKey}})" />
-            </div>
-          </div>
-          <div>
-            <div style="font-size: 12px; margin-bottom: 6px; font-weight: 600;">Add to:</div>
-            <select class="method-select" onchange="activeRequest.auth.apiKeyIn = this.value; markDirty();">
-              <option value="header" ${auth.apiKeyIn !== 'query' ? 'selected' : ''}>Header</option>
-              <option value="query" ${auth.apiKeyIn === 'query' ? 'selected' : ''}>Query Params</option>
-            </select>
-          </div>
-        `;
-      } else {
-        fields.innerHTML = '<span style="font-size: 12px; color: var(--text-muted);">This request does not use any authorization headers.</span>';
-      }
-    }
-
-    function changeAuthType() {
-      const t = document.getElementById('auth-type').value;
-      activeRequest.auth = { type: t };
-      markDirty();
-      renderAuthView();
-    }
-
-    function switchReqTab(tab) {
-      activeReqTab = tab;
-      ['params', 'headers', 'body', 'auth', 'scripts'].forEach(t => {
-        document.getElementById(`tab-${t}`).style.display = (t === tab) ? 'block' : 'none';
-      });
-      const btns = document.querySelectorAll('.tab-nav-left .tab-btn');
-      btns.forEach(b => {
-        if (b.textContent.toLowerCase().includes(tab)) b.classList.add('active');
-        else if (!b.parentElement.parentElement.classList.contains('response-pane')) b.classList.remove('active');
-      });
-    }
-
-    function switchResTab(tab) {
-      activeResTab = tab;
-      document.getElementById('res-body').style.display = (tab === 'body') ? 'block' : 'none';
-      document.getElementById('res-headers').style.display = (tab === 'headers') ? 'block' : 'none';
-      document.getElementById('res-tests').style.display = (tab === 'tests') ? 'block' : 'none';
-      document.getElementById('res-logs').style.display = (tab === 'logs') ? 'block' : 'none';
-
-      const btns = document.querySelectorAll('.response-pane .tab-btn');
-      btns.forEach(b => {
-        if (b.textContent.toLowerCase().includes(tab)) b.classList.add('active');
-        else b.classList.remove('active');
-      });
-    }
-
-    /* Execute HTTP Request with Anime.js Kinetic Counters */
-    async function sendActiveRequest() {
-      if (!activeRequest) return;
-      syncCurrentFieldsToActiveRequest();
-
-      const statusEl = document.getElementById('res-status');
-      statusEl.textContent = 'Sending...';
-      statusEl.style.color = '#f59e0b';
-      statusEl.style.background = 'rgba(245, 158, 11, 0.15)';
-      statusEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
-      document.getElementById('res-body').textContent = 'Connecting socket and dispatching wire packet...';
-
-      try {
-        const payload = {
-          request: activeRequest,
-          collectionVariables: activeCollection?.variables || [],
-          environmentId: activeEnvironmentId || undefined
-        };
-
-        const res = await fetch('/api/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        currentResponseData = data;
-
-        // Render Status badge
-        if (data.status === 0) {
-          statusEl.textContent = `${data.error?.category || 'Connection Failed'}`;
-          statusEl.style.color = '#ef4444';
-          statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
-          statusEl.style.borderColor = 'rgba(239, 68, 68, 0.35)';
-        } else {
-          statusEl.textContent = `${data.status} ${data.statusText}`;
-          if (data.status >= 200 && data.status < 300) {
-            statusEl.style.color = '#10b981';
-            statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
-            statusEl.style.borderColor = 'rgba(16, 185, 129, 0.35)';
-          } else {
-            statusEl.style.color = '#ef4444';
-            statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
-            statusEl.style.borderColor = 'rgba(239, 68, 68, 0.35)';
-          }
-        }
-
-        // Anime.js Kinetic Count-Up for Response Time and Size
-        const targetMs = data.timings?.totalMs || 0;
-        const targetKb = (data.sizeBytes || 0) / 1024;
-
-        if (typeof anime !== 'undefined') {
-          const metricObj = { time: 0, size: 0 };
-          anime({
-            targets: metricObj,
-            time: targetMs,
-            size: targetKb,
-            round: 1,
-            easing: 'easeOutExpo',
-            duration: 750,
-            update: function() {
-              document.getElementById('res-time').textContent = `${metricObj.time} ms`;
-              document.getElementById('res-size').textContent = `${(metricObj.size).toFixed(2)} KB`;
-            }
-          });
-        } else {
-          document.getElementById('res-time').textContent = `${targetMs} ms`;
-          document.getElementById('res-size').textContent = `${targetKb.toFixed(2)} KB`;
-        }
-
-        // Render Body
-        const resBodyEl = document.getElementById('res-body');
-        if (data.error && data.status === 0) {
-          resBodyEl.innerHTML = `
-            <div class="error-card">
-              <div class="error-card-title">⚠️ ${escapeHtml(data.error.category)}</div>
-              <div class="error-card-msg">${escapeHtml(data.error.message)}</div>
-              <div class="error-card-guidance">💡 <strong>Guidance:</strong> ${escapeHtml(data.error.guidance)}</div>
-            </div>
-          `;
-        } else {
-          try {
-            const parsed = JSON.parse(data.body);
-            resBodyEl.textContent = JSON.stringify(parsed, null, 2);
-          } catch {
-            resBodyEl.textContent = data.body || '(Empty Response)';
-          }
-        }
-
-        // Render Headers
-        let headersStr = '';
-        for (const [k, v] of Object.entries(data.headers || {})) {
-          headersStr += `${k}: ${v}\n`;
-        }
-        document.getElementById('res-headers').textContent = headersStr || 'No response headers.';
-
-        // Render Tests
-        const testResults = data.testResults || [];
-        document.getElementById('tests-count').textContent = testResults.length;
-        let testsHtml = '';
-        testResults.forEach(t => {
-          testsHtml += `
-            <div style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;">
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <span>${t.passed ? '✅' : '❌'}</span>
-                <span style="font-weight: 600; color: ${t.passed ? '#10b981' : '#ef4444'};">${escapeHtml(t.name)}</span>
-              </div>
-              ${t.error ? `<div style="color: #ef4444; font-size: 11px; margin-left: 24px;">${escapeHtml(t.error)}</div>` : ''}
-            </div>
-          `;
-        });
-        document.getElementById('res-tests').innerHTML = testsHtml || '<div style="color: var(--text-muted); padding: 12px;">No tests were configured for this request.</div>';
-
-        // Render Console Logs
-        const logs = data.logs || [];
-        document.getElementById('logs-count').textContent = logs.length;
-        let logsHtml = '';
-        logs.forEach(l => {
-          logsHtml += `<div class="console-line">${escapeHtml(l)}</div>`;
-        });
-        document.getElementById('res-logs').innerHTML = logsHtml || '<div style="color: var(--text-muted); padding: 12px;">No console logs emitted. Use console.log() in your scripts.</div>';
-
-        // Reload environments if mutated by scripts
-        if (data.updatedVariables && activeEnvironmentId) {
-          loadEnvironments();
-        }
-
-      } catch (err) {
-        statusEl.textContent = 'System Error';
-        statusEl.style.color = '#ef4444';
-        statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
-        document.getElementById('res-body').textContent = String(err);
-      }
-    }
-
-    function escapeHtml(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    /* Response Tools */
-    function copyResponseBody() {
-      const text = document.getElementById('res-body').innerText;
-      if (!text) return;
-      navigator.clipboard.writeText(text).then(() => {
-        const orig = document.getElementById('res-time').textContent;
-        document.getElementById('res-time').textContent = 'Copied!';
-        setTimeout(() => { document.getElementById('res-time').textContent = orig; }, 1200);
-      });
-    }
-
-    function downloadResponseBody() {
-      const text = document.getElementById('res-body').innerText;
-      if (!text) return;
-      const isJson = text.trim().startsWith('{') || text.trim().startsWith('[');
-      const ext = isJson ? 'json' : 'txt';
-      const blob = new Blob([text], { type: isJson ? 'application/json' : 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `response_${Date.now()}.${ext}`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function toggleResponseSearch() {
-      const container = document.getElementById('res-search-container');
-      const isHidden = container.style.display === 'none' || !container.style.display;
-      container.style.display = isHidden ? 'flex' : 'none';
-      if (isHidden) {
-        document.getElementById('res-search-input').focus();
-      }
-    }
-
-    function filterResponseSearch(query) {
-      if (!currentResponseData) return;
-      const bodyEl = document.getElementById('res-body');
-      let rawText = '';
-      try {
-        rawText = JSON.stringify(JSON.parse(currentResponseData.body), null, 2);
-      } catch {
-        rawText = currentResponseData.body || '';
-      }
-
-      if (!query.trim()) {
-        bodyEl.textContent = rawText;
-        return;
-      }
-
-      const escaped = escapeHtml(rawText);
-      const reg = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      bodyEl.innerHTML = escaped.replace(reg, '<mark style="background: #f59e0b; color: #000; padding: 1px 3px; border-radius: 2px;">$1</mark>');
-    }
-
-    /* Environment Manager Modal */
-    function openEnvironmentManager() {
-      document.getElementById('modal-title').textContent = '⚙️ Environment Management';
-      let envListHtml = '';
-      environments.forEach(e => {
-        envListHtml += `
-          <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; ${e.id === activeEnvironmentId ? 'background: rgba(144, 71, 255, 0.15); border-left: 2px solid var(--primary);' : ''}" onclick="selectEnvironmentForEdit('${e.id}')">
-            <span><strong>${escapeHtml(e.name)}</strong> <span style="font-size: 11px; color: var(--text-muted);">(${e.values.length} vars)</span></span>
-            <button class="icon-btn" onclick="event.stopPropagation(); deleteEnvironment('${e.id}')">🗑️</button>
-          </div>
-        `;
-      });
-
-      document.getElementById('modal-body').innerHTML = `
-        <div style="display: flex; gap: 16px; height: 380px;">
-          <div style="width: 220px; border-right: 1px solid var(--border); overflow-y: auto;">
-            <button class="nav-btn" style="width: 100%; margin-bottom: 12px;" onclick="createNewEnvironment()">+ New Environment</button>
-            <div id="env-modal-list">${envListHtml || '<div style="font-size: 12px; color: var(--text-muted); padding: 10px;">No environments found.</div>'}</div>
-          </div>
-          <div style="flex: 1; display: flex; flex-direction: column;" id="env-edit-panel">
-            <div style="font-size: 12px; color: var(--text-muted); padding: 24px; text-align: center;">Select an environment on the left to edit variables.</div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('modal-footer').innerHTML = `
-        <button class="nav-btn" onclick="closeModal()">Done</button>
-      `;
-
-      openModal();
-      if (activeEnvironmentId) selectEnvironmentForEdit(activeEnvironmentId);
-    }
-
-    function selectEnvironmentForEdit(envId) {
-      const env = environments.find(e => e.id === envId);
-      if (!env) return;
-
-      const panel = document.getElementById('env-edit-panel');
-      let tableRows = '';
-      (env.values || []).forEach((v, idx) => {
-        tableRows += `
-          <tr>
-            <td><input type="checkbox" ${v.enabled !== false ? 'checked' : ''} onchange="toggleEnvVar('${envId}', ${idx})"></td>
-            <td><input type="text" class="kv-input" value="${escapeHtml(v.key)}" oninput="updateEnvVar('${envId}', ${idx}, 'key', this.value)" placeholder="VARIABLE_NAME"></td>
-            <td><input type="text" class="kv-input" value="${escapeHtml(v.value)}" oninput="updateEnvVar('${envId}', ${idx}, 'value', this.value)" placeholder="Value"></td>
-            <td><button class="icon-btn" onclick="removeEnvVar('${envId}', ${idx})">✕</button></td>
-          </tr>
-        `;
-      });
-
-      panel.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <input type="text" class="url-input" style="font-weight: 700; font-size: 14px; width: 220px;" value="${escapeHtml(env.name)}" oninput="env.name = this.value; saveEnvironmentDirect(env);" />
-          <button class="nav-btn" onclick="addEnvVarRow('${envId}')">+ Add Variable</button>
-        </div>
-        <div style="flex: 1; overflow-y: auto;">
-          <table class="kv-table">
-            <thead>
-              <tr>
-                <th style="width: 30px;"></th>
-                <th>Variable Name</th>
-                <th>Current Value</th>
-                <th style="width: 30px;"></th>
-              </tr>
-            </thead>
-            <tbody>${tableRows}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    async function createNewEnvironment() {
-      const name = prompt('Environment Name:', 'Production');
-      if (!name) return;
-      const newEnv = {
-        id: 'env_' + Date.now(),
-        name,
-        values: [
-          { key: 'baseUrl', value: 'https://api.example.com', enabled: true },
-          { key: 'apiKey', value: 'secret-key-xyz', enabled: true }
-        ]
-      };
-      await fetch('/api/environments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newEnv)
-      });
-      await loadEnvironments();
-      openEnvironmentManager();
-      selectEnvironmentForEdit(newEnv.id);
-    }
-
-    async function saveEnvironmentDirect(env) {
-      await fetch('/api/environments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(env)
-      });
-      loadEnvironments();
-    }
-
-    function addEnvVarRow(envId) {
-      const env = environments.find(e => e.id === envId);
-      if (!env) return;
-      env.values.push({ key: '', value: '', enabled: true });
-      saveEnvironmentDirect(env);
-      selectEnvironmentForEdit(envId);
-    }
-
-    function updateEnvVar(envId, idx, field, val) {
-      const env = environments.find(e => e.id === envId);
-      if (!env) return;
-      env.values[idx][field] = val;
-      saveEnvironmentDirect(env);
-    }
-
-    function toggleEnvVar(envId, idx) {
-      const env = environments.find(e => e.id === envId);
-      if (!env) return;
-      env.values[idx].enabled = !env.values[idx].enabled;
-      saveEnvironmentDirect(env);
-    }
-
-    function removeEnvVar(envId, idx) {
-      const env = environments.find(e => e.id === envId);
-      if (!env) return;
-      env.values.splice(idx, 1);
-      saveEnvironmentDirect(env);
-      selectEnvironmentForEdit(envId);
-    }
-
-    async function deleteEnvironment(envId) {
-      if (!confirm('Are you sure you want to delete this environment?')) return;
-      await fetch(`/api/environments/${envId}`, { method: 'DELETE' });
-      if (activeEnvironmentId === envId) activeEnvironmentId = '';
-      await loadEnvironments();
-      openEnvironmentManager();
-    }
-
-    function openEnvironmentQuickLook() {
-      const env = environments.find(e => e.id === activeEnvironmentId);
-      document.getElementById('modal-title').textContent = env ? `👁️ Quick Look: ${env.name}` : '👁️ Quick Look: No Active Environment';
-
-      if (!env) {
-        document.getElementById('modal-body').innerHTML = `
-          <div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 36px;">
-            No active environment selected. Choose an environment from the top dropdown.
-          </div>
-        `;
-      } else {
-        let rows = '';
-        env.values.forEach(v => {
-          rows += `
-            <tr>
-              <td style="font-family: var(--font-mono); font-weight: 600; color: var(--cyber-cyan);">{{${escapeHtml(v.key)}}}</td>
-              <td style="font-family: var(--font-mono); color: #e2e8f0;">${escapeHtml(v.value)}</td>
-            </tr>
-          `;
-        });
-        document.getElementById('modal-body').innerHTML = `
-          <table class="kv-table">
-            <thead>
-              <tr><th>Variable</th><th>Active Value</th></tr>
-            </thead>
-            <tbody>${rows || '<tr><td colspan="2" style="color: var(--text-muted);">No variables defined.</td></tr>'}</tbody>
-          </table>
-        `;
-      }
-
-      document.getElementById('modal-footer').innerHTML = `
-        <button class="nav-btn" onclick="openEnvironmentManager()">Manage Variables</button>
-        <button class="nav-btn" onclick="closeModal()">Close</button>
-      `;
-      openModal();
-    }
-
-    /* Code Snippet Generator Modal */
-    function openCodeGeneratorModal() {
-      if (!activeRequest) return;
-      syncCurrentFieldsToActiveRequest();
-
-      document.getElementById('modal-title').textContent = '</> Code Snippets';
-      document.getElementById('modal-body').innerHTML = `
-        <div class="tab-nav" style="border-bottom: 1px solid var(--border); margin-bottom: 14px;">
-          <button class="tab-btn active" onclick="switchSnippetLang('curl')">cURL</button>
-          <button class="tab-btn" onclick="switchSnippetLang('fetch')">Fetch (JavaScript)</button>
-          <button class="tab-btn" onclick="switchSnippetLang('python')">Python (requests)</button>
-          <button class="tab-btn" onclick="switchSnippetLang('go')">Go (net/http)</button>
-        </div>
-        <textarea class="code-editor" id="snippet-textarea" style="height: 280px;" readonly></textarea>
-      `;
-
-      document.getElementById('modal-footer').innerHTML = `
-        <button class="nav-btn" onclick="copySnippetCode()">📋 Copy Snippet</button>
-        <button class="nav-btn" onclick="closeModal()">Close</button>
-      `;
-
-      openModal();
-      switchSnippetLang('curl');
-    }
-
-    function compileSnippetRequest(req) {
-      const method = (req.method || 'GET').toUpperCase();
-      let url = req.url || '';
-      const enabledParams = (req.queryParams || []).filter(q => q.enabled !== false && q.key);
-      if (enabledParams.length > 0) {
-        try {
-          const hasProto = /^https?:\/\//i.test(url);
-          const u = new URL(hasProto ? url : 'http://' + url);
-          enabledParams.forEach(p => u.searchParams.append(p.key, p.value || ''));
-          url = hasProto ? u.toString() : u.toString().replace(/^http:\/\//, '');
-        } catch {}
-      }
-
-      const headers = [...(req.headers || []).filter(h => h.enabled !== false && h.key)];
-
-      // Auth integration
-      if (req.auth) {
-        if (req.auth.type === 'bearer' && req.auth.bearerToken) {
-          headers.push({ key: 'Authorization', value: `Bearer ${req.auth.bearerToken}` });
-        } else if (req.auth.type === 'basic') {
-          const creds = btoa(`${req.auth.basicUsername || ''}:${req.auth.basicPassword || ''}`);
-          headers.push({ key: 'Authorization', value: `Basic ${creds}` });
-        } else if (req.auth.type === 'apikey' && req.auth.apiKeyName && req.auth.apiKeyValue) {
-          if (req.auth.apiKeyIn === 'query') {
-            try {
-              const hasProto = /^https?:\/\//i.test(url);
-              const u = new URL(hasProto ? url : 'http://' + url);
-              u.searchParams.append(req.auth.apiKeyName, req.auth.apiKeyValue);
-              url = hasProto ? u.toString() : u.toString().replace(/^http:\/\//, '');
-            } catch {}
-          } else {
-            headers.push({ key: req.auth.apiKeyName, value: req.auth.apiKeyValue });
-          }
-        }
-      }
-
-      // Body integration
-      let bodyStr = '';
-      let isJsonBody = false;
-      if (method !== 'GET' && method !== 'HEAD' && req.body) {
-        if (req.body.mode === 'raw-json') {
-          bodyStr = req.body.raw || '';
-          isJsonBody = true;
-          if (!headers.some(h => h.key.toLowerCase() === 'content-type')) {
-            headers.push({ key: 'Content-Type', value: 'application/json' });
-          }
-        } else if (req.body.mode === 'raw-text') {
-          bodyStr = req.body.raw || '';
-        } else if (req.body.mode === 'x-www-form-urlencoded') {
-          const sp = new URLSearchParams();
-          (req.body.formData || []).filter(p => p.enabled !== false && p.key).forEach(p => sp.append(p.key, p.value || ''));
-          bodyStr = sp.toString();
-          if (!headers.some(h => h.key.toLowerCase() === 'content-type')) {
-            headers.push({ key: 'Content-Type', value: 'application/x-www-form-urlencoded' });
-          }
-        } else if (req.body.mode === 'form-data') {
-          const sp = new URLSearchParams();
-          (req.body.formData || []).filter(p => p.enabled !== false && p.key).forEach(p => sp.append(p.key, p.value || ''));
-          bodyStr = sp.toString();
-        }
-      }
-
-      return { method, url, headers, bodyStr, isJsonBody };
-    }
-
-    function switchSnippetLang(lang) {
-      const area = document.getElementById('snippet-textarea');
-      const compiled = compileSnippetRequest(activeRequest);
-      const { method, url, headers, bodyStr, isJsonBody } = compiled;
-
-      if (lang === 'curl') {
-        let cmd = `curl -X ${method} "${url}"`;
-        headers.forEach(h => { cmd += ` \\\n  -H "${h.key}: ${h.value}"`; });
-        if (bodyStr && method !== 'GET' && method !== 'HEAD') {
-          cmd += ` \\\n  -d '${bodyStr}'`;
-        }
-        area.value = cmd;
-      } else if (lang === 'fetch') {
-        const headersObj = {};
-        headers.forEach(h => { headersObj[h.key] = h.value; });
-        let code = `fetch("${url}", {\n  method: "${method}",\n  headers: ${JSON.stringify(headersObj, null, 4)}`;
-        if (bodyStr && method !== 'GET' && method !== 'HEAD') {
-          code += `,\n  body: ${isJsonBody ? `JSON.stringify(${bodyStr})` : JSON.stringify(bodyStr)}`;
-        }
-        code += `\n})\n.then(response => response.json())\n.then(result => console.log(result))\n.catch(error => console.error('Error:', error));`;
-        area.value = code;
-      } else if (lang === 'python') {
-        let code = `import requests\n\nurl = "${url}"\n`;
-        const headersDict = {};
-        headers.forEach(h => { headersDict[h.key] = h.value; });
-        code += `headers = ${JSON.stringify(headersDict, null, 4)}\n`;
-
-        if (bodyStr && method !== 'GET' && method !== 'HEAD') {
-          if (isJsonBody) {
-            code += `payload = ${bodyStr}\n`;
-            code += `response = requests.${method.toLowerCase()}(url, json=payload, headers=headers)\n`;
-          } else {
-            code += `payload = """${bodyStr}"""\n`;
-            code += `response = requests.${method.toLowerCase()}(url, data=payload, headers=headers)\n`;
-          }
-        } else {
-          code += `response = requests.${method.toLowerCase()}(url, headers=headers)\n`;
-        }
-        code += `print(response.status_code)\nprint(response.text)`;
-        area.value = code;
-      } else if (lang === 'go') {
-        let code = `package main\n\nimport (\n\t"fmt"\n\t"net/http"\n\t"io"\n`;
-        if (bodyStr && method !== 'GET' && method !== 'HEAD') code += `\t"strings"\n`;
-        code += `)\n\nfunc main() {\n\tclient := &http.Client{}\n`;
-        if (bodyStr && method !== 'GET' && method !== 'HEAD') {
-          code += `\tbody := strings.NewReader(\`${bodyStr}\`)\n`;
-          code += `\treq, err := http.NewRequest("${method}", "${url}", body)\n`;
-        } else {
-          code += `\treq, err := http.NewRequest("${method}", "${url}", nil)\n`;
-        }
-        code += `\tif err != nil {\n\t\tpanic(err)\n\t}\n`;
-        headers.forEach(h => {
-          code += `\treq.Header.Set("${h.key}", "${h.value}")\n`;
-        });
-        code += `\tres, err := client.Do(req)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tdefer res.Body.Close()\n\trespBytes, _ := io.ReadAll(res.Body)\n\tfmt.Println(string(respBytes))\n}`;
-        area.value = code;
-      }
-
-      const btns = document.querySelectorAll('#modal-body .tab-btn');
-      btns.forEach(b => {
-        if (b.textContent.toLowerCase().includes(lang)) b.classList.add('active');
-        else b.classList.remove('active');
-      });
-    }
-
-    function copySnippetCode() {
-      const code = document.getElementById('snippet-textarea').value;
-      navigator.clipboard.writeText(code).then(() => {
-        alert('Snippet copied to clipboard!');
-      });
-    }
-
-    /* Views & Sniffer */
-    function switchView(view) {
-      if (view === 'studio') {
-        document.getElementById('studio-view').style.display = 'flex';
-        document.getElementById('sniffer-screen').style.display = 'none';
-        document.getElementById('btn-studio-view').classList.add('active');
-        document.getElementById('btn-sniffer-view').classList.remove('active');
-      } else {
-        document.getElementById('studio-view').style.display = 'none';
-        document.getElementById('sniffer-screen').style.display = 'flex';
-        document.getElementById('btn-studio-view').classList.remove('active');
-        document.getElementById('btn-sniffer-view').classList.add('active');
-        pollSnifferTraffic();
-      }
-    }
-
-    async function pollSnifferTraffic() {
-      try {
-        const res = await fetch('/api/sniff/traffic');
-        const items = await res.json();
-        document.getElementById('sniff-count').textContent = items.length;
-
-        const tbody = document.getElementById('traffic-tbody');
-        if (items.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No traffic intercepted yet. Send requests through port 8085.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = '';
-        items.slice(-30).reverse().forEach(item => {
-          const tr = document.createElement('tr');
-          const mClass = `method-${item.method.toLowerCase()}`;
-          tr.innerHTML = `
-            <td><span class="method-badge ${mClass}">${item.method}</span></td>
-            <td><span style="color: var(--cyber-cyan);">${escapeHtml(item.pathname)}</span> <span style="color: var(--text-muted); font-size: 11px;">(${escapeHtml(item.url)})</span></td>
-            <td><span style="color: ${item.responseStatus < 300 ? '#10b981' : '#ef4444'}; font-weight: 700;">${item.responseStatus}</span></td>
-            <td>${item.durationMs} ms</td>
-            <td style="color: var(--text-muted); font-size: 11px;">${new Date(item.timestamp).toLocaleTimeString()}</td>
-          `;
-          tr.onclick = () => showSniffedItemDetails(item);
-          tbody.appendChild(tr);
-        });
-      } catch (e) {}
-    }
-
-    async function clearSniffedTraffic() {
-      await fetch('/api/sniff/clear', { method: 'POST' });
-      pollSnifferTraffic();
-    }
-
-    async function exportOpenApi() {
-      const res = await fetch('/api/sniff/export/openapi', { method: 'POST' });
-      const spec = await res.json();
-
-      document.getElementById('modal-title').textContent = '✨ Reverse-Engineered OpenAPI 3.1.0 Specification';
-      document.getElementById('modal-body').innerHTML = `
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-          Automatically inferred schemas, parameters, and responses from intercepted live traffic.
-        </p>
-        <textarea class="code-editor" style="height: 380px;" readonly>${JSON.stringify(spec, null, 2)}</textarea>
-      `;
-      document.getElementById('modal-footer').innerHTML = `<button class="nav-btn" onclick="closeModal()">Close</button>`;
-      openModal();
-    }
-
-    async function exportTypeScriptSdk() {
-      const res = await fetch('/api/sniff/export/sdk', { method: 'POST' });
-      const code = await res.text();
-
-      document.getElementById('modal-title').textContent = '📦 Strongly Typed Client SDK';
-      document.getElementById('modal-body').innerHTML = `
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-          Production-ready TypeScript client ready to drop into your codebase.
-        </p>
-        <textarea class="code-editor" style="height: 380px;" readonly>${code}</textarea>
-      `;
-      document.getElementById('modal-footer').innerHTML = `<button class="nav-btn" onclick="closeModal()">Close</button>`;
-      openModal();
-    }
-
-    function showSniffedItemDetails(item) {
-      document.getElementById('modal-title').textContent = `${item.method} ${item.pathname}`;
-      document.getElementById('modal-body').innerHTML = `
-        <div style="font-size: 12px; margin-bottom: 12px;">
-          <strong>Target:</strong> <code style="color: var(--cyber-cyan);">${escapeHtml(item.url)}</code><br/>
-          <strong>Status:</strong> ${item.responseStatus} | <strong>Latency:</strong> ${item.durationMs} ms
-        </div>
-        <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">Captured Request Body:</div>
-        <pre class="code-editor" style="height: 120px; margin-bottom: 14px;">${JSON.stringify(item.requestBody || {}, null, 2)}</pre>
-        <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px;">Captured Response Body:</div>
-        <pre class="code-editor" style="height: 160px;">${JSON.stringify(item.responseBody || {}, null, 2)}</pre>
-      `;
-      document.getElementById('modal-footer').innerHTML = `<button class="nav-btn" onclick="closeModal()">Close</button>`;
-      openModal();
-    }
-
-    function openImportModal() {
-      document.getElementById('modal-title').textContent = '📥 Import Postman Collection or cURL';
-      document.getElementById('modal-body').innerHTML = `
-        <div style="font-size: 12px; margin-bottom: 10px;">Paste a Postman Collection JSON or raw cURL command:</div>
-        <textarea class="code-editor" id="import-text" style="height: 250px;" placeholder="curl -X POST https://api.example.com -H 'Content-Type: application/json' -d '{\"foo\":\"bar\"}'"></textarea>
-      `;
-      document.getElementById('modal-footer').innerHTML = `
-        <button class="nav-btn" onclick="executeImport()">Import</button>
-        <button class="nav-btn" onclick="closeModal()">Cancel</button>
-      `;
-      openModal();
-    }
-
-    async function executeImport() {
-      const text = document.getElementById('import-text').value.trim();
-      if (!text) return;
-
-      if (text.startsWith('curl')) {
-        const res = await fetch('/api/import/curl', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ curl: text })
-        });
-        const req = await res.json();
-        if (collections.length > 0) {
-          collections[0].items.push({ id: req.id, name: req.name, request: req });
-          selectRequest(req, collections[0]);
-        }
-      } else {
-        try {
-          const parsed = JSON.parse(text);
-          const res = await fetch('/api/import/postman', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(parsed)
-          });
-          const col = await res.json();
-          await loadCollections();
-        } catch (err) {
-          alert('Failed to parse input: ' + err.message);
-        }
-      }
-      closeModal();
-    }
-
-    function openModal() {
-      document.getElementById('modal-backdrop').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('modal-backdrop').style.display = 'none';
-    }
-
-    init();
-  </script>
-</body>
+    </footer>
+    <div id="copy-status" class="copy-status" role="status"></div>
+  </body>
 </html>

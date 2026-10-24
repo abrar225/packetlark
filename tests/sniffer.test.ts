@@ -1,7 +1,11 @@
+import { startHttpFixture } from './http-fixture.js';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { TrafficSnifferProxy } from '../src/core/sniffing/TrafficSnifferProxy.js';
 
 describe('TrafficSnifferProxy Ring Buffer & Header Filtering', () => {
+  let target: Awaited<ReturnType<typeof startHttpFixture>>;
+  beforeAll(async()=>{target=await startHttpFixture();});
+  afterAll(async()=>{await target.stop();});
   let proxy: TrafficSnifferProxy;
   const proxyPort = 8399;
 
@@ -42,7 +46,7 @@ describe('TrafficSnifferProxy Ring Buffer & Header Filtering', () => {
 
   it('proxies requests and strips content-encoding headers to protect client decoders', async () => {
     // Send request through sniffer proxy to httpbin gzip endpoint
-    const res = await fetch(`http://localhost:${proxyPort}/https://httpbin.org/gzip`, {
+    const res = await fetch(`http://localhost:${proxyPort}/${target.url}/gzip`, {
       headers: {
         'Accept': 'application/json'
       }
@@ -56,7 +60,7 @@ describe('TrafficSnifferProxy Ring Buffer & Header Filtering', () => {
   });
 
   it('proxies binary payloads transparently without UTF-8 corruption', async () => {
-    const res = await fetch(`http://localhost:${proxyPort}/https://httpbin.org/bytes/64`);
+    const res = await fetch(`http://localhost:${proxyPort}/${target.url}/bytes/64`);
     expect(res.status).toBe(200);
     const buf = await res.arrayBuffer();
     expect(buf.byteLength).toBe(64);

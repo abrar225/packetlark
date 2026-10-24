@@ -1,20 +1,29 @@
+import { startHttpFixture } from './http-fixture.js';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { StudioServer } from '../src/server/StudioServer.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
 describe('StudioServer Environment Management & Request Persistence', () => {
+  let target: Awaited<ReturnType<typeof startHttpFixture>>;
+  beforeAll(async()=>{target=await startHttpFixture();});
+  afterAll(async()=>{await target.stop();});
   let server: StudioServer;
+  const testWorkspace = mkdtempSync(join(tmpdir(), 'rea-test-'));
   const serverPort = 4288;
   const snifferPort = 8288;
 
   beforeAll(async () => {
-    server = new StudioServer(serverPort, snifferPort);
+    server = new StudioServer(serverPort, snifferPort, testWorkspace);
     await server.start();
   });
 
   afterAll(async () => {
     await server.stop();
+    rmSync(testWorkspace, { recursive: true, force: true });
   });
 
   it('handles environment creation, listing, and deletion', async () => {
@@ -80,7 +89,7 @@ describe('StudioServer Environment Management & Request Persistence', () => {
           id: newReqId,
           name: 'Persisted Dynamic Request',
           method: 'GET',
-          url: 'https://httpbin.org/get',
+          url: `${target.url}/get`,
           headers: [],
           queryParams: [],
           body: { mode: 'none' },
@@ -138,7 +147,7 @@ describe('StudioServer Environment Management & Request Persistence', () => {
         environmentId: env.id,
         request: {
           method: 'GET',
-          url: 'https://httpbin.org/get',
+          url: `${target.url}/get`,
           headers: [],
           queryParams: [],
           body: { mode: 'none' },
