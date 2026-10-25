@@ -48,6 +48,34 @@ await fetch(`http://127.0.0.1:${port}/api/collections`, {
     ],
   }),
 });
+if (process.argv.includes("--large")) {
+  for (let group = 0; group < 20; group++) {
+    const collection = {
+      id: `benchmark_${group}`,
+      name: `Benchmark ${group}`,
+      schemaVersion: "2.1.0",
+      variables: [],
+      items: Array.from({ length: 500 }, (_, index) => {
+        const id = `benchmark_${group * 500 + index}`;
+        return {
+          id,
+          name: `Benchmark request ${group * 500 + index}`,
+          request: {
+            ...req(id, `Benchmark request ${group * 500 + index}`, "/fast"),
+            body: { mode: "none" },
+          },
+        };
+      }),
+    };
+    const response = await fetch(`http://127.0.0.1:${port}/api/collections`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collection),
+    });
+    if (!response.ok)
+      throw new Error(`Large fixture creation failed: ${response.status}`);
+  }
+}
 console.log(
   JSON.stringify({
     port,

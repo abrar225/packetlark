@@ -66,6 +66,7 @@ export interface HttpRequest {
   timeoutMs?: number;
   followRedirects?: boolean;
   maxResponseBytes?: number;
+  maxRequestBytes?: number;
   postman?: Record<string, any>;
 }
 
@@ -85,6 +86,8 @@ export interface ApiErrorDetail {
 }
 
 export interface HttpResponse {
+  /** Indicates transport was attempted, not a guarantee about remote side effects. */
+  transportAttempted?: boolean;
   persistence?: {
     environment: {
       status: "saved" | "conflict" | "failed";

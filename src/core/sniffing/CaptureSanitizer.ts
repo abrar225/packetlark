@@ -1,3 +1,4 @@
+import { isSensitiveField } from "../security/SecretRedactor.js";
 import type { SniffedTrafficItem } from "../models/types.js";
 const marker = "[REDACTED]";
 const safeHeaders = new Set([
@@ -14,9 +15,7 @@ const safeHeaders = new Set([
   "location",
 ]);
 const sensitive = (key: string, extra: Set<string>) =>
-  /authorization|cookie|token|secret|password|passwd|api.?key|credential|session/i.test(
-    key,
-  ) || extra.has(key.toLowerCase());
+  isSensitiveField(key) || extra.has(key.toLowerCase());
 
 /** Safe inspection copy only. Never use this copy to forward a request. Unknown text/binary bodies are omitted. */
 export function sanitizeCapture(

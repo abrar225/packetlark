@@ -1,4 +1,5 @@
 import http from "node:http";
+import { readIncomingBody } from "../core/engine/BodyBudget.js";
 import { createHash } from "node:crypto";
 import { validWorkspaceResource } from "../core/models/WorkspaceValidation.js";
 import fs from "node:fs";
@@ -6,7 +7,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   CollectionRunner,
-  RunResult,
+  RunReport,
+  reportWithoutBodies,
 } from "../core/runner/CollectionRunner.js";
 import { resolveCollectionRequest } from "../core/models/CollectionContext.js";
 import { CookieJar } from "tough-cookie";
@@ -60,20 +62,22 @@ function findAndDeleteRequest(items: CollectionItem[], reqId: string): boolean {
   return false;
 }
 
+interface RunJob {
+  controller: AbortController;
+  state: "running" | "completed";
+  result?: RunReport;
+  error?: string;
+  progress?: any;
+  retainedBytes?: number;
+}
+const maxRunHistoryBytes = 32 * 1024 * 1024;
+
 export class StudioServer {
   private server: http.Server | null = null;
   private port: number;
   private cookieJar = new CookieJar();
-  private runs = new Map<
-    string,
-    {
-      controller: AbortController;
-      state: "running" | "completed";
-      result?: RunResult;
-      error?: string;
-      progress?: any;
-    }
-  >();
+  private executions = new Set<AbortController>();
+  private runs = new Map<string, RunJob>();
   private storageDir: string;
   private collectionsDir: string;
   private environmentsDir: string;
@@ -478,82 +482,155 @@ pm.test("Has valid repo name", function () {
     this.environments.delete(id);
   }
 
+  private activeWorkCount() {
+    return (
+      this.executions.size +
+      [...this.runs.values()].filter((job) => job.state === "running").length
+    );
+  }
+
+  private runHistoryStats() {
+    let retainedBytes = 0,
+      completedRuns = 0;
+    for (const job of this.runs.values())
+      if (job.state === "completed") {
+        retainedBytes += job.retainedBytes || 0;
+        completedRuns++;
+      }
+    return {
+      retainedBytes,
+      completedRuns,
+      limitBytes: maxRunHistoryBytes,
+      maxRuns: 20,
+    };
+  }
+
+  private completeRun(id: string, job: RunJob) {
+    job.state = "completed";
+    job.retainedBytes =
+      (job.result ? Buffer.byteLength(JSON.stringify(job.result)) : 0) +
+      Buffer.byteLength(
+        JSON.stringify({
+          id,
+          state: job.state,
+          error: job.error,
+          progress: job.progress,
+        }),
+      );
+    while (
+      this.runHistoryStats().retainedBytes > maxRunHistoryBytes ||
+      this.runs.size > 20
+    ) {
+      const oldest = [...this.runs].find(
+        ([, entry]) => entry.state === "completed",
+      );
+      if (!oldest) break;
+      this.runs.delete(oldest[0]);
+    }
+  }
+
   public async start(): Promise<number> {
     // Start sniffer proxy in parallel
     await this.sniffer.start();
 
     return new Promise((resolve, reject) => {
-      this.server = http.createServer(async (req, res) => {
-        // Only the local studio may use this API from a browser. Check Host too,
-        // so a foreign hostname resolving to loopback cannot bypass the origin check.
-        const host = req.headers.host || "";
-        const allowedHosts = [
-          `localhost:${this.port}`,
-          `127.0.0.1:${this.port}`,
-        ];
-        const origin = req.headers.origin;
-        if (
-          !allowedHosts.includes(host) ||
-          (origin && !allowedHosts.some((h) => origin === `http://${h}`))
-        ) {
-          res.writeHead(403, { "Content-Type": "application/json" });
-          res.end(
-            JSON.stringify({
-              error: "Only the local studio origin is allowed",
-            }),
-          );
-          return;
-        }
-        res.setHeader("X-Content-Type-Options", "nosniff");
-        res.setHeader("Referrer-Policy", "no-referrer");
-        if (origin) {
-          res.setHeader("Access-Control-Allow-Origin", origin);
-          res.setHeader("Vary", "Origin");
-        }
-        if (req.method === "OPTIONS") {
-          res.setHeader(
-            "Access-Control-Allow-Methods",
-            "GET, POST, PUT, DELETE, OPTIONS",
-          );
-          res.setHeader(
-            "Access-Control-Allow-Headers",
-            "Content-Type, Authorization, X-Requested-With",
-          );
-          res.writeHead(204);
-          res.end();
-          return;
-        }
-        const urlObj = new URL(req.url || "/", `http://localhost:${this.port}`);
-        const pathname = urlObj.pathname;
-
-        // REST API routes with top-level error isolation
-        if (pathname.startsWith("/api/")) {
-          try {
-            await this.handleApi(req, res, pathname, urlObj);
-          } catch (err: any) {
-            res.writeHead(err.statusCode || 500, {
-              "Content-Type": "application/json",
-            });
+      this.server = http.createServer(
+        {
+          headersTimeout: 10000,
+          requestTimeout: 10000,
+          connectionsCheckingInterval: 1000,
+        },
+        async (req, res) => {
+          req.on("error", () => {});
+          res.on("error", () => {});
+          // Only the local studio may use this API from a browser. Check Host too,
+          // so a foreign hostname resolving to loopback cannot bypass the origin check.
+          const host = req.headers.host || "";
+          const allowedHosts = [
+            `localhost:${this.port}`,
+            `127.0.0.1:${this.port}`,
+          ];
+          const origin = req.headers.origin;
+          if (
+            !allowedHosts.includes(host) ||
+            (req.headers["sec-fetch-site"] &&
+              !["same-origin", "none"].includes(
+                String(req.headers["sec-fetch-site"]),
+              )) ||
+            (origin && !allowedHosts.some((h) => origin === `http://${h}`))
+          ) {
+            res.writeHead(403, { "Content-Type": "application/json" });
             res.end(
               JSON.stringify({
-                error: {
-                  category: "Internal Server Error",
-                  message:
-                    err.message || "An unhandled server exception occurred",
-                  guidance:
-                    "Please inspect the request payload or server diagnostics.",
-                  code: err.code || "INTERNAL_ERROR",
-                },
+                error: "Only the local studio origin is allowed",
               }),
             );
+            return;
           }
-          return;
-        }
+          res.setHeader("X-Content-Type-Options", "nosniff");
+          res.setHeader("Referrer-Policy", "no-referrer");
+          if (origin) {
+            res.setHeader("Access-Control-Allow-Origin", origin);
+            res.setHeader("Vary", "Origin");
+          }
+          if (req.method === "OPTIONS") {
+            res.setHeader(
+              "Access-Control-Allow-Methods",
+              "GET, POST, PUT, DELETE, OPTIONS",
+            );
+            res.setHeader(
+              "Access-Control-Allow-Headers",
+              "Content-Type, Authorization, X-Requested-With",
+            );
+            res.writeHead(204);
+            res.end();
+            return;
+          }
+          const urlObj = new URL(
+            req.url || "/",
+            `http://localhost:${this.port}`,
+          );
+          const pathname = urlObj.pathname;
 
-        // Static files from public/
-        this.serveStatic(req, res, pathname);
-      });
+          // REST API routes with top-level error isolation
+          if (pathname.startsWith("/api/")) {
+            try {
+              await this.handleApi(req, res, pathname, urlObj);
+            } catch (err: any) {
+              if (res.destroyed || res.headersSent) {
+                if (!res.destroyed) res.destroy();
+                return;
+              }
+              res.shouldKeepAlive = false;
+              res.setHeader("Connection", "close");
+              res.once("finish", () => {
+                if (!req.complete) req.destroy();
+              });
+              res.writeHead(err.statusCode || 500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  error: {
+                    category: "Internal Server Error",
+                    message:
+                      err.message || "An unhandled server exception occurred",
+                    guidance:
+                      "Please inspect the request payload or server diagnostics.",
+                    code: err.code || "INTERNAL_ERROR",
+                  },
+                }),
+              );
+            }
+            return;
+          }
 
+          // Static files from public/
+          this.serveStatic(req, res, pathname);
+        },
+      );
+
+      this.server.maxConnections = 64;
       this.server.listen(this.port, "127.0.0.1", () => {
         this.port = (this.server.address() as { port: number }).port;
         resolve(this.port);
@@ -586,17 +663,12 @@ pm.test("Has valid repo name", function () {
     };
 
     const readBody = async (): Promise<any> => {
-      const chunks: Buffer[] = [];
-      let bytes = 0;
-      for await (const chunk of req) {
-        bytes += chunk.length;
-        if (bytes > 2 * 1024 * 1024)
-          throw Object.assign(new Error("Request payload exceeds 2 MiB"), {
-            statusCode: 413,
-          });
-        chunks.push(chunk);
-      }
-      const str = Buffer.concat(chunks).toString("utf8");
+      const bytes = await readIncomingBody(
+        req,
+        2 * 1024 * 1024,
+        AbortSignal.timeout(10000),
+      );
+      const str = bytes.toString("utf8");
       if (!str.trim()) return {};
       try {
         return JSON.parse(str);
@@ -621,6 +693,9 @@ pm.test("Has valid repo name", function () {
         snifferPort: this.sniffer.getPort(),
         collectionsCount: this.collections.size,
         environmentsCount: this.environments.size,
+        runHistory: this.runHistoryStats(),
+        activeWork: this.activeWorkCount(),
+        maxActiveWork: 2,
       });
       return;
     }
@@ -683,11 +758,25 @@ pm.test("Has valid repo name", function () {
         httpRequest = resolved.request;
         collectionVars = resolved.variables;
       }
+      if (this.activeWorkCount() >= 2) {
+        sendJson(
+          {
+            error: {
+              code: "ERR_CONCURRENCY",
+              message:
+                "Two executions or runs are active. Cancel or wait for one.",
+            },
+          },
+          503,
+        );
+        return;
+      }
       const controller = new AbortController();
       const onClose = () => {
         if (!res.writableEnded) controller.abort();
       };
       res.on("close", onClose);
+      this.executions.add(controller);
       let response;
       try {
         response = await HttpExecutor.execute(
@@ -698,6 +787,7 @@ pm.test("Has valid repo name", function () {
         );
       } finally {
         res.off("close", onClose);
+        this.executions.delete(controller);
       }
       if (res.destroyed) return;
 
@@ -757,17 +847,17 @@ pm.test("Has valid repo name", function () {
     }
 
     if (pathname === "/api/runs" && req.method === "POST") {
-      if (
-        [...this.runs.values()].filter((run) => run.state === "running")
-          .length >= 2
-      ) {
+      const body = await readBody();
+      if (this.activeWorkCount() >= 2) {
         sendJson(
-          { error: "Two runs are already active. Cancel or wait for one." },
+          {
+            error:
+              "Two executions or runs are already active. Cancel or wait for one.",
+          },
           429,
         );
         return;
       }
-      const body = await readBody();
       const collection = this.collections.get(body.collectionId);
       if (!collection) {
         sendJson({ error: "Collection not found" }, 404);
@@ -782,13 +872,7 @@ pm.test("Has valid repo name", function () {
         if (!completed) break;
         this.runs.delete(completed[0]);
       }
-      const job: {
-        controller: AbortController;
-        state: "running" | "completed";
-        result?: RunResult;
-        error?: string;
-        progress?: any;
-      } = { controller, state: "running" };
+      const job: RunJob = { controller, state: "running" };
       this.runs.set(id, job);
       CollectionRunner.run(collection, {
         environment: body.environmentId
@@ -801,15 +885,16 @@ pm.test("Has valid repo name", function () {
         stopOnFailure: body.stopOnFailure,
         timeoutMs: body.timeoutMs,
         signal: controller.signal,
-        onProgress: (progress) => (job.progress = progress),
+        onProgress: (progress) =>
+          (job.progress = { ...progress, name: progress.name.slice(0, 512) }),
       })
         .then((result) => {
-          job.result = result;
-          job.state = "completed";
+          job.result = reportWithoutBodies(result);
+          this.completeRun(id, job);
         })
         .catch((error) => {
-          job.error = error.message;
-          job.state = "completed";
+          job.error = String(error.message).slice(0, 512);
+          this.completeRun(id, job);
         });
       sendJson({ id, state: job.state }, 202);
       return;
@@ -1196,10 +1281,12 @@ pm.test("Has valid repo name", function () {
 
   public async stop(): Promise<void> {
     for (const run of this.runs.values()) run.controller.abort();
+    for (const execution of this.executions) execution.abort();
     await this.sniffer.stop();
     if (!this.server) return;
     return new Promise((resolve) => {
       this.server?.close(() => resolve());
+      this.server?.closeAllConnections();
     });
   }
 }

@@ -87,6 +87,7 @@ async function init() {
   await loadEnvironments();
   await loadCollections();
   await updateHealth();
+  performance.mark("rea:studio-ready");
 
   setInterval(pollSnifferTraffic, 2000);
   setInterval(updateHealth, 10000);

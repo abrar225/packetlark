@@ -194,7 +194,9 @@ export class TrafficSnifferProxy {
         req.headers.host || "",
       ) &&
         !absolute) ||
-      req.headers.origin
+      req.headers.origin ||
+      req.headers["sec-fetch-site"] ||
+      ["navigate", "no-cors"].includes(String(req.headers["sec-fetch-mode"]))
     ) {
       fail(403, "ERR_ORIGIN", "Use the local proxy from a trusted HTTP client");
       return;

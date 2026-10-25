@@ -3,6 +3,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { realpath, readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
+import { SecretRedactor } from "../core/security/SecretRedactor.js";
+import { parseJsonDocument } from "../core/models/JsonDocument.js";
 import {
   CollectionRunner,
   reportWithoutBodies,
@@ -35,7 +37,7 @@ export function createMcpServer(workspace: string): McpServer {
       throw new Error("Workspace path escape rejected");
     if ((await stat(file)).size > 2 * 1024 * 1024)
       throw new Error("Workspace file exceeds 2 MiB");
-    return JSON.parse(await readFile(file, "utf8"));
+    return parseJsonDocument(await readFile(file, "utf8"), kind);
   }
   server.registerTool(
     "list_collections",
@@ -107,23 +109,7 @@ export function createMcpServer(workspace: string): McpServer {
           maxRequests: 100,
           signal: extra.signal,
         });
-        const secrets = (environment?.values || [])
-          .filter((v) => v.secret || v.type === "secret")
-          .map((v) => String(v.value))
-          .filter(Boolean);
-        const serialized = JSON.stringify(reportWithoutBodies(result));
-        return reply(
-          JSON.parse(
-            secrets.reduce(
-              (text, secret) =>
-                text
-                  .split(JSON.stringify(secret).slice(1, -1))
-                  .join("[redacted]"),
-              serialized,
-            ),
-          ),
-          result.status !== "passed",
-        );
+        return reply(reportWithoutBodies(result), result.status !== "passed");
       } catch (error) {
         return reply({ error: error.message }, true);
       }
@@ -153,6 +139,7 @@ export function createMcpServer(workspace: string): McpServer {
       },
     },
     async (input, extra) => {
+      const secrets = new SecretRedactor();
       try {
         const response = await HttpExecutor.execute(
           {
@@ -172,10 +159,10 @@ export function createMcpServer(workspace: string): McpServer {
           },
           [],
           [],
-          { signal: extra.signal },
+          { signal: extra.signal, secrets },
         );
         return reply(
-          {
+          secrets.redact({
             status: response.status,
             statusText: response.statusText,
             sizeBytes: response.sizeBytes,
@@ -184,11 +171,11 @@ export function createMcpServer(workspace: string): McpServer {
             ...(input.includeBody
               ? { body: response.body, bodyEncoding: response.bodyEncoding }
               : {}),
-          },
+          }),
           !!response.error,
         );
       } catch (error) {
-        return reply({ error: error.message }, true);
+        return reply({ error: secrets.text(error.message) }, true);
       }
     },
   );

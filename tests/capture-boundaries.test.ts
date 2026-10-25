@@ -472,4 +472,101 @@ describe("public capture transport boundaries", () => {
       await isolated.stop();
     }
   });
+  it("closes slow headers at the parser deadline even when bytes continue arriving", async () => {
+    const isolated = new TrafficSnifferProxy(0, { timeoutMs: 80 });
+    const endpoint = await isolated.start();
+    const socket = net.connect(endpoint, "127.0.0.1");
+    socket.on("error", () => {});
+    socket.resume();
+    let timer: ReturnType<typeof setInterval>;
+    try {
+      await once(socket, "connect");
+      const closed = new Promise<boolean>((resolve) =>
+        socket.once("close", () => resolve(true)),
+      );
+      socket.write(`GET / HTTP/1.1\r\nHost: 127.0.0.1:${endpoint}\r\nX-Slow: `);
+      timer = setInterval(() => socket.write("x"), 15);
+      expect(
+        await Promise.race([
+          closed,
+          new Promise((resolve) => setTimeout(() => resolve(false), 700)),
+        ]),
+      ).toBe(true);
+      expect(isolated.getCaptureStats().activeRequests).toBe(0);
+    } finally {
+      clearInterval(timer);
+      socket.destroy();
+      await isolated.stop();
+    }
+  });
+  it("releases every request after repeated client cancellation", async () => {
+    const isolated = new TrafficSnifferProxy(0, {
+      timeoutMs: 1000,
+      maxConcurrentRequests: 1,
+    });
+    const endpoint = await isolated.start();
+    try {
+      for (let i = 0; i < 30; i++) {
+        const abort = new AbortController();
+        const running = fetch(`http://127.0.0.1:${endpoint}/${origin}/slow`, {
+          signal: abort.signal,
+        }).catch(() => null);
+        for (
+          let j = 0;
+          j < 100 && isolated.getCaptureStats().activeRequests !== 1;
+          j++
+        )
+          await new Promise((resolve) => setTimeout(resolve, 2));
+        expect(isolated.getCaptureStats().activeRequests).toBe(1);
+        abort.abort();
+        await running;
+        for (
+          let j = 0;
+          j < 100 && isolated.getCaptureStats().activeRequests;
+          j++
+        )
+          await new Promise((resolve) => setTimeout(resolve, 2));
+        expect(isolated.getCaptureStats().activeRequests).toBe(0);
+      }
+      expect(
+        (await fetch(`http://127.0.0.1:${endpoint}/${origin}/echo`)).status,
+      ).toBe(200);
+    } finally {
+      await isolated.stop();
+    }
+  });
+  it("plateaus retained record bytes across three 1000-request capture batches", async () => {
+    const isolated = new TrafficSnifferProxy(0, {
+      maxHistoryBytes: 64 * 1024,
+      maxRecordBytes: 4096,
+    });
+    const endpoint = await isolated.start();
+    const payload = JSON.stringify({ message: "x".repeat(1024) });
+    try {
+      for (let batch = 0; batch < 3; batch++) {
+        for (let index = 0; index < 1000; index += 4)
+          await Promise.all(
+            Array.from({ length: 4 }, async () => {
+              const response = await fetch(
+                `http://127.0.0.1:${endpoint}/${origin}/echo`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: payload,
+                },
+              );
+              expect(response.status).toBe(200);
+              await response.arrayBuffer();
+            }),
+          );
+        const stats = isolated.getCaptureStats();
+        expect(stats.retainedBytes).toBeLessThanOrEqual(64 * 1024);
+        expect(stats.retainedBytes).toBeGreaterThan(60 * 1024);
+        expect(stats.activeRequests).toBe(0);
+        expect(stats.retainedRecords).toBeLessThan(500);
+      }
+    } finally {
+      await isolated.stop();
+    }
+  }, 15000);
 });
