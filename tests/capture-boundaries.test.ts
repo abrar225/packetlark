@@ -14,6 +14,24 @@ describe("public capture transport boundaries", () => {
     port: number;
   beforeAll(async () => {
     target = http.createServer(async (req, res) => {
+      if (req.url === "/cookie-secrets") {
+        res.setHeader("Content-Type", "application/json");
+        res.setHeader("Set-Cookie", [
+          "first=cookie-first-secret; Path=/",
+          "second=cookie-second-secret; Path=/",
+        ]);
+        res.setHeader("Location", origin + "/?token=location-secret");
+        res.end(
+          JSON.stringify({
+            echo: [
+              "cookie-first-secret",
+              "cookie-second-secret",
+              "location-secret",
+            ],
+          }),
+        );
+        return;
+      }
       if (req.url?.startsWith("/secrets")) {
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Set-Cookie", "session=cookie-secret");
@@ -430,5 +448,24 @@ describe("public capture transport boundaries", () => {
     expect(isolated.getCapturedItems()).toEqual([]);
     expect(published).toEqual([]);
     expect(isolated.getCaptureStats().omittedRecords).toBe(1);
+  });
+  it("redacts echoed values from every response cookie and redirect query", async () => {
+    const isolated = new TrafficSnifferProxy(0);
+    const endpoint = await isolated.start();
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:${endpoint}/${origin}/cookie-secrets`,
+      );
+      expect((await response.json()).echo).toHaveLength(3);
+      const retained = JSON.stringify(isolated.getCapturedItems());
+      for (const secret of [
+        "cookie-first-secret",
+        "cookie-second-secret",
+        "location-secret",
+      ])
+        expect(retained).not.toContain(secret);
+    } finally {
+      await isolated.stop();
+    }
   });
 });

@@ -64,8 +64,22 @@ export function sanitizeCapture(
       if (sensitive(key, extra) || !safeHeaders.has(key.toLowerCase()))
         remember(value);
       if (/cookie/i.test(key))
-        for (const part of value.split(";"))
-          remember(part.slice(part.indexOf("=") + 1).trim());
+        for (const match of value.matchAll(
+          /(?:^|[;,]\s*)[^=;,\s]+\s*=\s*("[^"]*"|[^;,]*)/g,
+        ))
+          remember(match[1].trim().replace(/^"|"$/g, ""));
+      if (key.toLowerCase() === "location") {
+        let location: URL;
+        try {
+          location = new URL(value, url);
+        } catch {
+          continue;
+        }
+        remember(location.username);
+        remember(location.password);
+        for (const [field, entry] of location.searchParams)
+          if (sensitive(field, extra)) remember(entry);
+      }
     }
   const normalizeBody = (body: unknown, headers: Record<string, string>) => {
     const mime =

@@ -344,7 +344,10 @@ export class TrafficSnifferProxy {
               ? "[Omitted: inspection byte limit]"
               : inspect(requestBytes, headers.get("content-type") || ""),
           responseStatus: upstream.status,
-          responseHeaders: Object.fromEntries(responseHeaders),
+          responseHeaders: {
+            ...Object.fromEntries(responseHeaders),
+            ...(cookies.length ? { "set-cookie": cookies.join("; ") } : {}),
+          },
           responseBody:
             responseBytes.length > this.limits.maxRecordBytes / 2
               ? "[Omitted: inspection byte limit]"
