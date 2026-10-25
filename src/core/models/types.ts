@@ -85,6 +85,14 @@ export interface ApiErrorDetail {
 }
 
 export interface HttpResponse {
+  persistence?: {
+    environment: {
+      status: "saved" | "conflict" | "failed";
+      revision?: string;
+      code?: string;
+      message?: string;
+    };
+  };
   status: number;
   statusText: string;
   headers: Record<string, string>;
@@ -126,6 +134,8 @@ export interface CollectionItem {
 }
 
 export interface ApiCollection {
+  /** Workspace content revision; excluded from canonical JSON files. */
+  revision?: string;
   id: string;
   name: string;
   description?: string;
@@ -140,6 +150,7 @@ export interface ApiCollection {
 }
 
 export interface Environment {
+  revision?: string;
   id: string;
   name: string;
   values: KeyValueParam[];
@@ -152,6 +163,8 @@ export interface SniffedTrafficItem {
   url: string;
   pathname: string;
   queryParams: Record<string, string>;
+  queryParamEntries?: Array<[string, string]>;
+  redaction?: { version: number; applied: boolean; bodyOmitted?: boolean };
   requestHeaders: Record<string, string>;
   requestBody?: any;
   responseStatus: number;

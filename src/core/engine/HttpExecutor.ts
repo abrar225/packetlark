@@ -1,3 +1,4 @@
+import { readResponseBody } from "./BodyBudget.js";
 import {
   HttpRequest,
   HttpResponse,
@@ -470,28 +471,7 @@ export class HttpExecutor {
         url = next;
       }
       firstByteMs = Math.round(performance.now() - start);
-      const chunks: Uint8Array[] = [];
-      let size = 0;
-      const reader = response.body?.getReader();
-      if (reader)
-        try {
-          while (true) {
-            const chunk = await reader.read();
-            if (chunk.done) break;
-            size += chunk.value.byteLength;
-            if (size > maxBytes) {
-              await reader.cancel();
-              throw Object.assign(
-                new Error(`Response exceeds ${maxBytes} byte limit`),
-                { code: "ERR_RESPONSE_LIMIT" },
-              );
-            }
-            chunks.push(chunk.value);
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      const bytes = Buffer.concat(chunks);
+      const bytes = await readResponseBody(response, maxBytes, signal);
       const mime = response.headers.get("content-type") || "";
       const binary =
         !!mime &&
