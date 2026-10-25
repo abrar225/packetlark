@@ -1254,6 +1254,7 @@ mark {
   flex-wrap: wrap;
   gap: 8px;
 }
+.modal-footer:empty { display: none; }
 @media (max-width: 700px) {
   .workspace-previews {
     grid-template-columns: 1fr;

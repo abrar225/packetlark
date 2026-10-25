@@ -703,3 +703,56 @@ export async function verifyRunnerContextAdmission(page, baseUrl) {
     });
   }
 }
+
+export async function verifyReviewFooterIsolation(page, baseUrl) {
+  await page.goto(baseUrl + "/studio");
+  await page.click('button[onclick="openImportModal()"]');
+  await page.click('[aria-label="Close dialog"]');
+  await page.click('[aria-label="GET Race A"]');
+  const original = JSON.parse(
+    (await page.fetch("/api/collections/race_fixture")).body,
+  );
+  try {
+    await page.fill("#req-url", "http://example.test/footer-draft");
+    const disk = structuredClone(original);
+    disk.name = "Footer conflict";
+    assert.equal(
+      (
+        await page.fetch("/api/collections/race_fixture", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "If-Match": `"${original.revision}"`,
+          },
+          body: JSON.stringify(disk),
+        })
+      ).status,
+      200,
+    );
+    await page.click('[aria-label="Check workspace files"]');
+    await page.waitForSelector('[aria-label="Review workspace changes"]');
+    await page.click('[aria-label="Review workspace changes"]');
+    assert.equal(
+      await page.evaluate(
+        () => document.getElementById("modal-footer").children.length,
+      ),
+      0,
+    );
+    return {
+      verdict: "PASS",
+      cases: ["review never retains another dialog's footer actions"],
+    };
+  } finally {
+    await page.click('[aria-label="Load disk and discard local drafts"]');
+    await page.acceptDialog();
+    await page.waitForFunction(
+      () => document.getElementById("modal-backdrop").style.display === "none",
+    );
+    delete original.revision;
+    await page.fetch("/api/collections/race_fixture", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(original),
+    });
+  }
+}

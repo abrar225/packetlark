@@ -124,6 +124,7 @@ export class WorkspaceSync {
     this.options.syncFields();
     document.getElementById("modal-title").textContent =
       "Review workspace changes";
+    document.getElementById("modal-footer").replaceChildren();
     const body = document.getElementById("modal-body");
     body.replaceChildren();
     const choose = document.createElement("select");
