@@ -49,6 +49,7 @@ let activeReqTab = "params";
 let activeResTab = "body";
 let currentResponseData = null;
 let isDirty = false;
+let collectionTree;
 const requestDrafts = new Map();
 const collectionSaves = new Map();
 const environmentSaves = new Map();
@@ -69,6 +70,7 @@ function adoptCollectionCommit(collection, baseRevision) {
     )
       draft.collectionRevision = collection.revision;
   if (activeCollection?.id === collection.id) activeCollection = collection;
+  renderCollectionsTree();
 }
 
 window.addEventListener("beforeunload", (event) => {
@@ -83,6 +85,25 @@ window.addEventListener("beforeunload", (event) => {
 
 async function init() {
   refreshIcons();
+  collectionTree = new window.ReaCollectionTree(
+    document.getElementById("collection-tree"),
+    {
+      collections: () => collections,
+      selected: () =>
+        activeRequest && activeCollection
+          ? draftKey(activeCollection.id, activeRequest.id)
+          : null,
+      dirty: (collectionId, requestId) =>
+        !!requestDrafts.get(draftKey(collectionId, requestId))?.dirty,
+      draft: (collectionId, requestId) => {
+        const draft = requestDrafts.get(draftKey(collectionId, requestId));
+        return draft?.dirty || draft?.saving ? draft.request : null;
+      },
+      select: selectRequest,
+      remove: deleteRequest,
+      refreshIcons,
+    },
+  );
 
   await loadEnvironments();
   await loadCollections();
@@ -190,7 +211,10 @@ async function loadCollections() {
     ) {
       const firstReqItem = findFirstRequestItem(collections[0].items);
       if (firstReqItem) {
-        selectRequest(firstReqItem.request, collections[0]);
+        selectRequest(
+          window.ReaCollectionTree.requestForItem(firstReqItem),
+          collections[0],
+        );
       }
     }
   } catch (err) {
@@ -215,7 +239,7 @@ function refreshDirtyState() {
     ? "inline"
     : "none";
   document.getElementById("btn-save-req").classList.toggle("is-dirty", isDirty);
-  renderCollectionsTree();
+  collectionTree?.refreshState();
 }
 function markDirty() {
   if (activeDraft) {
@@ -227,107 +251,11 @@ function markDirty() {
 }
 
 function renderCollectionsTree() {
-  const tree = document.getElementById("collection-tree");
-  tree.innerHTML = "";
-
-  const query = document
-    .getElementById("collection-search")
-    .value.trim()
-    .toLowerCase();
-  const filterItems = (items) =>
-    items.flatMap((item) =>
-      item.isFolder
-        ? [{ ...item, items: filterItems(item.items || []) }].filter(
-            (x) => x.items.length,
-          )
-        : (item.name + " " + (item.request?.url || ""))
-              .toLowerCase()
-              .includes(query)
-          ? [item]
-          : [],
-    );
-  let foundCount = 0;
-  collections.forEach((col) => {
-    const visibleItems =
-      query && !col.name.toLowerCase().includes(query)
-        ? filterItems(col.items)
-        : col.items;
-    if (!visibleItems.length) return;
-    foundCount += visibleItems.length;
-    const colDiv = document.createElement("div");
-    colDiv.className = "collection-node";
-
-    const label = document.createElement("div");
-    label.className = "collection-label";
-    label.innerHTML = `<i data-lucide="folder"></i><span>${escapeHtml(col.name)}</span>`;
-    colDiv.appendChild(label);
-
-    renderTreeItems(visibleItems, colDiv, col, 0);
-    tree.appendChild(colDiv);
-  });
-  if (!foundCount)
-    tree.innerHTML = `<p class="empty-collection">${query ? "No matching requests. Try another search." : "Import a collection to get started."}</p>`;
-  refreshIcons();
-}
-
-function renderTreeItems(items, parentEl, col, depth) {
-  if (!Array.isArray(items)) return;
-
-  items.forEach((item) => {
-    if (item.isFolder) {
-      const folderDiv = document.createElement("div");
-      folderDiv.className = "tree-folder";
-      folderDiv.style.marginLeft = `${depth > 0 ? 12 : 8}px`;
-
-      const title = document.createElement("div");
-      title.className = "tree-folder-title";
-      title.innerHTML = `<i data-lucide="folder"></i> <span>${escapeHtml(item.name)}</span>`;
-      const childrenDiv = document.createElement("div");
-
-      title.onclick = () => {
-        const isHidden = childrenDiv.style.display === "none";
-        childrenDiv.style.display = isHidden ? "block" : "none";
-        title.innerHTML = `${isHidden ? '<i data-lucide="folder"></i>' : '<i data-lucide="folder"></i>'} <span>${escapeHtml(item.name)}</span>`;
-      };
-
-      folderDiv.appendChild(title);
-      renderTreeItems(item.items || [], childrenDiv, col, depth + 1);
-      folderDiv.appendChild(childrenDiv);
-      parentEl.appendChild(folderDiv);
-    } else if (item.request) {
-      const reqDiv = document.createElement("div");
-      const isSelected =
-        activeCollection?.id === col.id &&
-        activeRequest?.id === item.request.id;
-      reqDiv.className = `request-item ${isSelected ? "selected" : ""}`;
-      if (depth > 0) reqDiv.style.paddingLeft = `${14 + depth * 8}px`;
-
-      const mClass = `method-${item.request.method.toLowerCase()}`;
-      const isCurrentDirty = requestDrafts.get(
-        draftKey(col.id, item.request.id),
-      )?.dirty;
-
-      reqDiv.innerHTML = `
-            <button class="req-main-info" type="button">
-              <span class="method-badge ${mClass}">${escapeHtml(item.request.method)}</span>
-              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(item.request.name || item.request.url)}</span>
-              ${isCurrentDirty ? '<span class="dirty-dot">•</span>' : ""}
-            </button>
-            <button class="icon-btn" title="Delete Request" data-delete-request>✕</button>
-          `;
-      reqDiv.querySelector("[data-delete-request]").onclick = (event) => {
-        event.stopPropagation();
-        deleteRequest(item.request.id, col.id);
-      };
-      const selectButton = reqDiv.querySelector(".req-main-info");
-      selectButton.setAttribute(
-        "aria-label",
-        `${item.request.method} ${item.request.name || item.request.url}`,
-      );
-      selectButton.onclick = () => selectRequest(item.request, col);
-      parentEl.appendChild(reqDiv);
-    }
-  });
+  syncCurrentFieldsToActiveRequest();
+  collectionTree?.update(
+    collections,
+    document.getElementById("collection-search").value.trim().toLowerCase(),
+  );
 }
 
 function selectRequest(req, col) {
@@ -395,7 +323,7 @@ function selectRequest(req, col) {
     activeRequest.name || "Untitled request";
   document.getElementById("collection-name").textContent = col.name;
   document.body.classList.remove("sidebar-open");
-  renderCollectionsTree();
+  collectionTree?.reveal(draftKey(col.id, activeRequest.id));
 }
 
 function syncCurrentFieldsToActiveRequest() {
@@ -505,6 +433,7 @@ async function createNewRequest() {
     const data = await res.json();
     if (!res.ok || !data.ok)
       throw new Error(data.error?.message || data.error || "Create failed");
+    document.getElementById("collection-search").value = "";
     adoptCollectionCommit(data.collection, ownerCollection.revision);
     if (selectionRevision === ownerSelection)
       selectRequest(newReq, data.collection);

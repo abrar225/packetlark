@@ -26,6 +26,7 @@ export function collectionRequests(
       }
       if (!item.request) continue;
       const request = structuredClone(item.request);
+      request.id ??= item.id;
       let auth: AuthConfig = { type: "none" };
       for (const parent of parents)
         if (parent.auth && parent.auth.type !== "inherit") auth = parent.auth;

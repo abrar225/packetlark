@@ -4,6 +4,7 @@ import http from "node:http";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { StudioServer } from "../src/server/StudioServer.js";
+import { startHttpFixture } from "./http-fixture.js";
 
 async function workspace(
   test: (
@@ -41,6 +42,66 @@ async function workspace(
 }
 
 describe("workspace API and restart integrity", () => {
+  it("rejects ambiguous request and item identities without replacing the collection", () =>
+    workspace(async (_root, api) => {
+      const original = (await (await api("collections")).json())[0];
+      for (const ids of [
+        ["one", "same", "two", "same"],
+        ["one", "one", "two", "one"],
+        ["one", "two", "two", "three"],
+      ]) {
+        const items = [0, 1].map((index) => ({
+          id: ids[index * 2],
+          name: "Request " + index,
+          request: {
+            id: ids[index * 2 + 1],
+            method: "GET",
+            url: "http://example.test/",
+          },
+        }));
+        const response = await api(`collections/${original.id}`, "PUT", {
+          items,
+        });
+        expect(response.status).toBe(400);
+        expect(
+          (await (await api(`collections/${original.id}`)).json()).revision,
+        ).toBe(original.revision);
+      }
+    }));
+  it("executes a native item without a separate request ID and retains inherited context after restart", () =>
+    workspace(async (_root, api, restart) => {
+      const target = await startHttpFixture();
+      try {
+        const created = await api("collections", "POST", {
+          id: "native_identity",
+          name: "Native identity",
+          variables: [{ key: "baseUrl", value: target.url, enabled: true }],
+          testScript:
+            'pm.test("inherited", () => pm.expect(pm.response.code).to.equal(200))',
+          items: [
+            {
+              id: "native_item",
+              name: "Native request",
+              request: { method: "GET", url: "{{baseUrl}}/get" },
+            },
+          ],
+        });
+        expect(created.ok).toBe(true);
+        await restart();
+        const response = await api("execute", "POST", {
+          collectionId: "native_identity",
+          request: { id: "native_item", method: "GET", url: "{{baseUrl}}/get" },
+        });
+        expect(response.status).toBe(200);
+        const result = await response.json();
+        expect(result.status).toBe(200);
+        expect(result.testResults).toEqual([
+          { name: "inherited", passed: true },
+        ]);
+      } finally {
+        await target.stop();
+      }
+    }));
   it("keeps deliberately emptied collections and environments empty after refresh and restart", () =>
     workspace(async (root, api, restart) => {
       for (const kind of ["collections", "environments"]) {

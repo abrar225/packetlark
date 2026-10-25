@@ -145,7 +145,7 @@ export class StudioServer {
       if (statusCode === 503) throw this.workspaceError(file);
       throw Object.assign(
         new Error(
-          `Invalid ${kind} data. Check IDs, request structure, variables and value types.`,
+          `Invalid ${kind} data. Check unique IDs, request structure, variables and value types.`,
         ),
         { statusCode, code: "ERR_RESOURCE_INVALID" },
       );

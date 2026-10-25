@@ -85,9 +85,10 @@ export async function verifyOwnership(page, baseUrl) {
   await clickRequest("B");
   await page.fill("#req-url", "http://example.test/b-draft");
   await release("save");
-  await page.waitForFunction(
-    () => !document.querySelector('[aria-label="GET Race A"] .dirty-dot'),
-  );
+  await page.waitForFunction(() => {
+    const dot = document.querySelector('[aria-label="GET Race A"] .dirty-dot');
+    return !dot || dot.getClientRects().length === 0;
+  });
   let actual = await state();
   assert.equal(actual.name, "Race B");
   assert.equal(actual.dirty, true);

@@ -1,5 +1,6 @@
 // Ego Page API only; measurements dispatch public DOM events, never call application internals.
 export async function measureBrowser(page, baseUrl, samples = 30) {
+  await page.cdp("Page.bringToFront");
   await page.cdp("Network.enable");
   await page.cdp("Network.setCacheDisabled", { cacheDisabled: true });
   const startup = [],
@@ -18,6 +19,7 @@ export async function measureBrowser(page, baseUrl, samples = 30) {
       rendered_requests: document.querySelectorAll(".req-main-info").length,
       viewport: [innerWidth, innerHeight],
       visibility: document.visibilityState,
+      focused: document.hasFocus(),
       browser: navigator.userAgent,
     }));
     startup.push(state.ready_ms);
@@ -64,6 +66,16 @@ export async function measureBrowser(page, baseUrl, samples = 30) {
       ),
     );
   }
+  const snapshot = JSON.parse((await page.fetch("/api/collections")).body);
+  const count = (items) =>
+    items.reduce(
+      (total, item) => total + (item.request ? 1 : count(item.items || [])),
+      0,
+    );
+  surface.workspace_requests = snapshot.reduce(
+    (total, collection) => total + count(collection.items || []),
+    0,
+  );
   const stats = (values) => {
     const sorted = [...values].sort((a, b) => a - b);
     return {
@@ -76,7 +88,7 @@ export async function measureBrowser(page, baseUrl, samples = 30) {
   return {
     measured_at: new Date().toISOString(),
     methodology:
-      "30 navigations with browser HTTP cache disabled; studio-ready mark after environments, collections and health load. Filter and selection timings are DOM-event dispatch to next animation frame, not physical input latency or guaranteed paint completion. Existing browser process/OS caches are warm; no competitor comparison.",
+      "Foreground QA tab; 30 navigations with browser HTTP cache disabled; studio-ready mark after environments, collections and health load. Filter and selection timings are DOM-event dispatch to next animation frame, not physical input latency or guaranteed paint completion. Existing browser process/OS caches are warm; no competitor comparison.",
     surface,
     startup: stats(startup),
     filter: stats(filter),

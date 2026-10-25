@@ -1,4 +1,6 @@
 import "./fonts.css";
+import { CollectionTree } from "./collection-tree.js";
+window.ReaCollectionTree = CollectionTree;
 import {
   createIcons,
   Plus,
