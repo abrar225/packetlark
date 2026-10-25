@@ -357,6 +357,12 @@ export async function verifyStaleDeletes(page, baseUrl) {
   await page.evaluate(() => {
     window.__deleteAlerts = [];
     window.alert = (message) => window.__deleteAlerts.push(message);
+    // Keep this client deliberately stale while exercising If-Match deletion.
+    const native = window.fetch.bind(window);
+    window.fetch = (...args) =>
+      String(args[0]) === "/api/workspace"
+        ? Promise.resolve(new Response(null, { status: 304 }))
+        : native(...args);
   });
   const read = await page.fetch("/api/collections/race_fixture");
   const collection = JSON.parse(read.body);

@@ -123,6 +123,26 @@
             ><strong id="request-name">Select a request</strong
             ><span class="request-kind">HTTP request</span>
           </div>
+          <div class="workspace-sync-bar">
+            <span id="workspace-sync-message" role="status" aria-live="polite"
+              >Local files</span
+            >
+            <button
+              id="btn-check-workspace"
+              class="nav-btn"
+              aria-label="Check workspace files"
+            >
+              Check files
+            </button>
+            <button
+              id="btn-review-workspace"
+              class="nav-btn"
+              aria-label="Review workspace changes"
+              hidden
+            >
+              Review changes
+            </button>
+          </div>
           <!-- URL dispatch bar -->
           <div class="dispatch-bar">
             <select
@@ -206,7 +226,10 @@
                 min="1"
                 max="300000"
                 value="30000"
-                onchange="activeRequest.timeoutMs=Number(this.value);markDirty()"
+                onchange="
+                  activeRequest.timeoutMs = Number(this.value);
+                  markDirty();
+                "
               />
               ms</label
             ><label
@@ -214,7 +237,10 @@
                 id="req-redirects"
                 type="checkbox"
                 checked
-                onchange="activeRequest.followRedirects=this.checked;markDirty()"
+                onchange="
+                  activeRequest.followRedirects = this.checked;
+                  markDirty();
+                "
               />
               Follow redirects</label
             ><span id="import-warning" role="status"></span>
@@ -643,7 +669,10 @@
         </div>
         <form
           id="runner-form"
-          onsubmit="event.preventDefault();startCollectionRun()"
+          onsubmit="
+            event.preventDefault();
+            startCollectionRun();
+          "
         >
           <label
             >Collection<select

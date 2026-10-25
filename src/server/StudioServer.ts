@@ -72,6 +72,12 @@ interface RunJob {
   retainedBytes?: number;
 }
 const maxRunHistoryBytes = 32 * 1024 * 1024;
+const workspaceLimits = {
+  bytes: 32 * 1024 * 1024,
+  documents: 1000,
+  directoryEntries: 2048,
+};
+type WorkspaceBudget = { bytes: number; documents: number };
 
 export class StudioServer {
   private server: http.Server | null = null;
@@ -109,6 +115,7 @@ export class StudioServer {
       this.ensureStorage();
       this.loadInitialCollections();
       this.loadInitialEnvironments();
+      this.refreshWorkspaceSnapshot();
     } catch (error) {
       this.lease.release();
       throw error;
@@ -228,8 +235,56 @@ export class StudioServer {
     }
   }
 
-  private readWorkspaceJson(file: string, includeRevision = false) {
+  private workspaceLimitError(statusCode = 503) {
+    return Object.assign(
+      new Error(
+        "Workspace exceeds the supported limit: 1000 collection/environment documents, 32 MiB combined, or 2048 directory entries. Files were preserved; reduce or split this workspace.",
+      ),
+      { statusCode, code: "ERR_WORKSPACE_LIMIT" },
+    );
+  }
+
+  private workspaceEntries(directory: string) {
+    this.assertWorkspaceDirectories();
+    const stream = fs.opendirSync(directory),
+      names: string[] = [];
+    let entries = 0;
+    try {
+      for (let entry; (entry = stream.readSync());) {
+        if (++entries > workspaceLimits.directoryEntries)
+          throw this.workspaceLimitError();
+        names.push(entry.name);
+      }
+    } finally {
+      stream.closeSync();
+    }
+    return names;
+  }
+
+  private resourceFiles(directory: string) {
+    const files = this.workspaceEntries(directory).filter((name) =>
+      name.endsWith(".json"),
+    );
+    if (files.length > workspaceLimits.documents)
+      throw this.workspaceLimitError();
+    return files.sort();
+  }
+
+  private readWorkspaceJson(
+    file: string,
+    includeRevision = false,
+    budget?: WorkspaceBudget,
+  ) {
     const raw = this.readWorkspaceText(file);
+    if (budget) {
+      budget.bytes += Buffer.byteLength(raw);
+      budget.documents++;
+      if (
+        budget.bytes > workspaceLimits.bytes ||
+        budget.documents > workspaceLimits.documents
+      )
+        throw this.workspaceLimitError();
+    }
     try {
       const value = JSON.parse(raw);
       if (includeRevision && value && typeof value === "object")
@@ -260,20 +315,69 @@ export class StudioServer {
   private readResourceDirectory<T>(
     directory: string,
     kind: "collections" | "environments",
+    budget: WorkspaceBudget = { bytes: 0, documents: 0 },
   ): Map<string, T> {
     this.assertWorkspaceDirectories();
     const resources = new Map<string, T>();
-    for (const file of fs
-      .readdirSync(directory)
-      .filter((file) => file.endsWith(".json"))) {
+    for (const file of this.resourceFiles(directory)) {
       const fullPath = path.join(directory, file);
-      const resource = this.readWorkspaceJson(fullPath, true);
+      const resource = this.readWorkspaceJson(fullPath, true, budget);
       this.validateResource(resource, kind, fullPath);
       if (file !== resource.id + ".json" || resources.has(resource.id))
         throw this.workspaceError(fullPath);
       resources.set(resource.id, resource);
     }
     return resources;
+  }
+
+  private refreshWorkspaceSnapshot() {
+    const budget = { bytes: 0, documents: 0 };
+    const collections = this.readResourceDirectory<ApiCollection>(
+      this.collectionsDir,
+      "collections",
+      budget,
+    );
+    const environments = this.readResourceDirectory<Environment>(
+      this.environmentsDir,
+      "environments",
+      budget,
+    );
+    const revision = this.revision(
+      JSON.stringify([
+        [...collections].map(([id, value]) => [id, value.revision]).sort(),
+        [...environments].map(([id, value]) => [id, value.revision]).sort(),
+      ]),
+    );
+    // Publish together only after both directories validate.
+    this.collections = collections;
+    this.environments = environments;
+    return {
+      revision,
+      collections: [...collections.values()],
+      environments: [...environments.values()],
+    };
+  }
+
+  private checkExecutionRevisions(body: any) {
+    for (const [label, revision, current] of [
+      [
+        "Collection",
+        body.collectionRevision,
+        this.collections.get(body.collectionId)?.revision,
+      ],
+      [
+        "Environment",
+        body.environmentRevision,
+        this.environments.get(body.environmentId)?.revision,
+      ],
+    ])
+      if (revision && revision !== current)
+        throw Object.assign(
+          new Error(
+            `${label} changed before execution. Review its current settings before sending or running.`,
+          ),
+          { statusCode: 412, code: "ERR_WORKSPACE_CONFLICT" },
+        );
   }
 
   private migrateLegacy(
@@ -465,6 +569,18 @@ pm.test("Has valid repo name", function () {
   private atomicWrite(file: string, data: string) {
     this.assertWorkspaceDirectories();
     this.workspaceFileExists(file); // Reject non-regular destinations, including dangling links.
+    const directory = path.dirname(file);
+    if (
+      directory === this.collectionsDir ||
+      directory === this.environmentsDir
+    ) {
+      const entries = this.workspaceEntries(directory);
+      if (
+        !entries.includes(path.basename(file)) &&
+        entries.length >= workspaceLimits.directoryEntries
+      )
+        throw this.workspaceLimitError(413);
+    }
     const temporary = file + "." + crypto.randomUUID() + ".tmp";
     try {
       const descriptor = fs.openSync(temporary, "wx", 0o600);
@@ -541,8 +657,35 @@ pm.test("Has valid repo name", function () {
     this.validateResource(value, kind, file, 400);
     const data = this.serializeResource(value);
     this.checkRevision(file, expected);
+    this.checkWorkspaceWriteBudget(file, data);
     this.atomicWrite(file, data);
     value.revision = this.revision(data);
+  }
+
+  private checkWorkspaceWriteBudget(target: string, data: string) {
+    let bytes = Buffer.byteLength(data),
+      documents = 1;
+    for (const directory of [this.collectionsDir, this.environmentsDir]) {
+      let files: string[];
+      try {
+        files = this.resourceFiles(directory);
+      } catch (error: any) {
+        if (error.code === "ERR_WORKSPACE_LIMIT")
+          throw this.workspaceLimitError(413);
+        throw error;
+      }
+      for (const name of files) {
+        const file = path.join(directory, name);
+        if (file === target) continue;
+        const stat = fs.lstatSync(file);
+        if (!stat.isFile() || stat.size > 2 * 1024 * 1024)
+          throw this.workspaceError(file);
+        bytes += stat.size;
+        documents++;
+      }
+    }
+    if (bytes > workspaceLimits.bytes || documents > workspaceLimits.documents)
+      throw this.workspaceLimitError(413);
   }
 
   public persistCollection(
@@ -808,7 +951,7 @@ pm.test("Has valid repo name", function () {
     urlObj: URL,
   ) {
     const workspacePath =
-      /^\/api\/(collections|environments)(\/|$)/.test(pathname) ||
+      /^\/api\/(workspace|collections|environments)(\/|$)/.test(pathname) ||
       pathname === "/api/execute" ||
       pathname === "/api/import/postman" ||
       (pathname === "/api/runs" && req.method === "POST");
@@ -840,6 +983,18 @@ pm.test("Has valid repo name", function () {
       }
     };
 
+    if (pathname === "/api/workspace" && req.method === "GET") {
+      const snapshot = this.refreshWorkspaceSnapshot();
+      const tag = `"${snapshot.revision}"`;
+      res.setHeader("ETag", tag);
+      res.setHeader("Cache-Control", "no-store");
+      if (req.headers["if-none-match"] === tag) {
+        res.writeHead(304);
+        res.end();
+      } else sendJson(snapshot);
+      return;
+    }
+
     // 1. Health check & memory footprint
     if (pathname === "/api/health") {
       const mem = process.memoryUsage();
@@ -864,6 +1019,8 @@ pm.test("Has valid repo name", function () {
     // 2. Dispatch Request Execution with environment sync
     if (pathname === "/api/execute" && req.method === "POST") {
       const body = await readBody();
+      this.refreshWorkspaceSnapshot();
+      this.checkExecutionRevisions(body);
       let httpRequest = body.request;
       let collectionVars = body.collectionVariables || [];
       const envId = body.environmentId;
@@ -878,16 +1035,6 @@ pm.test("Has valid repo name", function () {
         return;
       }
 
-      if (
-        body.environmentRevision &&
-        environmentSnapshot?.revision !== body.environmentRevision
-      )
-        throw Object.assign(
-          new Error(
-            "Environment changed before execution. Reload and review it before sending.",
-          ),
-          { statusCode: 412, code: "ERR_WORKSPACE_CONFLICT" },
-        );
       if (environmentSnapshot)
         this.checkRevision(
           this.resourceFile("environments", envId),
@@ -1009,6 +1156,8 @@ pm.test("Has valid repo name", function () {
 
     if (pathname === "/api/runs" && req.method === "POST") {
       const body = await readBody();
+      this.refreshWorkspaceSnapshot();
+      this.checkExecutionRevisions(body);
       if (this.activeWorkCount() >= 2) {
         sendJson(
           {

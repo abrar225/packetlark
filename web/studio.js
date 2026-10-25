@@ -1,6 +1,8 @@
 import "./fonts.css";
 import { CollectionTree } from "./collection-tree.js";
+import { WorkspaceSync } from "./workspace-sync.js";
 window.ReaCollectionTree = CollectionTree;
+window.ReaWorkspaceSync = WorkspaceSync;
 import {
   createIcons,
   Plus,

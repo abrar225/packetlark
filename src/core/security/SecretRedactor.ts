@@ -1,9 +1,6 @@
 import type { KeyValueParam } from "../models/types.js";
-
-export const isSensitiveField = (key: string) =>
-  /authorization|cookie|token|secret|password|passwd|api.?key|credential|session/i.test(
-    key,
-  );
+import { isSensitiveField } from "./SensitiveFields.js";
+export { isSensitiveField } from "./SensitiveFields.js";
 const marker = "[REDACTED]";
 
 /** Run-local, bounded credential knowledge. Never serialize raw values into a report. */

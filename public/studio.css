@@ -1218,3 +1218,44 @@ mark {
   outline: 2px solid var(--primary);
   outline-offset: -2px;
 }
+.workspace-sync-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.workspace-sync-bar > span {
+  flex: 1;
+}
+.workspace-sync-bar [hidden] {
+  display: none;
+}
+.workspace-sync-bar .nav-btn {
+  padding: 5px 8px;
+  font-size: 11px;
+}
+.workspace-previews {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.workspace-previews pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow: auto;
+  font: 11px var(--font-mono);
+}
+.workspace-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 700px) {
+  .workspace-previews {
+    grid-template-columns: 1fr;
+  }
+}

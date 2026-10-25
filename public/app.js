@@ -50,6 +50,7 @@ let activeResTab = "body";
 let currentResponseData = null;
 let isDirty = false;
 let collectionTree;
+let workspaceSync;
 const requestDrafts = new Map();
 const collectionSaves = new Map();
 const environmentSaves = new Map();
@@ -60,6 +61,7 @@ const draftKey = (collectionId, requestId) =>
   JSON.stringify([collectionId, requestId]);
 
 function adoptCollectionCommit(collection, baseRevision) {
+  workspaceSync?.touch();
   collections = collections.map((col) =>
     col.id === collection.id ? collection : col,
   );
@@ -104,11 +106,35 @@ async function init() {
       refreshIcons,
     },
   );
+  workspaceSync = new window.ReaWorkspaceSync({
+    syncFields: syncCurrentFieldsToActiveRequest,
+    model: () => ({
+      collections,
+      environments,
+      drafts: [...requestDrafts.values()],
+      dirtyEnvironments,
+      collectionSaves,
+      environmentSaves,
+    }),
+    apply: applyWorkspaceState,
+    preview: (item) =>
+      item.kind === "collections"
+        ? collectionWithDrafts(item.local)
+        : item.local,
+    canRebase: canRebaseWorkspaceChange,
+    resolve: resolveWorkspaceChange,
+    openModal,
+    closeModal,
+  });
 
   await loadEnvironments();
   await loadCollections();
   await updateHealth();
   performance.mark("rea:studio-ready");
+  workspaceSync.refresh();
+  setInterval(() => {
+    if (!document.hidden) workspaceSync.refresh();
+  }, 5000);
 
   setInterval(pollSnifferTraffic, 2000);
   setInterval(updateHealth, 10000);
@@ -152,6 +178,7 @@ async function updateHealth() {
 }
 
 async function loadEnvironments() {
+  workspaceSync?.touch();
   try {
     const res = await fetch("/api/environments");
     if (!res.ok)
@@ -159,11 +186,12 @@ async function loadEnvironments() {
         (await res.json()).error?.message || "Environment load failed",
       );
     const loaded = await res.json();
-    environments = loaded.map((env) =>
-      dirtyEnvironments.has(env.id)
-        ? environments.find((existing) => existing.id === env.id) || env
-        : env,
+    environments = window.ReaWorkspaceSync.merge(
+      loaded,
+      environments,
+      (id) => dirtyEnvironments.has(id) || environmentSaves.has(id),
     );
+    workspaceSync?.touch();
     renderEnvironmentSelector();
   } catch (e) {
     console.error("Failed to load environments:", e);
@@ -196,13 +224,22 @@ function onEnvironmentSelected(val) {
 }
 
 async function loadCollections() {
+  workspaceSync?.touch();
   try {
     const res = await fetch("/api/collections");
     if (!res.ok)
       throw new Error(
         (await res.json()).error?.message || "Collection load failed",
       );
-    collections = await res.json();
+    collections = window.ReaWorkspaceSync.merge(
+      await res.json(),
+      collections,
+      (id) =>
+        [...requestDrafts.values()].some(
+          (draft) => draft.collectionId === id && (draft.dirty || draft.saving),
+        ),
+    );
+    workspaceSync?.touch();
     renderCollectionsTree();
     if (
       !activeRequest &&
@@ -231,6 +268,187 @@ function findFirstRequestItem(items) {
     }
   }
   return null;
+}
+
+function findWorkspaceRequest(collection, id) {
+  const visit = (items) => {
+    for (const item of items || []) {
+      if (item.request && (item.request.id || item.id) === id)
+        return window.ReaCollectionTree.requestForItem(item);
+      const nested = item.isFolder && visit(item.items);
+      if (nested) return nested;
+    }
+    return null;
+  };
+  return collection && visit(collection.items);
+}
+
+function collectionWithDrafts(collection) {
+  const copy = structuredClone(collection);
+  const visit = (items) => {
+    for (const item of items || []) {
+      if (item.request) {
+        const draft = requestDrafts.get(
+          draftKey(collection.id, item.request.id || item.id),
+        );
+        if (draft?.dirty || draft?.saving) {
+          item.request = structuredClone(draft.request);
+          item.name = item.request.name || item.name;
+        }
+      }
+      if (item.isFolder) visit(item.items);
+    }
+  };
+  visit(copy.items);
+  return copy;
+}
+
+function clearWorkspaceSelection(message) {
+  selectionRevision++;
+  requestAbortController?.abort();
+  requestAbortController = null;
+  activeRequest = null;
+  activeDraft = null;
+  activeCollection = null;
+  currentResponseData = null;
+  document.getElementById("req-url").value = "";
+  document.getElementById("request-name").textContent = "No request selected";
+  document.getElementById("collection-name").textContent = "Collections";
+  document.getElementById("save-status").textContent = message;
+  document.getElementById("btn-send-main").disabled = true;
+  document.getElementById("btn-save-req").disabled = true;
+  document.getElementById("cancel-request").style.display = "none";
+  for (const id of ["res-body", "res-headers", "res-tests", "res-logs"])
+    document.getElementById(id).textContent = "";
+  for (const id of ["res-status", "res-time", "res-size"])
+    document.getElementById(id).textContent = "—";
+  refreshDirtyState();
+}
+
+function applyWorkspaceState(next) {
+  const selectedId = activeRequest?.id,
+    selectedCollection = activeCollection?.id;
+  collections = next.collections;
+  environments = next.environments;
+  if (
+    activeEnvironmentId &&
+    !environments.some((env) => env.id === activeEnvironmentId)
+  )
+    activeEnvironmentId = "";
+  renderEnvironmentSelector();
+  if (selectedCollection) {
+    const collection = collections.find((col) => col.id === selectedCollection);
+    const request = findWorkspaceRequest(collection, selectedId);
+    if (!collection || !request)
+      clearWorkspaceSelection("Selected request was removed from disk.");
+    else if (
+      !activeDraft?.dirty &&
+      !activeDraft?.saving &&
+      activeDraft?.collectionRevision !== collection.revision
+    )
+      selectRequest(request, collection);
+    else {
+      activeCollection = collection;
+      document.getElementById("collection-name").textContent = collection.name;
+    }
+  }
+  renderCollectionsTree();
+}
+
+function canRebaseWorkspaceChange(item) {
+  return (
+    item.kind === "environments" ||
+    [...requestDrafts.values()].every(
+      (draft) =>
+        draft.collectionId !== item.id ||
+        !draft.dirty ||
+        !!findWorkspaceRequest(item.remote, draft.request.id),
+    )
+  );
+}
+
+async function resolveWorkspaceChange(item, action) {
+  if (
+    (item.kind === "collections" ? collectionSaves : environmentSaves).has(
+      item.id,
+    )
+  )
+    throw new Error("Wait for this resource's save to finish.");
+  syncCurrentFieldsToActiveRequest();
+  if (action === "rebase" && (!item.remote || !canRebaseWorkspaceChange(item)))
+    throw new Error(
+      "Deleted draft requests require a recovered copy or an explicit discard.",
+    );
+  let replacement = item.remote;
+  const wasSelected = activeCollection?.id === item.id,
+    requestId = activeRequest?.id;
+  if (action === "copy") {
+    const copy =
+      item.kind === "collections"
+        ? collectionWithDrafts(item.local)
+        : structuredClone(item.local);
+    copy.id = crypto.randomUUID();
+    copy.name += " (recovered copy)";
+    delete copy.revision;
+    workspaceSync.touch();
+    const response = await fetch(`/api/${item.kind}`, {
+      method: "POST",
+      signal: AbortSignal.timeout(10000),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(copy),
+    });
+    const result = await response.json();
+    if (!response.ok)
+      throw new Error(
+        result.error?.message ||
+          result.error ||
+          "Copy could not be saved; drafts retained.",
+      );
+    replacement = result;
+  }
+  if (item.kind === "collections") {
+    for (const [key, draft] of requestDrafts)
+      if (draft.collectionId === item.id) {
+        if (action === "rebase" && draft.dirty)
+          draft.collectionRevision = item.remote.revision;
+        else requestDrafts.delete(key);
+      }
+    if (
+      activeDraft?.collectionId === item.id &&
+      !requestDrafts.has(draftKey(item.id, activeDraft.request.id))
+    )
+      activeDraft = null;
+    const current = collections.filter(
+      (col) =>
+        col.id !== item.id && (action !== "copy" || col.id !== replacement.id),
+    );
+    if (item.remote) current.push(item.remote);
+    if (action === "copy") current.push(replacement);
+    applyWorkspaceState({ collections: current, environments });
+    if (action === "copy" && wasSelected) {
+      const request = findWorkspaceRequest(replacement, requestId);
+      if (request) selectRequest(request, replacement);
+    }
+  } else {
+    const current = environments.filter(
+      (env) =>
+        env.id !== item.id && (action !== "copy" || env.id !== replacement.id),
+    );
+    if (action === "rebase") {
+      item.local.revision = item.remote.revision;
+      current.push(item.local);
+    } else {
+      dirtyEnvironments.delete(item.id);
+      if (item.remote) current.push(item.remote);
+    }
+    if (action === "copy") {
+      current.push(replacement);
+      if (activeEnvironmentId === item.id) activeEnvironmentId = replacement.id;
+    }
+    applyWorkspaceState({ collections, environments: current });
+    if (action === "rebase") await saveEnvironmentDirect(item.local);
+  }
+  workspaceSync.touch();
 }
 
 function refreshDirtyState() {
@@ -264,6 +482,7 @@ function selectRequest(req, col) {
   requestAbortController?.abort();
   requestAbortController = null;
   document.getElementById("btn-send-main").disabled = false;
+  document.getElementById("btn-save-req").disabled = false;
   document.getElementById("btn-send-main").removeAttribute("aria-busy");
   document.getElementById("cancel-request").style.display = "none";
   currentResponseData = null;
@@ -390,6 +609,7 @@ async function saveActiveRequest() {
     owner.saving = null;
     if (collectionSaves.get(owner.collectionId) === task)
       collectionSaves.delete(owner.collectionId);
+    workspaceSync?.touch();
   }
 }
 
@@ -780,8 +1000,9 @@ async function sendActiveRequest() {
 
   try {
     const payload = {
-      request: activeRequest,
+      request: structuredClone(activeRequest),
       collectionId: activeCollection?.id,
+      collectionRevision: activeDraft?.collectionRevision,
       collectionVariables: activeCollection?.variables || [],
       environmentId: environmentId || undefined,
     };
@@ -1178,6 +1399,7 @@ async function saveEnvironmentDirect(env) {
         if (!res.ok)
           throw new Error(data.error?.message || data.error || "Save failed");
         env.revision = data.revision;
+        workspaceSync?.touch();
       }
       dirtyEnvironments.delete(env.id);
       renderEnvironmentSelector();
@@ -1187,6 +1409,7 @@ async function saveEnvironmentDirect(env) {
       alert(`Failed to save ${env.name}: ${error.message}`);
     } finally {
       environmentSaves.delete(env.id);
+      workspaceSync?.touch();
     }
   });
   environmentSaves.set(env.id, job);
@@ -1692,6 +1915,7 @@ function openModal() {
 }
 
 function closeModal() {
+  if (workspaceSync?.resolving) return;
   document.getElementById("modal-backdrop").style.display = "none";
   document.querySelector("header").inert = false;
   document.querySelector(".app-body").inert = false;
@@ -1740,6 +1964,8 @@ async function startCollectionRun() {
   if (activeRunId) return;
   const progress = document.getElementById("run-progress"),
     button = document.getElementById("start-run");
+  if (button.disabled) return;
+  button.disabled = true;
   try {
     const raw = document.getElementById("run-data").value.trim(),
       data = raw ? JSON.parse(raw) : undefined;
@@ -1748,12 +1974,26 @@ async function startCollectionRun() {
         "Iteration data must be a nonempty JSON array of objects",
       );
     const iterations = Number(document.getElementById("run-iterations").value);
+    const collectionId = document.getElementById("run-collection").value;
+    const collectionRevision = collections.find(
+      (col) => col.id === collectionId,
+    )?.revision;
+    const environmentId = activeEnvironmentId;
+    await environmentSaves.get(environmentId)?.promise;
+    if (dirtyEnvironments.has(environmentId))
+      throw new Error(
+        "Environment changes are unsaved. Resolve them before running.",
+      );
     const res = await fetch("/api/runs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        collectionId: document.getElementById("run-collection").value,
-        environmentId: activeEnvironmentId || undefined,
+        collectionId,
+        collectionRevision,
+        environmentId: environmentId || undefined,
+        environmentRevision: environments.find(
+          (env) => env.id === environmentId,
+        )?.revision,
         iterations: data && iterations === 1 ? data.length : iterations,
         data,
         timeoutMs: Number(document.getElementById("run-timeout").value),
@@ -1761,7 +2001,8 @@ async function startCollectionRun() {
       }),
     });
     const job = await res.json();
-    if (!res.ok) throw new Error(job.error || "Could not start run");
+    if (!res.ok)
+      throw new Error(job.error?.message || job.error || "Could not start run");
     activeRunId = job.id;
     lastRunResult = null;
     button.disabled = true;
