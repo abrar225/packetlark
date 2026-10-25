@@ -33,7 +33,7 @@ The latest [fresh-process baseline](verification/P1_COLD_START.json) records 30 
 
 These are integrity checks for the trusted local-account model. They do not prevent a malicious same-user process from racing separate filesystem calls, supply a cooperating-process lease, make revision checks atomic, or certify power-loss recovery. Those boundaries remain explicit release work.
 
-The first CI submission of the path increment timed out in the oversized-file test. Its generic deep comparison of a 2 MiB Buffer took 1,952 ms locally and exceeded CI's five-second test limit. Switching that assertion to native exact byte equality reduced the local case to 36 ms without changing the expected file contents or raising timeouts. The corrected submission requires a fresh Node 22/24 CI pass.
+The first CI submission of the path increment timed out in the oversized-file test. Its generic deep comparison of a 2 MiB Buffer took 1,952 ms locally and exceeded CI's five-second test limit. Switching that assertion to native exact byte equality reduced the local case to 36 ms without changing the expected file contents or raising timeouts. The [corrected submission passed Node 22/24 CI](https://github.com/abrar225/rea-api-studio/actions/runs/40201638914).
 
 ## Cooperating-process ownership
 
@@ -43,12 +43,18 @@ A clean-source 30-process [ownership baseline](verification/P1_OWNERSHIP_COLD_ST
 
 This closes the first local cooperating-process lease/recovery slice; external-editor reconciliation and the broader repository/manifest design remain open. No automatic lock expiry, distributed lock or independent crash-durability certification is claimed.
 
+## External-file reconciliation and context review
+
+Source: `503404f7d0977efb9681af95ef318853411beb2a` (core implementation `e94c467`). Validated conditional snapshots now reconcile disk changes while retaining dirty/busy resources. Explicit review supports disk reload, keeping request drafts with reviewed context and separate recovered collection/environment copies. Send and Run bind browser submissions to collection/environment revisions and reject stale context before transport. Workspace read/write budgets cover aggregate documents/bytes and managed directory entries.
+
+Observed locally: **144 tests in 18 files**, **41 browser cases**, strict extension build, compatibility probes and production-only package smoke passed. A fresh 10,004-request reference run recorded startup/filter/selection p95 of **158.5 / 9.0 / 9.8 ms**. Source, viewport, measurement limits, behavioral details and remaining risks are in [WORKSPACE_RECONCILIATION.md](WORKSPACE_RECONCILIATION.md). This uses periodic polling and explicit version choices, not automatic three-way merging or durable recovery.
+
 ## Remaining P1 requirements
 
-- A repository boundary with external-file change reconciliation and versioned manifests. Local cooperating-process leases, explicit exited-owner recovery and basic path/symlink checks are implemented; stronger cross-platform/race validation remains open.
+- A versioned per-request repository/manifest boundary. Local cooperating-process leases, explicit exited-owner recovery, basic path/symlink checks and polling-based external reconciliation are implemented; stronger cross-platform/race validation remains open.
 - Complete collection/folder/request authoring: create, rename, duplicate, reorder, move, delete and inherited settings with stable identities.
 - Multiple request tabs and per-tab response ownership; bounded request history and examples.
-- Durable draft recovery and explicit conflict review, including external deletion, malformed files and recovery after restart.
+- Durable draft/restart recovery. Live conflict review and recovered copies cover external deletion and malformed snapshots, but do not preserve unsaved browser memory across crashes.
 - Versioned per-request storage/manifest migration preserving imported metadata, migration diagnostics, backups and validated restore.
 - Expanded sanitized migration corpus and semantic differences for supported Postman v2.1/cURL imports. Postman native v3 YAML remains separately scoped to P7.
 

@@ -62,6 +62,8 @@ Workspace data is stored under `.rea-api/collections/` and `.rea-api/environment
 
 Only one Studio may write a workspace at a time. Normal shutdown releases ownership; a hard exit requires reviewing `rea-api workspace status` and explicitly recovering the exited owner's token. See [workspace ownership and recovery](docs/WORKSPACE_OWNERSHIP.md) for commands, supported scope and maintenance details.
 
+The workbench checks external file changes while preserving unsaved drafts and offers explicit conflict review/recovered copies. Browser Send/Run operations bind their selected context revisions. Current workspace limits are 1,000 resource documents and 32 MiB combined, with 2 MiB per resource. See [reconciliation behavior and limits](docs/WORKSPACE_RECONCILIATION.md); durable unsaved-draft recovery remains unfinished.
+
 After installation/build, fonts, icons, and scripts are served locally. Calls to remote APIs still need a network connection. There is no implemented Rea telemetry service in this source tree.
 
 Only run scripts and imported collection scripts whose network behavior you trust. The engine now uses a separate QuickJS interpreter with heap/stack/time limits and a narrow JSON bridge instead of Node object references. Scripts can still make HTTP requests and change services; this is not a formal security certification. The server now rejects foreign browser origins and hosts, but it is not an authenticated multi-user server. Do not expose it publicly. Inspection captures are bounded and sanitized before retention; authorized forwarding preserves the request bytes. Redaction is not encryption or universal secret detection.
