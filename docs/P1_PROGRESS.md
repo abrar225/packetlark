@@ -33,6 +33,8 @@ The latest [fresh-process baseline](verification/P1_COLD_START.json) records 30 
 
 These are integrity checks for the trusted local-account model. They do not prevent a malicious same-user process from racing separate filesystem calls, supply a cooperating-process lease, make revision checks atomic, or certify power-loss recovery. Those boundaries remain explicit release work.
 
+The first CI submission of the path increment timed out in the oversized-file test. Its generic deep comparison of a 2 MiB Buffer took 1,952 ms locally and exceeded CI's five-second test limit. Switching that assertion to native exact byte equality reduced the local case to 36 ms without changing the expected file contents or raising timeouts. The corrected submission requires a fresh Node 22/24 CI pass.
+
 ## Remaining P1 requirements
 
 - A repository boundary with cooperating-process leases, explicit stale-lock recovery and external-file change reconciliation. The basic path/symlink checks above are implemented; stronger cross-platform/race validation remains open.

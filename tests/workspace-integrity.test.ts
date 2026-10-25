@@ -121,7 +121,7 @@ describe("workspace API and restart integrity", () => {
       });
       expect(result.status).toBe(503);
       expect((await result.json()).error.code).toBe("ERR_WORKSPACE_INVALID");
-      expect(fs.readFileSync(file)).toEqual(oversized);
+      expect(fs.readFileSync(file).equals(oversized)).toBe(true);
     }));
   it("requires restart when a managed directory is replaced by a different real directory", () =>
     workspace(async (root, api) => {
