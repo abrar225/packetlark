@@ -21,9 +21,21 @@ These are synthetic DOM-event timings on one reference browser/machine, not phys
 
 An earlier uncommitted run failed the filter target because its first two frame waits approached one second. It is retained in [P1_BROWSER_PRECOMMIT.json](verification/P1_BROWSER_PRECOMMIT.json); the underlying cause was not conclusively established. The later source-pinned run passed. Broader performance validation remains a P5 release gate.
 
+## Workspace path and read hardening
+
+Source: `f6eebb49c2874c54c0f42903bebccbd3e880d4e4`. This later increment passed **124 tests across 17 files** locally. Five public workspace regressions reproduce linked managed directories at startup, redirection after startup, a linked initialization marker, replacement by a different real directory and an oversized revision file. The symlink cases run on POSIX; supported Windows installation/behavior still requires P5 QA.
+
+The service binds the selected root to its canonical path and captures bigint device/inode identities for managed directories. Paths are checked at filesystem boundaries and workspace API entry/after body input. Root/managed symlinks are intentionally rejected; replacing a managed directory requires restoring the original directory or restarting after reviewing the new data. Markers, journals and resource destinations must be regular bounded files. New directories request 0700 permissions; existing directory permissions are preserved. File writes retain exclusive 0600 temporary files.
+
+Canonical reads and hash-revision reads now share descriptor-based handling: no-follow/nonblocking flags where available, descriptor type/size checks, 64 KiB chunks and a 2 MiB byte cap even if the file grows. Unsafe paths and oversized files are preserved and reported instead of repaired or overwritten. Workspace reads/exports/new executions are blocked when directory identities change; health, capture controls and existing run inspection/cancel remain accessible.
+
+The latest [fresh-process baseline](verification/P1_COLD_START.json) records 30 clean-source runs after this hardening: readiness p95 **70.395 ms**, backend RSS p95 **71.95 MiB**, with installed dependencies and warm OS caches. This is not a guaranteed process peak, combined browser cost or cross-machine comparison. The browser artifact above intentionally remains pinned to the earlier renderer commit.
+
+These are integrity checks for the trusted local-account model. They do not prevent a malicious same-user process from racing separate filesystem calls, supply a cooperating-process lease, make revision checks atomic, or certify power-loss recovery. Those boundaries remain explicit release work.
+
 ## Remaining P1 requirements
 
-- A repository boundary with cooperating-process leases, explicit stale-lock recovery, path/symlink checks and external-file change reconciliation.
+- A repository boundary with cooperating-process leases, explicit stale-lock recovery and external-file change reconciliation. The basic path/symlink checks above are implemented; stronger cross-platform/race validation remains open.
 - Complete collection/folder/request authoring: create, rename, duplicate, reorder, move, delete and inherited settings with stable identities.
 - Multiple request tabs and per-tab response ownership; bounded request history and examples.
 - Durable draft recovery and explicit conflict review, including external deletion, malformed files and recovery after restart.

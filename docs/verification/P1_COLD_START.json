@@ -1,0 +1,138 @@
+{
+  "measured_at": "2026-10-25T14:14:51.726Z",
+  "source_commit": "f6eebb49c2874c54c0f42903bebccbd3e880d4e4",
+  "tracked_changes_present": false,
+  "node": "v24.14.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "cpu": "Apple M4",
+  "methodology": "30 fresh CLI processes and fresh temporary workspaces; readiness includes module initialization and fsync-backed workspace seeding; installed dependencies and warm OS file caches; RSS from first health response, not guaranteed process peak or combined browser cost",
+  "summary": {
+    "ready_p50_ms": 62.337,
+    "ready_p95_ms": 70.395,
+    "backend_rss_p50_mib": 70.94,
+    "backend_rss_p95_mib": 71.95
+  },
+  "observations": [
+    {
+      "ready_ms": 71.788,
+      "backend_rss_mib": 71.03
+    },
+    {
+      "ready_ms": 69.082,
+      "backend_rss_mib": 71.3
+    },
+    {
+      "ready_ms": 67.898,
+      "backend_rss_mib": 71.16
+    },
+    {
+      "ready_ms": 64.363,
+      "backend_rss_mib": 70.73
+    },
+    {
+      "ready_ms": 61.174,
+      "backend_rss_mib": 71.09
+    },
+    {
+      "ready_ms": 61.53,
+      "backend_rss_mib": 70.95
+    },
+    {
+      "ready_ms": 63.035,
+      "backend_rss_mib": 70.92
+    },
+    {
+      "ready_ms": 61.296,
+      "backend_rss_mib": 70.86
+    },
+    {
+      "ready_ms": 60.359,
+      "backend_rss_mib": 70.92
+    },
+    {
+      "ready_ms": 62.453,
+      "backend_rss_mib": 70.86
+    },
+    {
+      "ready_ms": 63.536,
+      "backend_rss_mib": 71.13
+    },
+    {
+      "ready_ms": 60.783,
+      "backend_rss_mib": 70.94
+    },
+    {
+      "ready_ms": 60.234,
+      "backend_rss_mib": 70.97
+    },
+    {
+      "ready_ms": 62.912,
+      "backend_rss_mib": 70.94
+    },
+    {
+      "ready_ms": 61.179,
+      "backend_rss_mib": 70.94
+    },
+    {
+      "ready_ms": 63.758,
+      "backend_rss_mib": 71.98
+    },
+    {
+      "ready_ms": 64.771,
+      "backend_rss_mib": 70.83
+    },
+    {
+      "ready_ms": 62.749,
+      "backend_rss_mib": 71.09
+    },
+    {
+      "ready_ms": 61.938,
+      "backend_rss_mib": 70.81
+    },
+    {
+      "ready_ms": 70.395,
+      "backend_rss_mib": 71.95
+    },
+    {
+      "ready_ms": 62.519,
+      "backend_rss_mib": 71
+    },
+    {
+      "ready_ms": 61.116,
+      "backend_rss_mib": 70.95
+    },
+    {
+      "ready_ms": 62.619,
+      "backend_rss_mib": 71.06
+    },
+    {
+      "ready_ms": 60.042,
+      "backend_rss_mib": 70.81
+    },
+    {
+      "ready_ms": 61.81,
+      "backend_rss_mib": 70.88
+    },
+    {
+      "ready_ms": 60.351,
+      "backend_rss_mib": 70.89
+    },
+    {
+      "ready_ms": 62.384,
+      "backend_rss_mib": 70.94
+    },
+    {
+      "ready_ms": 62.337,
+      "backend_rss_mib": 71.11
+    },
+    {
+      "ready_ms": 61.839,
+      "backend_rss_mib": 70.86
+    },
+    {
+      "ready_ms": 60.024,
+      "backend_rss_mib": 71.06
+    }
+  ]
+}
