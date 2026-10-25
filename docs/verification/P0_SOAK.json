@@ -1,0 +1,917 @@
+{
+  "measured_at": "2026-10-25T10:42:48.209Z",
+  "source_commit": "0a7fc307cded932dc41213df88c7b7f29be05666",
+  "node": "v24.14.0",
+  "platform": "darwin",
+  "cpu": "Apple M4",
+  "elapsed_ms": 600186,
+  "requests": 41000,
+  "forced_gc_available": true,
+  "methodology": "10 minute loopback soak, 1000 requests per batch, four concurrent clients, 15 second batch cadence, 1 KiB JSON. Post-GC heap medians compare first/last five batches; 8 MiB is an investigation threshold for this fixture/reference machine, not a universal leak guarantee. RSS includes client, target and proxy; no browser or Postman comparison.",
+  "post_gc_median_heap_growth_mib": 0.887,
+  "verdict": "PASS",
+  "observations": [
+    {
+      "elapsed_ms": 201,
+      "requests": 1000,
+      "heap_used_mib": 11.625,
+      "rss_mib": 191.453,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 15274,
+      "requests": 2000,
+      "heap_used_mib": 9.712,
+      "rss_mib": 166.828,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 30251,
+      "requests": 3000,
+      "heap_used_mib": 10.049,
+      "rss_mib": 204.688,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 45245,
+      "requests": 4000,
+      "heap_used_mib": 10.23,
+      "rss_mib": 235.172,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 60255,
+      "requests": 5000,
+      "heap_used_mib": 9.98,
+      "rss_mib": 127.094,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 75227,
+      "requests": 6000,
+      "heap_used_mib": 10.167,
+      "rss_mib": 140.234,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 90223,
+      "requests": 7000,
+      "heap_used_mib": 10.525,
+      "rss_mib": 193.875,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 105256,
+      "requests": 8000,
+      "heap_used_mib": 10.11,
+      "rss_mib": 132.891,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 120228,
+      "requests": 9000,
+      "heap_used_mib": 10.015,
+      "rss_mib": 143.234,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 135232,
+      "requests": 10000,
+      "heap_used_mib": 10.385,
+      "rss_mib": 195.719,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 150223,
+      "requests": 11000,
+      "heap_used_mib": 10.81,
+      "rss_mib": 196.172,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 165201,
+      "requests": 12000,
+      "heap_used_mib": 10.644,
+      "rss_mib": 196.344,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 180218,
+      "requests": 13000,
+      "heap_used_mib": 10.748,
+      "rss_mib": 196.422,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 195201,
+      "requests": 14000,
+      "heap_used_mib": 10.737,
+      "rss_mib": 196.906,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 210212,
+      "requests": 15000,
+      "heap_used_mib": 10.754,
+      "rss_mib": 196.906,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 225193,
+      "requests": 16000,
+      "heap_used_mib": 10.826,
+      "rss_mib": 199.219,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 240204,
+      "requests": 17000,
+      "heap_used_mib": 10.845,
+      "rss_mib": 199.828,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 255183,
+      "requests": 18000,
+      "heap_used_mib": 10.779,
+      "rss_mib": 197.172,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 270202,
+      "requests": 19000,
+      "heap_used_mib": 10.845,
+      "rss_mib": 198.047,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 285192,
+      "requests": 20000,
+      "heap_used_mib": 10.783,
+      "rss_mib": 198.609,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 300204,
+      "requests": 21000,
+      "heap_used_mib": 10.919,
+      "rss_mib": 197.422,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 315199,
+      "requests": 22000,
+      "heap_used_mib": 10.807,
+      "rss_mib": 197.328,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 330196,
+      "requests": 23000,
+      "heap_used_mib": 10.498,
+      "rss_mib": 198.281,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 345182,
+      "requests": 24000,
+      "heap_used_mib": 10.772,
+      "rss_mib": 199.141,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 360201,
+      "requests": 25000,
+      "heap_used_mib": 10.891,
+      "rss_mib": 198.891,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 375186,
+      "requests": 26000,
+      "heap_used_mib": 10.899,
+      "rss_mib": 199.063,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 390347,
+      "requests": 27000,
+      "heap_used_mib": 10.846,
+      "rss_mib": 199.109,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 405184,
+      "requests": 28000,
+      "heap_used_mib": 10.838,
+      "rss_mib": 199.156,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 420199,
+      "requests": 29000,
+      "heap_used_mib": 10.764,
+      "rss_mib": 199.234,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 435183,
+      "requests": 30000,
+      "heap_used_mib": 10.683,
+      "rss_mib": 199.453,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 450198,
+      "requests": 31000,
+      "heap_used_mib": 10.946,
+      "rss_mib": 199.5,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 465182,
+      "requests": 32000,
+      "heap_used_mib": 10.897,
+      "rss_mib": 199.516,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 480196,
+      "requests": 33000,
+      "heap_used_mib": 10.882,
+      "rss_mib": 199.531,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 495179,
+      "requests": 34000,
+      "heap_used_mib": 10.849,
+      "rss_mib": 200.266,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 510194,
+      "requests": 35000,
+      "heap_used_mib": 10.917,
+      "rss_mib": 200.563,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 525182,
+      "requests": 36000,
+      "heap_used_mib": 10.849,
+      "rss_mib": 200.953,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 540213,
+      "requests": 37000,
+      "heap_used_mib": 10.953,
+      "rss_mib": 199.344,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 555181,
+      "requests": 38000,
+      "heap_used_mib": 10.917,
+      "rss_mib": 199.344,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 570201,
+      "requests": 39000,
+      "heap_used_mib": 10.93,
+      "rss_mib": 200,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 585183,
+      "requests": 40000,
+      "heap_used_mib": 10.936,
+      "rss_mib": 200.641,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    },
+    {
+      "elapsed_ms": 600175,
+      "requests": 41000,
+      "heap_used_mib": 11.021,
+      "rss_mib": 200.719,
+      "capture": {
+        "retainedRecords": 41,
+        "retainedBytes": 64370,
+        "omittedRecords": 0,
+        "activeRequests": 0,
+        "limits": {
+          "maxConnections": 32,
+          "maxRequestBytes": 4194304,
+          "maxResponseBytes": 10485760,
+          "timeoutMs": 2000,
+          "maxConcurrentRequests": 4,
+          "maxHistoryBytes": 65536,
+          "maxRecordBytes": 4096
+        },
+        "redactionVersion": 1
+      }
+    }
+  ]
+}

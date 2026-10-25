@@ -1,6 +1,6 @@
 # P0 trust foundations — implementation and evidence
 
-25 October 2026. **P0 remains in progress.** The user approved the plan and eight test interfaces in Q7. This record covers the first implementation bundle, not the full ten-workstream roadmap, a stable release or a new product rating.
+25 October 2026. **The scoped P0 local-core gates passed; P1 is next.** The user approved the plan and eight test interfaces in Q7. This record covers the first implementation bundle, not the full ten-workstream roadmap, a stable release or a new product rating.
 
 ## Implemented in this bundle
 
@@ -37,12 +37,23 @@ Browser reproduction: run `npm run build`, then `node scripts/p0-browser-fixture
 
 The loopback reference is [P0_BASELINE.json](verification/P0_BASELINE.json), measured at source `bf4398d` on Node 24 / Apple M4. Two hundred measured samples per path followed twenty warmups: direct response p95 0.163 ms; bounded capture p95 0.591 ms; workspace list p95 0.667 ms. Sampled RSS reached 162.81 MiB across the combined benchmark client, target, studio and two proxies. This is a single-machine sequential 1 KiB fixture, not production load, cold startup, browser responsiveness or a comparison with Postman. Run `npm run build` then `node scripts/benchmark-p0.mjs` to reproduce a new observation.
 
-## Remaining P0 and release gates
+## Gate completion and remaining release requirements
 
-Complete the wider threat model and adversarial export/log/agent/script data-flow review; test larger concurrent bodies, slow headers, repeated cancellation, long-duration retention and executor/capture policy consistency. Record browser responsiveness and cold-process baseline measurements, then ratify realistic performance budgets. Keep security review distinct from the implementation reviewer and advisory scan.
+The scoped threat model, adversarial boundary regressions, sustained capture and fresh-process/browser baselines are now recorded in [P0_GATE.json](P0_GATE.json). This closes the local-core baseline phase, not the independent security review or stable-release gates. Larger concurrent/representative workloads, allocator/process-tree profiling and extended operational testing continue under P5.
 
 P1 must add durable drafts/recovery, explicit conflict-review/merge UX, workspace locking/watching and complete collection authoring. P2/P3 still own secure local secrets, OAuth/PKCE, richer HTTP settings, typed scopes, grants and demonstrated script compatibility. The remaining protocols and platform capabilities stay on the approved roadmap. No automatic stable release or parity/rating increase follows from this bundle.
 
 VERDICT: PASS
 
-This verdict covers only the observed checks listed here. P0 and the overall program remain open.
+This verdict covers the observed local-core P0 gates. The overall program and stable-release gates remain open.
+
+
+## P0 completion increment
+
+Source `0a7fc30` passes **117 tests across 17 files**, including newly reproduced cross-origin API-key forwarding, rotated/intermediate/encoded credential report leaks, JSON diagnostic disclosure, complete-result/masking/history budgets, recursive outbound expansion/multipart wire size, whole-execution deadlines, cross-site requests without Origin, direct-work admission and shutdown. Production-only tarball smoke, strict extension build and advisory audit passed again. All 16 browser ownership cases passed again on the final P0 source.
+
+The ten-minute [capture soak](verification/P0_SOAK.json) completed **41,000 requests**, held retained capture record bytes at 64,370, ended with zero active forwards and measured 0.887 MiB post-GC median heap growth. The combined client/target/proxy process ended at 200.719 MiB RSS; this is not isolated backend RSS or proof against every native-memory leak. Raw observations and the reference-only investigation threshold are included.
+
+The final [fresh-process baseline](verification/P0_COLD_START.json) measured 30 new CLI processes: p95 readiness **85.62 ms** and backend RSS **71.41 MiB** on the recorded machine, with dependencies installed and OS file caches warm. These satisfy the initial reference startup/idle targets; they are not cross-machine guarantees. The [10,004-row browser baseline](verification/P0_BROWSER_BASELINE.json) measured p95 readiness **490 ms**, filtering **801 ms** and selection **805.5 ms**. Its worktree provenance limit is recorded. Filtering/selection miss the proposed 100 ms target and are the first P1 implementation task.
+
+The [threat model](P0_THREAT_MODEL.md) names the current trust assumptions and phase-owned risks. Reports now use shared known-input credential knowledge and non-expanding masks, including short values and common encodings; they retain exact compact-byte counters. Default run results are bounded at 16 MiB, completed Studio history at 32 MiB/20 entries, and direct executions/runs share two active slots. API bodies are capped at 2 MiB/10 seconds; outgoing bodies, headers and URL/expansion/form work are bounded independently. These byte limits do not represent total JS/native/browser memory. Raw-secret diagnostic retention stays disabled; offering an opt-in exception requires the P2/P3 credential/consent work rather than a quiet P0 bypass.

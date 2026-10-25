@@ -1860,10 +1860,11 @@
   ],
   "delivery_policy": "Candidate phase identifies the first planned increment, not proof of parity or completion. Workstream gates and later increments also apply.",
   "implementation_progress": {
-    "phase": "P0",
-    "status": "in-progress",
+    "phase": "P1",
+    "status": "starting",
     "record": "../P0_PROGRESS.md",
-    "implementation_commit": "039d2e81415d4351140d95c3d020ff624ffc20d2",
-    "note": "Baseline comparison fields remain historical. These changes do not close all listed requirements or establish Postman parity."
+    "implementation_commit": "0a7fc307cded932dc41213df88c7b7f29be05666",
+    "note": "P0 local-core gates passed. The baseline comparison remains historical and remaining phase requirements stay open.",
+    "p0_gate": "../P0_GATE.json"
   }
 }
