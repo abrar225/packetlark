@@ -1,3 +1,5 @@
+> Historical assessment of the initial redesign (24 October 2026). Several defects and missing runner capabilities described below were addressed in release candidate 1.1.0. See [current readiness](PLATFORM_READINESS.md) and [verification](VERIFICATION.md). The old scores are retained as historical reviewer judgments.
+
 # Rea versus Postman: candid product assessment
 
 **Reviewed 24 October 2026.** Baseline: `b88f097f5540622a53c54b64e64eb5298a24192a`. Source review covered the HTTP executor, variable resolver, Postman converter, script engine, proxy, schema/OpenAPI/SDK generators, server routes, browser UI, and all original test suites. This revision also includes the documented design and usability fixes.

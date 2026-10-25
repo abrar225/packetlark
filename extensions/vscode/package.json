@@ -1,0 +1,58 @@
+{
+  "name": "rea-api-studio",
+  "displayName": "Rea API Studio",
+  "description": "Open a local Rea workbench and run API collections inside VS Code.",
+  "version": "1.1.0",
+  "publisher": "rea-api-studio",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "onCommand:rea.openStudio"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    },
+    "virtualWorkspaces": false
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "rea.openStudio",
+        "title": "Rea: Open API Studio"
+      },
+      {
+        "command": "rea.stopStudio",
+        "title": "Rea: Stop API Studio"
+      }
+    ],
+    "configuration": {
+      "title": "Rea API Studio",
+      "properties": {
+        "rea.runtimePath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Absolute path to a built Rea API Studio checkout (npm ci && npm run build)."
+        },
+        "rea.nodePath": {
+          "type": "string",
+          "default": "node",
+          "scope": "machine",
+          "description": "Node.js 22+ executable."
+        }
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abrar225/rea-api-studio.git",
+    "directory": "extensions/vscode"
+  }
+}

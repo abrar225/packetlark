@@ -39,12 +39,15 @@ try {
       },
     ],
   });
-  const request = collection.items[0].request;
+  const { collectionRequests } = await import(
+    "../dist/core/models/CollectionContext.js"
+  );
+  const request = collectionRequests(collection)[0].request;
   const response = await HttpExecutor.execute(request);
   const url = JSON.parse(response.body).url;
-  assert.equal(url, "/items?tag=x&tag=x");
-  assert.equal(request.auth.type, "none");
-  assert.equal(collection.items[1].request.body.mode, "raw-json");
+  assert.equal(url, "/items?tag=x");
+  assert.equal(request.auth.type, "bearer");
+  assert.equal(collection.items[1].request.body.mode, "raw-text");
   const traffic = (host, body) => ({
     id: host,
     timestamp: new Date().toISOString(),
@@ -58,13 +61,20 @@ try {
     responseBody: body,
     durationMs: 1,
   });
-  const spec = OpenApiGenerator.generate([
-    traffic("a.example", false),
-    traffic("b.example", false),
-  ]);
+  const records = [traffic("a.example", false), traffic("b.example", false)];
+  assert.throws(() => OpenApiGenerator.generate(records), /origin/i);
+  const spec = OpenApiGenerator.generate(
+    records,
+    "Rea inferred API",
+    "1.0.0",
+    "https://a.example",
+  );
   assert.equal(Object.keys(spec.paths).length, 1);
-  assert.equal(spec.servers.length, 2);
-  assert.deepEqual(spec.paths["/items"].get.responses["200"].content, {});
+  assert.equal(
+    spec.paths["/items"].get.responses["200"].content["application/json"].schema
+      .type,
+    "boolean",
+  );
   console.log(
     JSON.stringify(
       {
@@ -79,7 +89,9 @@ try {
       2,
     ),
   );
-  console.log("Assessment probes reproduced the documented limitations.");
+  console.log(
+    "Regression probes passed: previous compatibility/spec defects remain fixed.",
+  );
 } finally {
   await new Promise((resolve) => server.close(resolve));
 }

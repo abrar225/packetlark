@@ -1,247 +1,262 @@
+const reserved = new Set([
+  "constructor",
+  "request",
+  "baseUrl",
+  "options",
+  "query",
+  "body",
+  "class",
+  "default",
+  "delete",
+  "return",
+  "function",
+  "var",
+  "let",
+  "const",
+  "new",
+  "private",
+  "public",
+  "protected",
+  "static",
+  "interface",
+  "type",
+  "extends",
+  "super",
+  "this",
+  "null",
+  "true",
+  "false",
+  "await",
+  "yield",
+  "arguments",
+  "eval",
+]);
 export class SdkGenerator {
-  /**
-   * Converts kebab-case, snake_case, dot.case, and other non-alphanumeric identifiers
-   * to a clean, valid TypeScript camelCase method name.
-   */
-  public static sanitizeMethodName(raw: string): string {
-    const parts = raw.split(/[-_.\s]+/).filter(Boolean);
-    if (parts.length === 0) return 'request';
-
-    let name = parts[0].toLowerCase();
-    for (let i = 1; i < parts.length; i++) {
-      const part = parts[i];
-      name += part.charAt(0).toUpperCase() + part.slice(1);
-    }
-
-    // If starts with a digit, prefix with req
-    if (/^[0-9]/.test(name)) {
-      name = 'req' + name;
-    }
-
-    return name.replace(/[^a-zA-Z0-9]/g, '') || 'request';
+  static sanitizeMethodName(raw: string): string {
+    const parts = String(raw)
+      .split(/[^a-zA-Z0-9]+/)
+      .filter(Boolean);
+    if (!parts.length) return "requestOperation";
+    let name =
+      parts[0].toLowerCase() +
+      parts
+        .slice(1)
+        .map((p) => p[0].toUpperCase() + p.slice(1))
+        .join("");
+    if (/^\d/.test(name)) name = "req" + name;
+    return reserved.has(name) ? name + "Operation" : name;
   }
-
-  /**
-   * Recursively converts a JSON Schema to a TypeScript type or interface string.
-   */
-  private static schemaToTypeScriptType(schema: any, indent = 0): string {
-    if (!schema) return 'any';
-    if (schema.type === 'string') {
-      if (schema.enum && Array.isArray(schema.enum)) {
-        return schema.enum.map((e: string) => JSON.stringify(e)).join(' | ');
+  private static type(
+    schema: any,
+    root: any,
+    seen = new Set<string>(),
+  ): string {
+    if (!schema) return "unknown";
+    if (schema.$ref) {
+      if (seen.has(schema.$ref)) return "unknown";
+      const next = new Set(seen).add(schema.$ref);
+      if (!schema.$ref.startsWith("#/")) return "unknown";
+      let target = root;
+      for (const part of schema.$ref.slice(2).split("/"))
+        target = target?.[part.replace(/~1/g, "/").replace(/~0/g, "~")];
+      return this.type(target, root, next);
+    }
+    if (schema.const !== undefined) return JSON.stringify(schema.const);
+    if (schema.enum)
+      return (
+        schema.enum.map((value: any) => JSON.stringify(value)).join(" | ") ||
+        "never"
+      );
+    if (schema.anyOf || schema.oneOf)
+      return (schema.anyOf || schema.oneOf)
+        .map((part: any) => this.type(part, root, seen))
+        .join(" | ");
+    if (Array.isArray(schema.type))
+      return [
+        ...new Set(
+          schema.type.map((type: string) =>
+            this.type({ ...schema, type }, root, seen),
+          ),
+        ),
+      ].join(" | ");
+    switch (schema.type) {
+      case "null":
+        return "null";
+      case "integer":
+      case "number":
+        return "number";
+      case "boolean":
+        return "boolean";
+      case "string":
+        return "string";
+      case "array":
+        return `(${this.type(schema.items, root, seen)})[]`;
+      case "object": {
+        const properties = Object.entries(schema.properties || {}).map(
+          ([key, value]) =>
+            `  ${/^[a-zA-Z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)}${schema.required?.includes(key) ? "" : "?"}: ${this.type(value, root, seen)};`,
+        );
+        if (!properties.length) return "Record<string, unknown>";
+        if (schema.additionalProperties)
+          properties.push(`  [key: string]: unknown;`);
+        return `{\n${properties.join("\n")}\n}`;
       }
-      return 'string';
+      default:
+        return "unknown";
     }
-    if (schema.type === 'number' || schema.type === 'integer') return 'number';
-    if (schema.type === 'boolean') return 'boolean';
-    if (schema.type === 'array') {
-      const itemType = this.schemaToTypeScriptType(schema.items, indent);
-      return `${itemType}[]`;
-    }
-    if (schema.type === 'object' && schema.properties) {
-      const spaces = ' '.repeat(indent);
-      const innerSpaces = ' '.repeat(indent + 2);
-      const props: string[] = [];
-      const required = Array.isArray(schema.required) ? schema.required : [];
-
-      for (const [propName, propSchema] of Object.entries(schema.properties)) {
-        const isReq = required.includes(propName);
-        const safeProp = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(propName) ? propName : JSON.stringify(propName);
-        const propType = this.schemaToTypeScriptType(propSchema, indent + 2);
-        props.push(`${innerSpaces}${safeProp}${isReq ? '' : '?'}: ${propType};`);
-      }
-
-      return `{\n${props.join('\n')}\n${spaces}}`;
-    }
-    return 'any';
   }
-
-  /**
-   * Generates a strongly typed TypeScript Client SDK from an OpenAPI 3.1 specification.
-   */
-  public static generateTypeScript(openApiSpec: any): string {
-    const title = (openApiSpec.info?.title || 'ApiClient').replace(/[^a-zA-Z0-9]/g, '') || 'ApiClient';
-    const serverUrl = openApiSpec.servers?.[0]?.url || 'http://localhost';
-
-    const generatedInterfacesMap = new Map<string, string>();
-
-    const registerInterface = (suggestedName: string, schema: any): string => {
-      const ifaceBody = this.schemaToTypeScriptType(schema, 0);
-      let finalName = suggestedName;
-      let counter = 1;
-      while (generatedInterfacesMap.has(finalName)) {
-        if (generatedInterfacesMap.get(finalName) === ifaceBody) {
-          return finalName; // Identical interface, safely reuse
-        }
-        counter++;
-        finalName = `${suggestedName}${counter}`;
-      }
-      generatedInterfacesMap.set(finalName, ifaceBody);
-      return finalName;
-    };
-
-    // First pass: generate interfaces for request and response payloads
-    const operationsList: Array<{
-      method: string;
-      pathStr: string;
-      op: any;
-      methodName: string;
-      requestTypeName: string;
-      responseTypeName: string;
-      hasBody: boolean;
-      pathParams: any[];
-      queryParams: any[];
-    }> = [];
-
-    for (const [pathStr, pathItem] of Object.entries(openApiSpec.paths || {})) {
-      for (const [method, op] of Object.entries(pathItem as Record<string, any>)) {
-        if (['get', 'post', 'put', 'delete', 'patch'].includes(method.toLowerCase())) {
-          const rawId = op.operationId || `${method}_${pathStr.replace(/[^a-zA-Z0-9]/g, '_')}`;
-          const methodName = this.sanitizeMethodName(rawId);
-          const baseName = methodName.charAt(0).toUpperCase() + methodName.slice(1);
-
-          const pathParams = (op.parameters || []).filter((p: any) => p.in === 'path');
-          const queryParams = (op.parameters || []).filter((p: any) => p.in === 'query');
-
-          // Request body schema
-          const bodyContent = op.requestBody?.content?.['application/json'];
-          const hasBody = Boolean(bodyContent?.schema);
-          let requestTypeName = 'any';
-          if (hasBody) {
-            requestTypeName = registerInterface(`${baseName}Request`, bodyContent.schema);
-          }
-
-          // Response schema (prefer 200 or 201)
-          const okResponse = op.responses?.['200'] || op.responses?.['201'] || Object.values(op.responses || {})[0];
-          const resContent = (okResponse as any)?.content?.['application/json'];
-          const hasResSchema = Boolean(resContent?.schema);
-          let responseTypeName = 'any';
-          if (hasResSchema) {
-            responseTypeName = registerInterface(`${baseName}Response`, resContent.schema);
-          }
-
-          operationsList.push({
-            method,
-            pathStr,
-            op,
-            methodName,
-            requestTypeName,
-            responseTypeName,
-            hasBody,
-            pathParams,
-            queryParams
-          });
-        }
-      }
-    }
-
-    const generatedInterfaces = Array.from(generatedInterfacesMap.entries()).map(
-      ([name, body]) => `export interface ${name} ${body}`
+  static generateTypeScript(spec: any): string {
+    const rawTitle = String(spec.info?.title || "ApiClient").replace(
+      /[^a-zA-Z0-9]/g,
+      "",
     );
-
-    let code = `/**
- * Auto-generated Client SDK for ${openApiSpec.info?.title || 'API'}
- * Generated by ReaAPI Studio
- */
-
-export interface RequestOptions {
-  headers?: Record<string, string>;
-  token?: string;
-}
-
-${generatedInterfaces.length > 0 ? generatedInterfaces.join('\n\n') + '\n\n' : ''}export class ${title} {
-  private baseUrl: string;
-
-  constructor(baseUrl: string = '${serverUrl}') {
-    this.baseUrl = baseUrl.replace(/\\/+$/, '');
-  }
-
-  private async request<T>(path: string, options: RequestInit & { token?: string }): Promise<T> {
-    const url = \`\${this.baseUrl}\${path}\`;
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...((options.headers as Record<string, string>) || {})
+    const title = /^[A-Za-z]/.test(rawTitle) ? rawTitle : "Api" + rawTitle;
+    const definitions = new Map<string, string>();
+    const methods: string[] = [];
+    const used = new Set<string>();
+    const declare = (name: string, schema: any) => {
+      let unique = name,
+        index = 2;
+      while (definitions.has(unique)) unique = name + index++;
+      const type = this.type(schema, spec);
+      definitions.set(
+        unique,
+        schema?.type === "object"
+          ? `export interface ${unique} ${type}`
+          : `export type ${unique} = ${type};`,
+      );
+      return unique;
     };
-
-    if (options.token) {
-      headers['Authorization'] = \`Bearer \${options.token}\`;
-    }
-
-    const res = await fetch(url, { ...options, headers });
-    if (!res.ok) {
-      const errBody = await res.text();
-      throw new Error(\`HTTP \${res.status} \${res.statusText}: \${errBody}\`);
-    }
-
-    const contentType = res.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      return res.json() as Promise<T>;
-    }
-    return (await res.text()) as unknown as T;
+    const media = (content: any) =>
+      Object.entries(content || {}).find(([type]) => type.includes("json")) ||
+      Object.entries(content || {})[0];
+    for (const [path, pathItem] of Object.entries<any>(spec.paths || {}))
+      for (const [method, op] of Object.entries<any>(pathItem)) {
+        if (
+          ![
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+          ].includes(method)
+        )
+          continue;
+        const base = this.sanitizeMethodName(
+            op.operationId || method + "_" + path,
+          ),
+          typeBase = base[0].toUpperCase() + base.slice(1);
+        let name = base,
+          n = 2;
+        while (used.has(name)) name = base + n++;
+        used.add(name);
+        const args: string[] = [],
+          aliases = new Map<string, string>();
+        const argUsed = new Set(["options", "query", "body"]);
+        const parameters = [
+          ...(pathItem.parameters || []),
+          ...(op.parameters || []),
+        ];
+        for (const match of path.matchAll(/\{([^{}]+)\}/g)) {
+          const raw = match[1];
+          if (aliases.has(raw)) continue;
+          let alias = this.sanitizeMethodName(raw);
+          let count = 2;
+          const initial = alias;
+          while (argUsed.has(alias)) alias = initial + count++;
+          argUsed.add(alias);
+          aliases.set(raw, alias);
+          args.push(`${alias}: string | number`);
+        }
+        const request = media(op.requestBody?.content);
+        let bodyCode = "undefined",
+          mime = "";
+        if (request && !["get", "head"].includes(method)) {
+          mime = request[0] as string;
+          const bodyType = mime.includes("json")
+            ? declare(typeBase + "Request", (request[1] as any).schema)
+            : mime === "multipart/form-data"
+              ? "FormData"
+              : "string";
+          args.push(
+            `body${op.requestBody.required === false ? "?" : ""}: ${bodyType}`,
+          );
+          bodyCode = mime.includes("json")
+            ? "body === undefined ? undefined : JSON.stringify(body)"
+            : "body";
+        }
+        const hasQuery = parameters.some((p: any) => p.in === "query");
+        if (hasQuery)
+          args.push(
+            "query?: Record<string, string | number | boolean | Array<string | number | boolean> | undefined>",
+          );
+        args.push("options: RequestOptions = {}");
+        const successful = Object.entries<any>(op.responses || {}).filter(
+          ([status]) => /^2\d\d$/.test(status),
+        );
+        const types: string[] = [];
+        if (method === "head") types.push("void");
+        else
+          for (const [status, response] of successful) {
+            const responseMedia = media(response.content);
+            if (status === "204" || !responseMedia) types.push("void");
+            else if (String(responseMedia[0]).includes("json"))
+              types.push(
+                declare(
+                  typeBase + "Response",
+                  (responseMedia[1] as any).schema,
+                ),
+              );
+            else
+              types.push(
+                String(responseMedia[0]).startsWith("text/") ||
+                  String(responseMedia[0]).includes("xml")
+                  ? "string"
+                  : "ArrayBuffer",
+              );
+          }
+        const returnType = types.length
+          ? [...new Set(types)].join(" | ")
+          : "unknown";
+        const segments: string[] = [];
+        let offset = 0;
+        for (const match of path.matchAll(/\{([^{}]+)\}/g)) {
+          segments.push(JSON.stringify(path.slice(offset, match.index)));
+          segments.push(`encodeURIComponent(String(${aliases.get(match[1])}))`);
+          offset = match.index + match[0].length;
+        }
+        segments.push(JSON.stringify(path.slice(offset)));
+        const server =
+          op.servers?.[0]?.url ||
+          pathItem.servers?.[0]?.url ||
+          spec.servers?.[0]?.url ||
+          "http://localhost";
+        methods.push(
+          `  public async ${name}(${args.join(", ")}): Promise<${returnType}> {\n    let path = ${segments.join(" + ")};\n${hasQuery ? `    const params = new URLSearchParams();\n    for (const [key, value] of Object.entries(query || {})) { if(value !== undefined) for(const part of Array.isArray(value) ? value : [value]) params.append(key, String(part)); }\n    if(params.size) path += '?' + params.toString();\n` : ""}    return this.request<${returnType}>(${JSON.stringify(server)}, path, { ...options, method: ${JSON.stringify(method.toUpperCase())}, body: ${bodyCode} }, ${JSON.stringify(mime === "multipart/form-data" ? "" : mime)});\n  }`,
+        );
+      }
+    return `/** Generated from observed/schema data. Review types and server assumptions before use. */
+export interface RequestOptions { headers?: Record<string, string>; token?: string; signal?: AbortSignal; baseUrl?: string; }
+${[...definitions.values()].join("\n\n")}
+export class ${title || "ApiClient"} {
+  constructor(private baseUrl?: string) {}
+  private async request<T>(server: string, path: string, options: RequestOptions & RequestInit, contentType: string): Promise<T> {
+    const headers = new Headers(options.headers);
+    if(contentType && options.body !== undefined && !headers.has('Content-Type')) headers.set('Content-Type', contentType);
+    if(options.token) headers.set('Authorization', 'Bearer ' + options.token);
+    const base = options.baseUrl || this.baseUrl || server;
+    const response = await fetch(base.replace(/\\/+$/, '') + path, {method:options.method, body:options.body, signal:options.signal, headers});
+    if(!response.ok) throw new Error('HTTP ' + response.status + ': ' + await response.text());
+    if(response.status === 204 || options.method === 'HEAD') return undefined as T;
+    const mime = response.headers.get('content-type') || '';
+    if(mime.includes('json')) { const text = await response.text(); return (text ? JSON.parse(text) : undefined) as T; }
+    if(mime.startsWith('text/') || mime.includes('xml') || !mime) return await response.text() as T;
+    return await response.arrayBuffer() as T;
   }
+${methods.join("\n\n")}
+}
 `;
-
-    // Generate methods for each operation
-    for (const item of operationsList) {
-      const {
-        method,
-        pathStr,
-        op,
-        methodName,
-        requestTypeName,
-        responseTypeName,
-        hasBody,
-        pathParams,
-        queryParams
-      } = item;
-
-      const paramArgs: string[] = [];
-      for (const p of pathParams) {
-        paramArgs.push(`${p.name}: string | number`);
-      }
-      if (hasBody) {
-        paramArgs.push(`body: ${requestTypeName}`);
-      }
-      if (queryParams.length > 0) {
-        paramArgs.push(`query?: Record<string, any>`);
-      }
-      paramArgs.push('options?: RequestOptions');
-
-      let pathTemplate = pathStr;
-      for (const p of pathParams) {
-        pathTemplate = pathTemplate.replaceAll(`{${p.name}}`, `\${${p.name}}`);
-      }
-
-      code += `
-  /**
-   * ${op.summary || `${method.toUpperCase()} ${pathStr}`}
-   */
-  public async ${methodName}(${paramArgs.join(', ')}): Promise<${responseTypeName}> {
-    let path = \`${pathTemplate}\`;
-    ${
-      queryParams.length > 0
-        ? `
-    if (query && Object.keys(query).length > 0) {
-      const sp = new URLSearchParams();
-      for (const [k, v] of Object.entries(query)) {
-        if (v !== undefined && v !== null) sp.append(k, String(v));
-      }
-      path += \`?\${sp.toString()}\`;
-    }`
-        : ''
-    }
-
-    return this.request<${responseTypeName}>(path, {
-      method: '${method.toUpperCase()}',
-      ${hasBody ? 'body: JSON.stringify(body),' : ''}
-      headers: options?.headers,
-      token: options?.token
-    });
-  }
-`;
-    }
-
-    code += `}\n`;
-    return code;
   }
 }

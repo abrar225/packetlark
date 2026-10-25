@@ -60,3 +60,31 @@ GitHub Actions CI checks Node 22 and 24. The Pages workflow builds/tests then up
 VERDICT: PASS
 
 This verdict covers the checks listed above. It does not assert full product parity, complete security, or correctness of all generated contracts and client code.
+
+# Platform foundations — 25 October 2026
+
+The record above describes the initial visual redesign. This section supersedes its unresolved-defect list for release candidate 1.1.0.
+
+## Observed checks
+
+- `npm run check`: **72 tests across 13 files passed**, including TypeScript compilation and web/sandbox asset builds. New tests exercise imported query normalization/inheritance/unsupported preservation, independent script scopes, real Chai/async assertions, bounded script networking, timeout/cancellation/body limits, binary bytes, redirect cookies, data iteration, request chaining, CSV and generated TypeScript compilation.
+- Actual CLI subprocesses verified JSON/JUnit output and exit codes. An actual MCP stdio client negotiated the server, listed tools/collections and exercised invalid-ID rejection. These checks do not establish compatibility with every agent client/version.
+- Workbench API tests verify invalid imports/malformed JSON return 400, inherited scripts execute, disabled environment entries survive script updates, and runs can be started/polled/cancelled.
+- `node scripts/assessment-probes.mjs`: formerly reproduced query/auth/text/falsy/multi-origin bugs now pass focused regression assertions.
+- `npm run build:extension`: strict extension typecheck and bundle passed. `@vscode/vsce@3.6.2 package --no-dependencies` produced a VSIX. VS Code was not installed here; extension-host execution, remote workspaces and Marketplace distribution are **not verified**. The preview explicitly supports trusted local desktop workspaces only.
+- `npm run test:package` / `npm pack`: packaged compiled server, sandbox bootstrap, local web assets and notices. A new temporary directory installed the tarball with production dependencies only and `--ignore-scripts`; CLI help and an actual collection with a WASM pre-request script executed without source/dev dependencies. The temporary installation was removed afterward.
+- Dependency lock audit observed **zero reported vulnerabilities**. This is an advisory snapshot, not a security audit or guarantee.
+
+## Browser observations and limit
+
+A temporary server at 4050/8095 used a disposable workspace. Direct Ego interactions verified selecting an imported request, sending a real local request, two inherited/async assertions, opening the runner, supplying two data rows, and rendering **PASSED: 2 requests · 4 assertions passed · 0 failed · 0 errors**. These results were visible in the browser snapshot.
+
+The longer automated browser scripts repeatedly lost the Ego connection, so their completion, full accessibility rerun, mobile overflow assertions and screenshots are **not claimed as passing** for this revision. Initial redesign browser results above remain historical, not a substitute for current verification. `scripts/browser-platform-check.mjs` records the intended repeatable checks; it still requires a completed run. No browser upgrade/profile/storage changes were made to bypass that failure.
+
+## Remaining release gates
+
+No direct Postman/Newman differential run, full sandbox conformance, independently reviewed security boundary, performance/RAM comparison, signed desktop installer, installed editor-host test, production operations test or real-user adoption study was completed. CLI reports omit bodies/headers/scopes by default and redact explicitly marked environment secrets; unknown secrets can still appear in names/assertion/error text. Workspaces remain plaintext files.
+
+VERDICT: PASS
+
+This verdict covers the observed automated/core/package checks only. Browser-harness completion and editor-host validation remain open and prevent calling the entire distribution stable or assigning a 9/10 platform score.
