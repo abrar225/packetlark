@@ -35,9 +35,17 @@ These are integrity checks for the trusted local-account model. They do not prev
 
 The first CI submission of the path increment timed out in the oversized-file test. Its generic deep comparison of a 2 MiB Buffer took 1,952 ms locally and exceeded CI's five-second test limit. Switching that assertion to native exact byte equality reduced the local case to 36 ms without changing the expected file contents or raising timeouts. The corrected submission requires a fresh Node 22/24 CI pass.
 
+## Cooperating-process ownership
+
+Source: `59b7fd34b75bbb64944eaa4061ca389754877283`. This increment implements single-writer ownership before migration/seeding, with read-only owner status and explicit reviewed-token recovery after an exited same-host process. It also fixes overlapping startup/shutdown, interrupted release cleanup, readiness/signal ordering and port-exhaustion cleanup. Thirteen new public workspace/CLI cases bring the local suite to **137 tests in 18 files**. See [WORKSPACE_OWNERSHIP.md](WORKSPACE_OWNERSHIP.md) for the supported protocol, retained recovery markers and limitations.
+
+A clean-source 30-process [ownership baseline](verification/P1_OWNERSHIP_COLD_START.json) recorded readiness p95 **71.939 ms** and backend RSS p95 **71.50 MiB** on the reference machine, with warm OS caches. This measures fresh temporary workspaces, not representative large-workspace startup or guaranteed peak RSS.
+
+This closes the first local cooperating-process lease/recovery slice; external-editor reconciliation and the broader repository/manifest design remain open. No automatic lock expiry, distributed lock or independent crash-durability certification is claimed.
+
 ## Remaining P1 requirements
 
-- A repository boundary with cooperating-process leases, explicit stale-lock recovery and external-file change reconciliation. The basic path/symlink checks above are implemented; stronger cross-platform/race validation remains open.
+- A repository boundary with external-file change reconciliation and versioned manifests. Local cooperating-process leases, explicit exited-owner recovery and basic path/symlink checks are implemented; stronger cross-platform/race validation remains open.
 - Complete collection/folder/request authoring: create, rename, duplicate, reorder, move, delete and inherited settings with stable identities.
 - Multiple request tabs and per-tab response ownership; bounded request history and examples.
 - Durable draft recovery and explicit conflict review, including external deletion, malformed files and recovery after restart.

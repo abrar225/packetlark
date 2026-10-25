@@ -2,6 +2,7 @@ import { readFile, writeFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { parseJsonDocument } from "./core/models/JsonDocument.js";
 import { StudioServer } from "./server/StudioServer.js";
+import { WorkspaceLease } from "./core/workspace/WorkspaceLease.js";
 import { PostmanConverter } from "./core/models/PostmanConverter.js";
 import {
   CollectionRunner,
@@ -16,10 +17,15 @@ async function readDocument(file: string) {
   return readFile(file, "utf8");
 }
 export async function main(args: string[]): Promise<number> {
+  if (args[0] === "workspace") {
+    if (!["status", "recover"].includes(args[1]))
+      throw new Error("Use workspace status or workspace recover");
+    args = [`workspace-${args[1]}`, ...args.slice(2)];
+  }
   const command = args[0] || "studio";
   if (["--help", "-h", "help"].includes(command)) {
     console.log(
-      `Rea API Studio\n\nrea-api studio [--port 4040] [--sniffer-port 8085] [--workspace directory]\nrea-api run collection.json [--environment env.json] [--data rows.json|rows.csv]\n  [--iterations count] [--folder name-or-request-id] [--timeout milliseconds]\n  [--bail] [--reporter cli|json|junit] [--report-file path]\nrea-api mcp --workspace directory\n\nRuns imported scripts in the bounded interpreter. Run only collections whose network behavior you trust.\nJSON/JUnit reports omit bodies, headers and environment values by default.`,
+      `Rea API Studio\n\nrea-api studio [--port 4040] [--sniffer-port 8085] [--workspace directory]\nrea-api run collection.json [--environment env.json] [--data rows.json|rows.csv]\n  [--iterations count] [--folder name-or-request-id] [--timeout milliseconds]\n  [--bail] [--reporter cli|json|junit] [--report-file path]\nrea-api mcp --workspace directory\nrea-api workspace status --workspace directory\nrea-api workspace recover --workspace directory --token reviewed-owner-token\n\nRuns imported scripts in the bounded interpreter. Run only collections whose network behavior you trust.\nJSON/JUnit reports omit bodies, headers and environment values by default.`,
     );
     return 0;
   }
@@ -36,6 +42,7 @@ export async function main(args: string[]): Promise<number> {
     "timeout",
     "reporter",
     "report-file",
+    "token",
   ]);
   for (let i = 1; i < args.length; i++) {
     const token = args[i];
@@ -49,6 +56,8 @@ export async function main(args: string[]): Promise<number> {
     else throw new Error(`Unexpected argument: ${token}`);
   }
   const allowed: Record<string, string[]> = {
+    "workspace-status": ["workspace"],
+    "workspace-recover": ["workspace", "token"],
     studio: ["port", "sniffer-port", "workspace"],
     mcp: ["workspace"],
     run: [
@@ -78,6 +87,27 @@ export async function main(args: string[]): Promise<number> {
       Number(flags.timeout) > 300000)
   )
     throw new Error("Timeout must be 1–300000 ms");
+  if (command === "workspace-status") {
+    console.log(
+      JSON.stringify(
+        WorkspaceLease.inspect(
+          path.resolve(String(flags.workspace || process.cwd()), ".rea-api"),
+        ),
+      ),
+    );
+    return 0;
+  }
+  if (command === "workspace-recover") {
+    console.log(
+      JSON.stringify(
+        WorkspaceLease.recover(
+          path.resolve(String(flags.workspace || process.cwd()), ".rea-api"),
+          flags.token as string,
+        ),
+      ),
+    );
+    return 0;
+  }
   if (command === "studio") {
     const port = Number(flags.port ?? process.env.PORT ?? 4040),
       sniffer = Number(
@@ -90,15 +120,27 @@ export async function main(args: string[]): Promise<number> {
       String(flags.workspace || process.cwd()),
       ".rea-api",
     );
-    const server = new StudioServer(port, sniffer, workspace);
-    const actual = await server.start();
-    console.log(`Rea API Studio: http://127.0.0.1:${actual}/studio`);
-    for (const signal of ["SIGINT", "SIGTERM"] as const)
-      process.once(signal, async () => {
-        await server.stop();
+    let server: StudioServer;
+    const shutdown = async () => {
+      try {
+        await server?.stop();
         process.exit(0);
-      });
-    return 0;
+      } catch (error) {
+        console.error("Rea: " + error.message);
+        process.exit(2);
+      }
+    };
+    const signals = ["SIGINT", "SIGTERM"] as const;
+    for (const signal of signals) process.once(signal, shutdown);
+    try {
+      server = new StudioServer(port, sniffer, workspace);
+      const actual = await server.start();
+      console.log(`Rea API Studio: http://127.0.0.1:${actual}/studio`);
+      return 0;
+    } catch (error) {
+      for (const signal of signals) process.removeListener(signal, shutdown);
+      throw error;
+    }
   }
   if (command === "mcp") {
     const { startMcp } = await import("./integrations/mcp.js");
