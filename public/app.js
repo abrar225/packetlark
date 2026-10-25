@@ -1,3 +1,4 @@
+let requestAbortController = null;
 function refreshIcons() {
   document.querySelectorAll("input,textarea,select").forEach((field) => {
     if (field.hasAttribute("aria-label") || field.labels?.length) return;
@@ -297,6 +298,15 @@ function selectRequest(req, col) {
 
   document.getElementById("req-prerequest-script").value =
     activeRequest.preRequestScript || "";
+  document.getElementById("req-timeout").value =
+    activeRequest.timeoutMs || 30000;
+  document.getElementById("req-redirects").checked =
+    activeRequest.followRedirects !== false;
+  document.getElementById("import-warning").textContent = (
+    col.importWarnings || []
+  ).length
+    ? `${col.importWarnings.length} import warning(s). Review unsupported settings before running.`
+    : "";
   document.getElementById("req-test-script").value =
     activeRequest.testScript || "";
 
@@ -337,6 +347,8 @@ async function saveActiveRequest() {
       },
     );
     const data = await res.json();
+    if (!res.ok || !data.ok)
+      throw new Error(data.error?.message || data.error || "Save failed");
     if (data.ok) {
       markClean();
       await loadCollections();
@@ -647,8 +659,7 @@ function renderAuthView() {
           </div>
         `;
   } else {
-    fields.innerHTML =
-      '<span style="font-size: 12px; color: var(--text-muted);">This request does not use any authorization headers.</span>';
+    fields.innerHTML = `<span style="font-size:12px;color:var(--text-muted)">${auth.type === "inherit" ? "Authorization is resolved from the nearest parent folder or collection when this request runs." : auth.type === "unsupported" ? "This imported authorization mode is preserved for export. Execution is blocked until you select a supported mode." : "This request does not use authorization headers."}</span>`;
   }
 }
 
@@ -697,6 +708,8 @@ async function sendActiveRequest() {
     return;
   const sendButton = document.getElementById("btn-send-main");
   sendButton.disabled = true;
+  requestAbortController = new AbortController();
+  document.getElementById("cancel-request").style.display = "inline-flex";
   sendButton.setAttribute("aria-busy", "true");
   syncCurrentFieldsToActiveRequest();
   switchResTab("body");
@@ -711,6 +724,7 @@ async function sendActiveRequest() {
   try {
     const payload = {
       request: activeRequest,
+      collectionId: activeCollection?.id,
       collectionVariables: activeCollection?.variables || [],
       environmentId: activeEnvironmentId || undefined,
     };
@@ -719,6 +733,7 @@ async function sendActiveRequest() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      signal: requestAbortController.signal,
     });
 
     const data = await res.json();
@@ -729,7 +744,9 @@ async function sendActiveRequest() {
     currentResponseData = data;
 
     // Render Status badge
-    if (data.status === 0) {
+    if (data.skipRequest) {
+      statusEl.textContent = "Skipped by script";
+    } else if (data.status === 0) {
       statusEl.textContent = `${data.error?.category || "Connection Failed"}`;
       statusEl.style.color = "#ef4444";
       statusEl.style.background = "rgba(239, 68, 68, 0.15)";
@@ -838,12 +855,15 @@ async function sendActiveRequest() {
       loadEnvironments();
     }
   } catch (err) {
-    statusEl.textContent = "System Error";
+    statusEl.textContent =
+      err.name === "AbortError" ? "Cancelled" : "Request failed";
     statusEl.style.color = "#ef4444";
     statusEl.style.background = "rgba(239, 68, 68, 0.15)";
     document.getElementById("res-body").textContent = String(err);
   } finally {
     sendButton.disabled = false;
+    requestAbortController = null;
+    document.getElementById("cancel-request").style.display = "none";
     sendButton.removeAttribute("aria-busy");
   }
 }
@@ -871,12 +891,23 @@ function copyResponseBody() {
 }
 
 function downloadResponseBody() {
-  const text = document.getElementById("res-body").innerText;
-  if (!text) return;
-  const isJson = text.trim().startsWith("{") || text.trim().startsWith("[");
-  const ext = isJson ? "json" : "txt";
-  const blob = new Blob([text], {
-    type: isJson ? "application/json" : "text/plain",
+  if (!currentResponseData) return;
+  const text = currentResponseData.body || "";
+  const binary = currentResponseData.bodyEncoding === "base64";
+  const isJson =
+    !binary && (text.trim().startsWith("{") || text.trim().startsWith("["));
+  const ext = binary ? "bin" : isJson ? "json" : "txt";
+  const bytes = binary
+    ? Uint8Array.from(atob(currentResponseData.bodyBase64 || ""), (c) =>
+        c.charCodeAt(0),
+      )
+    : text;
+  const blob = new Blob([bytes], {
+    type: binary
+      ? "application/octet-stream"
+      : isJson
+        ? "application/json"
+        : "text/plain",
   });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -1302,24 +1333,43 @@ function copySnippetCode() {
 
 /* Views & Sniffer */
 function switchView(view) {
-  if (view === "studio") {
-    document.getElementById("studio-view").style.display = "flex";
-    document.getElementById("sniffer-screen").style.display = "none";
-    document.getElementById("btn-studio-view").classList.add("active");
-    document.getElementById("btn-sniffer-view").classList.remove("active");
-  } else {
-    document.getElementById("studio-view").style.display = "none";
-    document.getElementById("sniffer-screen").style.display = "flex";
-    document.getElementById("btn-studio-view").classList.remove("active");
-    document.getElementById("btn-sniffer-view").classList.add("active");
-    pollSnifferTraffic();
+  for (const [name, id] of [
+    ["studio", "studio-view"],
+    ["sniffer", "sniffer-screen"],
+    ["runner", "runner-screen"],
+  ]) {
+    document.getElementById(id).style.display = name === view ? "flex" : "none";
+    document
+      .getElementById(`btn-${name}-view`)
+      ?.classList.toggle("active", name === view);
   }
+  if (view === "sniffer") pollSnifferTraffic();
 }
 
 async function pollSnifferTraffic() {
   try {
     const res = await fetch("/api/sniff/traffic");
-    const items = await res.json();
+    let items = await res.json();
+    const select = document.getElementById("sniff-origin"),
+      selected = select.value;
+    const origins = [
+      ...new Set(
+        items.map((item) => {
+          try {
+            return new URL(item.url).origin;
+          } catch {
+            return "";
+          }
+        }),
+      ),
+    ].filter(Boolean);
+    select.replaceChildren(
+      new Option("All origins", ""),
+      ...origins.map((origin) => new Option(origin, origin)),
+    );
+    select.value = origins.includes(selected) ? selected : "";
+    if (select.value)
+      items = items.filter((item) => new URL(item.url).origin === select.value);
     document.getElementById("sniff-count").textContent = items.length;
 
     const tbody = document.getElementById("traffic-tbody");
@@ -1355,8 +1405,18 @@ async function clearSniffedTraffic() {
 }
 
 async function exportOpenApi() {
-  const res = await fetch("/api/sniff/export/openapi", { method: "POST" });
+  const res = await fetch(
+    "/api/sniff/export/openapi?origin=" +
+      encodeURIComponent(document.getElementById("sniff-origin").value),
+    { method: "POST" },
+  );
   const spec = await res.json();
+  if (!res.ok) {
+    alert(
+      spec.error?.message || spec.error || "Export failed; choose one origin.",
+    );
+    return;
+  }
 
   document.getElementById("modal-title").textContent =
     "✨ Reverse-Engineered OpenAPI 3.1.0 Specification";
@@ -1372,8 +1432,16 @@ async function exportOpenApi() {
 }
 
 async function exportTypeScriptSdk() {
-  const res = await fetch("/api/sniff/export/sdk", { method: "POST" });
+  const res = await fetch(
+    "/api/sniff/export/sdk?origin=" +
+      encodeURIComponent(document.getElementById("sniff-origin").value),
+    { method: "POST" },
+  );
   const code = await res.text();
+  if (!res.ok) {
+    alert("Export failed. Choose one capture origin and try again.");
+    return;
+  }
 
   document.getElementById("modal-title").textContent =
     "📦 TypeScript client draft";
@@ -1431,6 +1499,10 @@ async function executeImport() {
       body: JSON.stringify({ curl: text }),
     });
     const req = await res.json();
+    if (!res.ok) {
+      alert(req.error?.message || req.error || "Import failed");
+      return;
+    }
     if (collections.length > 0) {
       collections[0].items.push({ id: req.id, name: req.name, request: req });
       selectRequest(req, collections[0]);
@@ -1500,3 +1572,119 @@ document.addEventListener("keydown", (event) => {
     }
   }
 });
+
+let activeRunId = null,
+  lastRunResult = null;
+function openRunner() {
+  const select = document.getElementById("run-collection");
+  select.replaceChildren(
+    ...collections.map((col) => new Option(col.name, col.id)),
+  );
+  if (activeCollection) select.value = activeCollection.id;
+  switchView("runner");
+}
+async function startCollectionRun() {
+  if (activeRunId) return;
+  const progress = document.getElementById("run-progress"),
+    button = document.getElementById("start-run");
+  try {
+    const raw = document.getElementById("run-data").value.trim(),
+      data = raw ? JSON.parse(raw) : undefined;
+    if (data && (!Array.isArray(data) || !data.length))
+      throw new Error(
+        "Iteration data must be a nonempty JSON array of objects",
+      );
+    const iterations = Number(document.getElementById("run-iterations").value);
+    const res = await fetch("/api/runs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        collectionId: document.getElementById("run-collection").value,
+        environmentId: activeEnvironmentId || undefined,
+        iterations: data && iterations === 1 ? data.length : iterations,
+        data,
+        timeoutMs: Number(document.getElementById("run-timeout").value),
+        stopOnFailure: document.getElementById("run-bail").checked,
+      }),
+    });
+    const job = await res.json();
+    if (!res.ok) throw new Error(job.error || "Could not start run");
+    activeRunId = job.id;
+    lastRunResult = null;
+    button.disabled = true;
+    document.getElementById("cancel-run").style.display = "inline-flex";
+    document.getElementById("download-run").disabled = true;
+    document.getElementById("run-results").replaceChildren();
+    while (activeRunId) {
+      const stateResponse = await fetch(`/api/runs/${activeRunId}`);
+      const state = await stateResponse.json();
+      if (!stateResponse.ok)
+        throw new Error(state.error || "Run polling failed");
+      progress.textContent = state.progress
+        ? `Completed ${state.progress.completed} request(s). ${state.progress.name}`
+        : "Starting run…";
+      if (state.state === "completed") {
+        if (state.error) throw new Error(state.error);
+        lastRunResult = state.result;
+        renderRunResult(lastRunResult);
+        document.getElementById("download-run").disabled = false;
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  } catch (error) {
+    progress.textContent = error.message;
+  } finally {
+    activeRunId = null;
+    button.disabled = false;
+    document.getElementById("cancel-run").style.display = "none";
+  }
+}
+function renderRunResult(result) {
+  const s = result.summary;
+  document.getElementById("run-progress").textContent =
+    `${result.status.toUpperCase()}: ${s.requests} requests · ${s.passed} assertions passed · ${s.failed} failed · ${s.errors} errors${result.error ? " · " + result.error : ""}`;
+  document.getElementById("run-results").innerHTML =
+    `<table class="traffic-table"><thead><tr><th>Iteration</th><th>Request</th><th>Status</th><th>Assertions</th><th>Time</th></tr></thead><tbody>${result.executions
+      .map(
+        (execution) =>
+          `<tr><td>${execution.iteration + 1}</td><td>${escapeHtml(execution.name)}</td><td>${escapeHtml(execution.response.statusText || execution.response.error?.category || String(execution.response.status))}</td><td>${(execution.response.testResults || []).filter((t) => t.passed).length}/${(execution.response.testResults || []).length}</td><td>${execution.response.timings.totalMs} ms</td></tr>${(
+            execution.response.testResults || []
+          )
+            .filter((t) => !t.passed)
+            .map(
+              (test) =>
+                `<tr><td colspan="5">${escapeHtml(test.name)}: ${escapeHtml(test.error)}</td></tr>`,
+            )
+            .join("")}`,
+      )
+      .join("")}</tbody></table>`;
+}
+async function cancelCollectionRun() {
+  if (activeRunId)
+    await fetch(`/api/runs/${activeRunId}/cancel`, { method: "POST" });
+}
+function downloadRunReport() {
+  if (!lastRunResult) return;
+  const summary = {
+    ...lastRunResult,
+    environment: undefined,
+    collectionVariables: undefined,
+    executions: lastRunResult.executions.map((e) => ({
+      name: e.name,
+      iteration: e.iteration,
+      status: e.response.status,
+      timings: e.response.timings,
+      testResults: e.response.testResults,
+      error: e.response.error,
+    })),
+  };
+  const url = URL.createObjectURL(
+    new Blob([JSON.stringify(summary, null, 2)], { type: "application/json" }),
+  );
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "rea-run-summary.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}

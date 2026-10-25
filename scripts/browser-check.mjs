@@ -6,7 +6,7 @@ const assert = (await import("node:assert/strict")).default;
 const cwd = (await import("node:url"))
   .fileURLToPath(new URL("../", import.meta.url))
   .replace(/\/$/, "");
-const task = await taskSpace("Rea redesign and evaluation");
+const task = await taskSpace("Rea platform compatibility 2026-10-25");
 const page = task.page("p1");
 const origin = "http://localhost:4050";
 const checks = [];

@@ -222,6 +222,7 @@ export class TrafficSnifferProxy {
 
       this.server.listen(this.port, '127.0.0.1', () => {
         this.isCapturing = true;
+        this.port=(this.server.address() as {port:number}).port;
         resolve(this.port);
       });
 

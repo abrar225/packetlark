@@ -21,6 +21,9 @@
         ></a
       >
       <nav class="view-nav" aria-label="Workspace views">
+        <button class="nav-btn" id="btn-runner-view" onclick="openRunner()">
+          Runner
+        </button>
         <button
           class="nav-btn active"
           id="btn-studio-view"
@@ -165,7 +168,15 @@
               &lt;/&gt; Code
             </button>
 
-            <!-- Emotion Agency Rolling-Text Send Button -->
+            <button
+              class="nav-btn"
+              id="cancel-request"
+              style="display: none"
+              onclick="requestAbortController?.abort()"
+            >
+              Cancel
+            </button>
+            <!-- Send request -->
             <button
               class="send-btn"
               aria-label="Send request"
@@ -183,6 +194,29 @@
             </button>
           </div>
 
+          <div class="request-settings">
+            <label
+              >Timeout
+              <input
+                id="req-timeout"
+                aria-label="Request timeout in milliseconds"
+                type="number"
+                min="1"
+                max="300000"
+                value="30000"
+                onchange="activeRequest.timeoutMs=Number(this.value);markDirty()"
+              />
+              ms</label
+            ><label
+              ><input
+                id="req-redirects"
+                type="checkbox"
+                checked
+                onchange="activeRequest.followRedirects=this.checked;markDirty()"
+              />
+              Follow redirects</label
+            ><span id="import-warning" role="status"></span>
+          </div>
           <!-- Request Tabs -->
           <div class="tab-nav">
             <div class="tab-nav-left" role="tablist">
@@ -390,7 +424,13 @@
                     aria-label="Authorization type"
                     onchange="changeAuthType()"
                   >
+                    <option value="inherit">
+                      Inherit from collection/folder
+                    </option>
                     <option value="none">No Auth</option>
+                    <option value="unsupported" disabled>
+                      Unsupported imported authentication
+                    </option>
                     <option value="bearer">Bearer Token</option>
                     <option value="basic">Basic Auth</option>
                     <option value="apikey">API Key</option>
@@ -570,6 +610,91 @@
         </main>
       </div>
 
+      <section
+        id="runner-screen"
+        style="display: none"
+        aria-label="Collection runner"
+      >
+        <div class="runner-toolbar">
+          <div>
+            <h1>Run a collection.</h1>
+            <p>
+              Repeat requests, share variables, and check every assertion.
+              Results remain local.
+            </p>
+          </div>
+          <button class="nav-btn" onclick="switchView('studio')">
+            Back to workbench
+          </button>
+        </div>
+        <form
+          id="runner-form"
+          onsubmit="event.preventDefault();startCollectionRun()"
+        >
+          <label
+            >Collection<select
+              id="run-collection"
+              class="method-select"
+              required
+            ></select
+          ></label>
+          <label
+            >Iterations<input
+              id="run-iterations"
+              type="number"
+              min="1"
+              max="1000"
+              value="1"
+              required
+          /></label>
+          <label
+            >Request timeout (ms)<input
+              id="run-timeout"
+              type="number"
+              min="1"
+              max="300000"
+              value="30000"
+              required
+          /></label>
+          <label
+            ><input type="checkbox" id="run-bail" checked /> Stop on first
+            failure</label
+          >
+          <label class="runner-data"
+            >Iteration data (JSON array, optional)<textarea
+              id="run-data"
+              class="code-editor"
+              placeholder='[{"userId":"1"},{"userId":"2"}]'
+            ></textarea>
+          </label>
+          <div class="runner-run-actions">
+            <button class="send-btn" id="start-run" type="submit">
+              Run collection</button
+            ><button
+              class="nav-btn"
+              id="cancel-run"
+              type="button"
+              style="display: none"
+              onclick="cancelCollectionRun()"
+            >
+              Cancel run</button
+            ><button
+              class="nav-btn"
+              id="download-run"
+              type="button"
+              disabled
+              onclick="downloadRunReport()"
+            >
+              Download summary JSON
+            </button>
+          </div>
+        </form>
+        <div id="run-progress" role="status">
+          Choose a collection to begin. Scripts run with bounded time and
+          memory; requests can still change remote services.
+        </div>
+        <div id="run-results"></div>
+      </section>
       <!-- Live Sniffer Screen -->
       <div id="sniffer-screen">
         <div class="sniffer-toolbar">
@@ -595,6 +720,14 @@
             </p>
           </div>
           <div style="display: flex; gap: 10px">
+            <select
+              id="sniff-origin"
+              class="method-select"
+              aria-label="Capture origin"
+              onchange="pollSnifferTraffic()"
+            >
+              <option value="">All origins</option>
+            </select>
             <button class="nav-btn" onclick="clearSniffedTraffic()">
               <i data-lucide="trash-2"></i> Clear
             </button>
@@ -654,7 +787,7 @@
         ><span class="status-dot"></span
         ><span id="connection-state">Connecting…</span></span
       ><span id="health-info">Local server</span
-      ><a href="./">Rea API Studio <span>1.0</span></a>
+      ><a href="./">Rea API Studio <span>1.1</span></a>
     </footer>
     <div class="toast" id="toast" role="status"></div>
   </body>

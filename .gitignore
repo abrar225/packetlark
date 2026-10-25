@@ -11,3 +11,9 @@ dist-site/
 .gravitas/
 .rea-api/
 public/third-party/
+
+sandbox/
+
+extensions/vscode/dist/
+*.vsix
+*.tgz

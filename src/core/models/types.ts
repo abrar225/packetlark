@@ -1,4 +1,11 @@
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+export type HttpMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "PATCH"
+  | "HEAD"
+  | "OPTIONS";
 
 export interface KeyValueParam {
   key: string;
@@ -8,24 +15,39 @@ export interface KeyValueParam {
   secret?: boolean;
 }
 
-export type AuthType = 'none' | 'bearer' | 'basic' | 'apikey';
+export type AuthType =
+  | "none"
+  | "inherit"
+  | "bearer"
+  | "basic"
+  | "apikey"
+  | "unsupported";
 
 export interface AuthConfig {
   type: AuthType;
+  originalType?: string;
+  postman?: Record<string, any>;
   bearerToken?: string;
   basicUsername?: string;
   basicPassword?: string;
   apiKeyName?: string;
   apiKeyValue?: string;
-  apiKeyIn?: 'header' | 'query';
+  apiKeyIn?: "header" | "query";
 }
 
-export type BodyMode = 'none' | 'raw-json' | 'raw-text' | 'form-data' | 'x-www-form-urlencoded';
+export type BodyMode =
+  | "none"
+  | "raw-json"
+  | "raw-text"
+  | "form-data"
+  | "x-www-form-urlencoded"
+  | "unsupported";
 
 export interface RequestBody {
   mode: BodyMode;
   raw?: string;
   formData?: KeyValueParam[];
+  postman?: Record<string, any>;
 }
 
 export interface HttpRequest {
@@ -39,6 +61,12 @@ export interface HttpRequest {
   auth: AuthConfig;
   preRequestScript?: string;
   testScript?: string;
+  preRequestScripts?: string[];
+  testScripts?: string[];
+  timeoutMs?: number;
+  followRedirects?: boolean;
+  maxResponseBytes?: number;
+  postman?: Record<string, any>;
 }
 
 export interface TimingMetrics {
@@ -67,6 +95,14 @@ export interface HttpResponse {
   logs?: string[];
   updatedVariables?: Record<string, string>;
   error?: ApiErrorDetail;
+  bodyBase64?: string;
+  bodyEncoding?: "utf8" | "base64";
+  updatedEnvironment?: Record<string, string>;
+  updatedLocalVariables?: Record<string, string>;
+  updatedCollectionVariables?: Record<string, string>;
+  updatedGlobals?: Record<string, string>;
+  nextRequest?: string | null;
+  skipRequest?: boolean;
 }
 
 export interface TestAssertionResult {
@@ -82,6 +118,11 @@ export interface CollectionItem {
   isFolder?: boolean;
   request?: HttpRequest;
   items?: CollectionItem[];
+  auth?: AuthConfig;
+  variables?: KeyValueParam[];
+  preRequestScript?: string;
+  testScript?: string;
+  postman?: Record<string, any>;
 }
 
 export interface ApiCollection {
@@ -91,6 +132,10 @@ export interface ApiCollection {
   schemaVersion: string;
   variables: KeyValueParam[];
   auth?: AuthConfig;
+  preRequestScript?: string;
+  testScript?: string;
+  postman?: Record<string, any>;
+  importWarnings?: string[];
   items: CollectionItem[];
 }
 

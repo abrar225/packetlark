@@ -1,330 +1,459 @@
-import { ApiCollection, CollectionItem, HttpRequest, HttpMethod, KeyValueParam, AuthConfig, RequestBody } from './types.js';
-
-export class PostmanConverter {
-  /**
-   * Converts a Postman Collection v2.1.0 JSON object to an ApiCollection.
-   */
-  public static fromPostman(postmanJson: any): ApiCollection {
-    const info = postmanJson.info || {};
-    const variables: KeyValueParam[] = (postmanJson.variable || []).map((v: any) => ({
-      key: v.key || '',
-      value: v.value || '',
-      enabled: v.disabled !== true,
-      description: v.description
-    }));
-
-    const items: CollectionItem[] = (postmanJson.item || []).map((item: any) => this.convertItem(item));
-
-    return {
-      id: info._postman_id || info.id || crypto.randomUUID(),
-      name: info.name || 'Imported Collection',
-      description: typeof info.description === 'string' ? info.description : info.description?.content || '',
-      schemaVersion: '2.1.0',
-      variables,
-      items
-    };
-  }
-
-  private static convertItem(item: any): CollectionItem {
-    const isFolder = Array.isArray(item.item) && !item.request;
-    const id = item.id || crypto.randomUUID();
-    const name = item.name || 'Untitled';
-
-    if (isFolder) {
+import {
+  ApiCollection,
+  CollectionItem,
+  HttpRequest,
+  HttpMethod,
+  KeyValueParam,
+  AuthConfig,
+  RequestBody,
+} from "./types.js";
+const string = (value: any) => (value == null ? "" : String(value));
+const variables = (values: any[]) =>
+  (values || []).map((v) => ({
+    key: string(v.key),
+    value: string(v.value),
+    enabled: v.disabled !== true,
+    description: v.description,
+    secret: v.type === "secret",
+  }));
+const events = (source: any, type: string) =>
+  (source.event || [])
+    .filter((e) => e.listen === type && e.disabled !== true)
+    .map((e) =>
+      Array.isArray(e.script?.exec)
+        ? e.script.exec.join("\n")
+        : e.script?.exec || "",
+    )
+    .join("\n");
+function authFrom(source: any, warnings: string[]): AuthConfig {
+  if (!source) return { type: "inherit" };
+  const get = (key: string) =>
+    string((source[source.type] || []).find((p) => p.key === key)?.value);
+  switch (source.type) {
+    case "noauth":
+      return { type: "none" };
+    case "bearer":
+      return { type: "bearer", bearerToken: get("token") };
+    case "basic":
       return {
+        type: "basic",
+        basicUsername: get("username"),
+        basicPassword: get("password"),
+      };
+    case "apikey":
+      return {
+        type: "apikey",
+        apiKeyName: get("key"),
+        apiKeyValue: get("value"),
+        apiKeyIn: get("in") === "query" ? "query" : "header",
+      };
+    default:
+      warnings.push(
+        `Unsupported authentication: ${source.type}. Preserved for export; execution is blocked.`,
+      );
+      return {
+        type: "unsupported",
+        originalType: source.type,
+        postman: structuredClone(source),
+      };
+  }
+}
+function authTo(auth?: AuthConfig): any {
+  if (!auth || auth.type === "inherit") return undefined;
+  if (auth.type === "unsupported") return auth.postman;
+  if (auth.type === "none") return { type: "noauth" };
+  const pairs =
+    auth.type === "bearer"
+      ? [["token", auth.bearerToken]]
+      : auth.type === "basic"
+        ? [
+            ["username", auth.basicUsername],
+            ["password", auth.basicPassword],
+          ]
+        : [
+            ["key", auth.apiKeyName],
+            ["value", auth.apiKeyValue],
+            ["in", auth.apiKeyIn || "header"],
+          ];
+  return {
+    type: auth.type,
+    [auth.type]: pairs.map(([key, value]) => ({
+      key,
+      value: value || "",
+      type: "string",
+    })),
+  };
+}
+export class PostmanConverter {
+  static fromPostman(source: any): ApiCollection {
+    if (!source || typeof source !== "object" || !Array.isArray(source.item))
+      throw new Error("Expected a Postman v2.1 collection with an item array");
+    if (source.info?.schema && !source.info.schema.includes("/v2.1.0/"))
+      throw new Error(
+        "Only Postman Collection v2.1 JSON is supported. Export v2.1 before importing.",
+      );
+    const warnings: string[] = [];
+    const convert = (item: any): CollectionItem => {
+      const id = /^[a-zA-Z0-9_-]{1,200}$/.test(string(item.id))
+        ? string(item.id)
+        : crypto.randomUUID();
+      const name = string(item.name) || "Untitled";
+      const base = {
         id,
         name,
-        description: item.description,
-        isFolder: true,
-        items: item.item.map((child: any) => this.convertItem(child))
+        description:
+          typeof item.description === "string"
+            ? item.description
+            : item.description?.content,
+        postman: structuredClone(item),
       };
-    }
-
-    const req = item.request || {};
-    let method: HttpMethod = (req.method || 'GET').toUpperCase() as HttpMethod;
-    let urlRaw = typeof req.url === 'string' ? req.url : req.url?.raw || '';
-
-    const headers: KeyValueParam[] = (req.header || []).map((h: any) => ({
-      key: h.key || '',
-      value: h.value || '',
-      enabled: h.disabled !== true,
-      description: h.description
-    }));
-
-    const queryParams: KeyValueParam[] = (req.url?.query || []).map((q: any) => ({
-      key: q.key || '',
-      value: q.value || '',
-      enabled: q.disabled !== true,
-      description: q.description
-    }));
-
-    // Body
-    const body: RequestBody = { mode: 'none' };
-    if (req.body) {
-      if (req.body.mode === 'raw') {
-        body.mode = 'raw-json';
-        body.raw = req.body.raw || '';
-      } else if (req.body.mode === 'urlencoded') {
-        body.mode = 'x-www-form-urlencoded';
-        body.formData = (req.body.urlencoded || []).map((p: any) => ({
-          key: p.key || '',
-          value: p.value || '',
-          enabled: p.disabled !== true
-        }));
-      } else if (req.body.mode === 'formdata') {
-        body.mode = 'form-data';
-        body.formData = (req.body.formdata || []).map((p: any) => ({
-          key: p.key || '',
-          value: p.value || '',
-          enabled: p.disabled !== true
-        }));
+      if (Array.isArray(item.item) && !item.request)
+        return {
+          ...base,
+          isFolder: true,
+          auth: authFrom(item.auth, warnings),
+          variables: variables(item.variable),
+          preRequestScript: events(item, "prerequest"),
+          testScript: events(item, "test"),
+          items: item.item.map(convert),
+        };
+      const req =
+        typeof item.request === "string"
+          ? { url: item.request }
+          : item.request || {};
+      let urlRaw = typeof req.url === "string" ? req.url : string(req.url?.raw);
+      if (!urlRaw && req.url?.host) {
+        const protocol = req.url.protocol || "https";
+        const host = Array.isArray(req.url.host)
+          ? req.url.host.join(".")
+          : req.url.host;
+        const path = Array.isArray(req.url.path)
+          ? req.url.path.join("/")
+          : req.url.path || "";
+        urlRaw = `${protocol}://${host}${req.url.port ? ":" + req.url.port : ""}/${path}`;
       }
-    }
-
-    // Auth
-    const auth: AuthConfig = { type: 'none' };
-    if (req.auth) {
-      if (req.auth.type === 'bearer') {
-        auth.type = 'bearer';
-        const bearerParam = (req.auth.bearer || []).find((b: any) => b.key === 'token');
-        auth.bearerToken = bearerParam ? bearerParam.value : '';
-      } else if (req.auth.type === 'basic') {
-        auth.type = 'basic';
-        const u = (req.auth.basic || []).find((b: any) => b.key === 'username');
-        const p = (req.auth.basic || []).find((b: any) => b.key === 'password');
-        auth.basicUsername = u ? u.value : '';
-        auth.basicPassword = p ? p.value : '';
-      } else if (req.auth.type === 'apikey') {
-        auth.type = 'apikey';
-        const k = (req.auth.apikey || []).find((b: any) => b.key === 'key');
-        const v = (req.auth.apikey || []).find((b: any) => b.key === 'value');
-        const where = (req.auth.apikey || []).find((b: any) => b.key === 'in');
-        auth.apiKeyName = k ? k.value : '';
-        auth.apiKeyValue = v ? v.value : '';
-        auth.apiKeyIn = where?.value === 'query' ? 'query' : 'header';
+      const hashIndex = urlRaw.indexOf("#");
+      const hash = hashIndex < 0 ? "" : urlRaw.slice(hashIndex);
+      const withoutHash = hashIndex < 0 ? urlRaw : urlRaw.slice(0, hashIndex);
+      const question = withoutHash.indexOf("?");
+      const rawQuery = question < 0 ? "" : withoutHash.slice(question + 1);
+      const params = Array.isArray(req.url?.query)
+        ? variables(req.url.query)
+        : [...new URLSearchParams(rawQuery)].map(([key, value]) => ({
+            key,
+            value,
+            enabled: true,
+          }));
+      if (Array.isArray(req.url?.query) && rawQuery) {
+        const enabled = params
+          .filter((p) => p.enabled)
+          .map((p) => [p.key, p.value]);
+        if (
+          JSON.stringify([...new URLSearchParams(rawQuery)]) !==
+          JSON.stringify(enabled)
+        )
+          warnings.push(
+            `${name}: structured query parameters take precedence over url.raw.`,
+          );
       }
-    }
-
-    // Scripts
-    let preRequestScript: string | undefined;
-    let testScript: string | undefined;
-    if (Array.isArray(item.event)) {
-      for (const ev of item.event) {
-        if (ev.listen === 'prerequest' && ev.script?.exec) {
-          preRequestScript = Array.isArray(ev.script.exec) ? ev.script.exec.join('\n') : ev.script.exec;
-        } else if (ev.listen === 'test' && ev.script?.exec) {
-          testScript = Array.isArray(ev.script.exec) ? ev.script.exec.join('\n') : ev.script.exec;
-        }
+      const url =
+        (question < 0 ? withoutHash : withoutHash.slice(0, question)) + hash;
+      const body: RequestBody = { mode: "none" };
+      if (req.body?.mode === "raw") {
+        body.mode =
+          req.body.options?.raw?.language === "json" ||
+          (!req.body.options?.raw?.language &&
+            /^\s*[\[{]/.test(req.body.raw || ""))
+            ? "raw-json"
+            : "raw-text";
+        body.raw = string(req.body.raw);
+      } else if (req.body?.mode === "urlencoded") {
+        body.mode = "x-www-form-urlencoded";
+        body.formData = variables(req.body.urlencoded);
+      } else if (
+        req.body?.mode === "formdata" &&
+        !(req.body.formdata || []).some((p) => p.type === "file")
+      ) {
+        body.mode = "form-data";
+        body.formData = variables(req.body.formdata);
+      } else if (req.body?.mode) {
+        body.mode = "unsupported";
+        body.postman = structuredClone(req.body);
+        warnings.push(
+          `${name}: unsupported ${req.body.mode} body preserved; execution is blocked.`,
+        );
       }
-    }
-
-    const httpRequest: HttpRequest = {
-      id,
-      name,
-      method,
-      url: urlRaw,
-      headers,
-      queryParams,
-      body,
-      auth,
-      preRequestScript,
-      testScript
+      const request: HttpRequest = {
+        id,
+        name,
+        method: (req.method || "GET").toUpperCase() as HttpMethod,
+        url,
+        queryParams: params,
+        headers: variables(req.header),
+        body,
+        auth: authFrom(req.auth, warnings),
+        preRequestScript: events(item, "prerequest"),
+        testScript: events(item, "test"),
+        postman: structuredClone(req),
+      };
+      return { ...base, isFolder: false, request };
     };
-
+    const auth = authFrom(source.auth, warnings);
+    const items = source.item.map(convert);
     return {
-      id,
-      name,
-      isFolder: false,
-      request: httpRequest
+      id: /^[a-zA-Z0-9_-]{1,200}$/.test(
+        string(source.info?._postman_id || source.info?.id),
+      )
+        ? string(source.info?._postman_id || source.info?.id)
+        : crypto.randomUUID(),
+      name: source.info?.name || "Imported collection",
+      description:
+        typeof source.info?.description === "string"
+          ? source.info.description
+          : source.info?.description?.content || "",
+      schemaVersion: "2.1.0",
+      variables: variables(source.variable),
+      auth,
+      preRequestScript: events(source, "prerequest"),
+      testScript: events(source, "test"),
+      items,
+      postman: structuredClone(source),
+      importWarnings: [...new Set(warnings)],
     };
   }
-
-  /**
-   * Converts an ApiCollection back to Postman Collection v2.1.0 format.
-   */
-  public static toPostman(collection: ApiCollection): any {
-    return {
-      info: {
-        _postman_id: collection.id,
-        name: collection.name,
-        description: collection.description || '',
-        schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
-      },
-      item: collection.items.map(item => this.convertItemToPostman(item)),
-      variable: (collection.variables || []).map(v => ({
+  static toPostman(collection: ApiCollection): any {
+    const encode = (s: string) =>
+      encodeURIComponent(s).replace(/%7B/g, "{").replace(/%7D/g, "}");
+    const vars = (values: KeyValueParam[]) =>
+      values.map((v) => ({
         key: v.key,
         value: v.value,
-        type: 'string',
-        disabled: v.enabled === false
-      }))
+        disabled: v.enabled === false,
+        type: v.secret ? "secret" : "string",
+        description: v.description,
+      }));
+    const event = (source: any, base: any) => {
+      const other = (base.event || []).filter(
+        (e) => !["prerequest", "test"].includes(e.listen),
+      );
+      return [
+        ...other,
+        ...[
+          ["prerequest", source.preRequestScript],
+          ["test", source.testScript],
+        ]
+          .filter(([, code]) => code)
+          .map(([listen, code]) => ({
+            listen,
+            script: { type: "text/javascript", exec: code.split("\n") },
+          })),
+      ];
     };
-  }
-
-  private static convertItemToPostman(item: CollectionItem): any {
-    if (item.isFolder && item.items) {
+    const convert = (item: CollectionItem): any => {
+      const base = structuredClone(item.postman || {});
+      if (item.isFolder)
+        return {
+          ...base,
+          id: item.id,
+          name: item.name,
+          item: (item.items || []).map(convert),
+          auth: authTo(item.auth),
+          variable: vars(item.variables || []),
+          event: event(item, base),
+        };
+      const req = item.request;
+      if (!req) throw new Error("Collection item has no request");
+      let body: any;
+      if (req.body.mode === "unsupported") body = req.body.postman;
+      else if (req.body.mode.startsWith("raw"))
+        body = {
+          mode: "raw",
+          raw: req.body.raw || "",
+          options: {
+            raw: { language: req.body.mode === "raw-json" ? "json" : "text" },
+          },
+        };
+      else if (
+        req.body.mode === "form-data" ||
+        req.body.mode === "x-www-form-urlencoded"
+      ) {
+        const mode = req.body.mode === "form-data" ? "formdata" : "urlencoded";
+        body = { mode, [mode]: vars(req.body.formData || []) };
+      }
+      const q = (req.queryParams || [])
+        .filter((p) => p.enabled !== false && p.key)
+        .map((p) => `${encode(p.key)}=${encode(p.value)}`)
+        .join("&");
+      const hash = req.url.includes("#")
+        ? req.url.slice(req.url.indexOf("#"))
+        : "";
+      const url = req.url.replace(/#.*$/, "");
+      const raw = url + (q ? (url.includes("?") ? "&" : "?") + q : "") + hash;
       return {
+        ...base,
+        id: item.id,
         name: item.name,
-        item: item.items.map(child => this.convertItemToPostman(child))
-      };
-    }
-
-    const req = item.request || {
-      method: 'GET',
-      url: '',
-      headers: [],
-      queryParams: [],
-      body: { mode: 'none' },
-      auth: { type: 'none' }
-    };
-
-    const events: any[] = [];
-    if (req.preRequestScript) {
-      events.push({
-        listen: 'prerequest',
-        script: {
-          type: 'text/javascript',
-          exec: req.preRequestScript.split('\n')
-        }
-      });
-    }
-    if (req.testScript) {
-      events.push({
-        listen: 'test',
-        script: {
-          type: 'text/javascript',
-          exec: req.testScript.split('\n')
-        }
-      });
-    }
-
-    let postmanBody: any;
-    if (req.body.mode === 'raw-json' || req.body.mode === 'raw-text') {
-      postmanBody = {
-        mode: 'raw',
-        raw: req.body.raw || '',
-        options: {
-          raw: {
-            language: req.body.mode === 'raw-json' ? 'json' : 'text'
-          }
-        }
-      };
-    } else if (req.body.mode === 'x-www-form-urlencoded') {
-      postmanBody = {
-        mode: 'urlencoded',
-        urlencoded: (req.body.formData || []).map(p => ({
-          key: p.key,
-          value: p.value,
-          disabled: p.enabled === false
-        }))
-      };
-    } else if (req.body.mode === 'form-data') {
-      postmanBody = {
-        mode: 'formdata',
-        formdata: (req.body.formData || []).map(p => ({
-          key: p.key,
-          value: p.value,
-          disabled: p.enabled === false
-        }))
-      };
-    }
-
-    let postmanAuth: any;
-    if (req.auth.type === 'bearer') {
-      postmanAuth = {
-        type: 'bearer',
-        bearer: [{ key: 'token', value: req.auth.bearerToken || '', type: 'string' }]
-      };
-    } else if (req.auth.type === 'basic') {
-      postmanAuth = {
-        type: 'basic',
-        basic: [
-          { key: 'username', value: req.auth.basicUsername || '', type: 'string' },
-          { key: 'password', value: req.auth.basicPassword || '', type: 'string' }
-        ]
-      };
-    } else if (req.auth.type === 'apikey') {
-      postmanAuth = {
-        type: 'apikey',
-        apikey: [
-          { key: 'key', value: req.auth.apiKeyName || '', type: 'string' },
-          { key: 'value', value: req.auth.apiKeyValue || '', type: 'string' },
-          { key: 'in', value: req.auth.apiKeyIn || 'header', type: 'string' }
-        ]
-      };
-    }
-
-    return {
-      name: item.name,
-      event: events,
-      request: {
-        method: req.method,
-        header: req.headers.map(h => ({
-          key: h.key,
-          value: h.value,
-          type: 'text',
-          disabled: h.enabled === false
-        })),
-        body: postmanBody,
-        url: {
-          raw: req.url,
-          query: req.queryParams.map(q => ({
-            key: q.key,
-            value: q.value,
-            disabled: q.enabled === false
-          }))
+        event: event(req, base),
+        request: {
+          ...structuredClone(req.postman || {}),
+          method: req.method,
+          auth: authTo(req.auth),
+          header: vars(req.headers || []),
+          body,
+          url: { raw, query: vars(req.queryParams || []) },
         },
-        auth: postmanAuth
+      };
+    };
+    const base = structuredClone(collection.postman || {});
+    return {
+      ...base,
+      info: {
+        ...base.info,
+        _postman_id: collection.id,
+        name: collection.name,
+        description: collection.description || "",
+        schema:
+          "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
       },
-      response: []
+      auth: authTo(collection.auth),
+      event: event(collection, base),
+      variable: vars(collection.variables || []),
+      item: collection.items.map(convert),
     };
   }
-
-  /**
-   * Parses a standard cURL command into an HttpRequest.
-   */
-  public static fromCurl(curlCommand: string): HttpRequest {
-    let clean = curlCommand.trim().replace(/\\\r?\n/g, ' ');
-    const methodMatch = clean.match(/-X\s+([A-Z]+)/i);
-    let method: HttpMethod = (methodMatch ? methodMatch[1].toUpperCase() : 'GET') as HttpMethod;
-
-    // URL match
-    const urlMatch = clean.match(/(?:curl\s+)?(?:['"])(https?:\/\/[^'"]+)(?:['"])|(?:https?:\/\/\S+)/i);
-    let url = urlMatch ? (urlMatch[1] || urlMatch[0]) : '';
-    if (url.startsWith('curl ')) url = url.replace('curl ', '').trim();
-
-    // Headers
-    const headers: KeyValueParam[] = [];
-    const headerRegex = /-H\s+['"]([^'"]+)['"]/g;
-    let hMatch: RegExpExecArray | null;
-    while ((hMatch = headerRegex.exec(clean)) !== null) {
-      const parts = hMatch[1].split(':');
-      if (parts.length >= 2) {
-        headers.push({
-          key: parts[0].trim(),
-          value: parts.slice(1).join(':').trim(),
-          enabled: true
-        });
+  static fromCurl(command: string): HttpRequest {
+    // Tokenization only: never pass imported text to a shell.
+    const tokens: string[] = [];
+    let token = "",
+      quote = "",
+      started = false;
+    const text = command.trim().replace(/\\\r?\n/g, "");
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quote) {
+        if (c === quote) quote = "";
+        else if (
+          c === "\\" &&
+          quote === '"' &&
+          i + 1 < text.length &&
+          /["\\$`]/.test(text[i + 1])
+        )
+          token += text[++i];
+        else token += c;
+        started = true;
+      } else if (c === '"' || c === "'") {
+        quote = c;
+        started = true;
+      } else if (c === "\\" && i + 1 < text.length) {
+        token += text[++i];
+        started = true;
+      } else if (/\s/.test(c)) {
+        if (started) {
+          tokens.push(token);
+          token = "";
+          started = false;
+        }
+      } else {
+        token += c;
+        started = true;
       }
     }
-
-    // Body
-    const body: RequestBody = { mode: 'none' };
-    const dataMatch = clean.match(/(?:-d|--data|--data-raw)\s+(?:'([^']*)'|"([^"]*)")/);
-    if (dataMatch) {
-      if (!methodMatch) method = 'POST';
-      body.mode = 'raw-json';
-      body.raw = dataMatch[1] ?? dataMatch[2] ?? '';
+    if (quote) throw new Error("Unterminated quote in cURL command");
+    if (started) tokens.push(token);
+    if (tokens.shift() !== "curl") throw new Error("Expected a curl command");
+    let method = "GET",
+      url = "",
+      explicit = false;
+    const headers: KeyValueParam[] = [];
+    const chunks: string[] = [];
+    let json = false;
+    const value = (i: number) => {
+      if (!tokens[i]) throw new Error("Missing cURL option value");
+      return tokens[i];
+    };
+    for (let i = 0; i < tokens.length; i++) {
+      const flag = tokens[i];
+      if (["-X", "--request"].includes(flag)) {
+        method = value(++i).toUpperCase();
+        explicit = true;
+      } else if (["-H", "--header"].includes(flag)) {
+        const h = value(++i);
+        const colon = h.indexOf(":");
+        if (colon < 1) throw new Error("Invalid cURL header");
+        headers.push({
+          key: h.slice(0, colon).trim(),
+          value: h.slice(colon + 1).trim(),
+          enabled: true,
+        });
+      } else if (
+        ["-d", "--data", "--data-raw", "--data-binary", "--json"].includes(flag)
+      ) {
+        const data = value(++i);
+        if (data.startsWith("@"))
+          throw new Error(
+            "cURL file uploads are not supported; no local file was read",
+          );
+        chunks.push(data);
+        json ||= flag === "--json";
+      } else if (flag === "--url") url = value(++i);
+      else if (["-I", "--head"].includes(flag)) {
+        method = "HEAD";
+        explicit = true;
+      } else if (
+        [
+          "-s",
+          "--silent",
+          "-S",
+          "--show-error",
+          "-L",
+          "--location",
+          "--compressed",
+        ].includes(flag)
+      ) {
+      } else if (flag.startsWith("-"))
+        throw new Error(
+          `Unsupported cURL option ${flag}; import was stopped instead of discarding behavior`,
+        );
+      else if (!url) url = flag;
+      else throw new Error("Only one cURL URL can be imported at a time");
     }
-
+    if (!/^https?:\/\//i.test(url))
+      throw new Error("cURL must include an HTTP or HTTPS URL");
+    if (chunks.length && !explicit) method = "POST";
+    const raw = chunks.join("&");
+    const declared =
+      headers.find((h) => h.key.toLowerCase() === "content-type")?.value || "";
+    const isJson = json || declared.includes("json");
+    if (chunks.length && !declared && !json)
+      headers.push({
+        key: "Content-Type",
+        value: "application/x-www-form-urlencoded",
+        enabled: true,
+      });
+    if (json && !declared)
+      headers.push({
+        key: "Content-Type",
+        value: "application/json",
+        enabled: true,
+      });
     return {
       id: crypto.randomUUID(),
-      name: 'cURL Request',
-      method,
+      name: "cURL Request",
+      method: method as HttpMethod,
       url,
       headers,
       queryParams: [],
-      body,
-      auth: { type: 'none' }
+      body: chunks.length
+        ? {
+            mode: isJson
+              ? "raw-json"
+              : declared.includes("x-www-form-urlencoded")
+                ? "x-www-form-urlencoded"
+                : "raw-text",
+            raw,
+          }
+        : { mode: "none" },
+      auth: { type: "none" },
     };
   }
 }

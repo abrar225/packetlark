@@ -1,44 +1,47 @@
-import { KeyValueParam } from '../models/types.js';
+import { KeyValueParam } from "../models/types.js";
 
 export class VariableResolver {
   /**
    * Replaces `{{variable}}` templates with values from active environments, collection variables, or dynamic generators.
    */
   public static resolve(text: string, context: Record<string, string>): string {
-    if (!text || typeof text !== 'string') return text;
+    if (!text || typeof text !== "string") return text;
 
     let current = text;
     const maxDepth = 5;
 
     for (let depth = 0; depth < maxDepth; depth++) {
       let substituted = false;
-      const next = current.replace(/\{\{\s*([a-zA-Z0-9_$.-]+)\s*\}\}/g, (match, rawKey) => {
-        const key = rawKey.trim();
+      const next = current.replace(
+        /\{\{\s*([a-zA-Z0-9_$.-]+)\s*\}\}/g,
+        (match, rawKey) => {
+          const key = rawKey.trim();
 
-        // Dynamic variables
-        if (key === '$guid' || key === '$uuid') {
-          substituted = true;
-          return crypto.randomUUID();
-        }
-        if (key === '$timestamp') {
-          substituted = true;
-          return Math.floor(Date.now() / 1000).toString();
-        }
-        if (key === '$isoTimestamp') {
-          substituted = true;
-          return new Date().toISOString();
-        }
-        if (key === '$randomInt') {
-          substituted = true;
-          return Math.floor(Math.random() * 1000).toString();
-        }
+          // Dynamic variables
+          if (key === "$guid" || key === "$uuid") {
+            substituted = true;
+            return crypto.randomUUID();
+          }
+          if (key === "$timestamp") {
+            substituted = true;
+            return Math.floor(Date.now() / 1000).toString();
+          }
+          if (key === "$isoTimestamp") {
+            substituted = true;
+            return new Date().toISOString();
+          }
+          if (key === "$randomInt") {
+            substituted = true;
+            return Math.floor(Math.random() * 1000).toString();
+          }
 
-        if (context && key in context) {
-          substituted = true;
-          return context[key];
-        }
-        return match;
-      });
+          if (context && Object.hasOwn(context, key)) {
+            substituted = true;
+            return context[key];
+          }
+          return match;
+        },
+      );
 
       if (next === current || !substituted) {
         break;
@@ -55,9 +58,9 @@ export class VariableResolver {
   public static buildContext(
     collectionVars: KeyValueParam[] = [],
     envVars: KeyValueParam[] = [],
-    runtimeVars: Record<string, string> = {}
+    runtimeVars: Record<string, string> = {},
   ): Record<string, string> {
-    const context: Record<string, string> = {};
+    const context: Record<string, string> = Object.create(null);
 
     // 1. Collection variables (lowest precedence)
     for (const v of collectionVars) {

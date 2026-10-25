@@ -25,7 +25,10 @@ The website published on [GitHub Pages](https://abrar225.github.io/rea-api-studi
 - HTTP requests with query parameters, headers, JSON/text, URL-encoded and text multipart bodies.
 - Bearer, Basic, and API-key authentication.
 - Local collections, nested imported folders, environments, and variables.
-- Pre-request JavaScript, response tests using a subset of `pm.*`, and console output.
+- QuickJS-isolated pre-request JavaScript, Chai assertions, inherited scripts, async tests and a supported subset of `pm.*`.
+- Redirect-aware cookie sessions, cancellation, response limits and original binary downloads.
+- Collection runner with JSON/CSV data, iterations, request chaining and CLI JSON/JUnit summaries.
+- Stdio MCP tools and a packageable VS Code desktop preview; see [integrations](docs/INTEGRATIONS.md).
 - Postman v2.1 collection import/export and basic cURL import.
 - Response search, copy, download, and cURL/Fetch/Python/Go snippets.
 - Forward HTTP traffic through a local proxy; inspect the last 500 records in memory.
@@ -59,13 +62,15 @@ Workspace data is stored under `.rea-api/collections/` and `.rea-api/environment
 
 After installation/build, fonts, icons, and scripts are served locally. Calls to remote APIs still need a network connection. There is no implemented Rea telemetry service in this source tree.
 
-Only run scripts and imported collection scripts you trust. The current engine uses `node:vm` and a defensive wrapper; this is **not an isolation boundary for hostile code**. The server now rejects foreign browser origins and hosts, but it is not an authenticated multi-user server. Do not expose it publicly. Captured traffic may include credentials; it is held in memory and is not automatically redacted.
+Only run scripts and imported collection scripts whose network behavior you trust. The engine now uses a separate QuickJS interpreter with heap/stack/time limits and a narrow JSON bridge instead of Node object references. Scripts can still make HTTP requests and change services; this is not a formal security certification. The server now rejects foreign browser origins and hosts, but it is not an authenticated multi-user server. Do not expose it publicly. Captured traffic may include credentials; it is held in memory and is not automatically redacted.
 
 ## Current limits
 
-This is not a complete Postman replacement. There is no dedicated GraphQL/gRPC/WebSocket/MQTT client, OAuth flow manager, cookie jar, collection runner, monitor, mock server, team sync, role management, or plugin ecosystem. GraphQL can be sent manually as HTTP JSON.
+This is a focused local HTTP workbench, not a complete Postman replacement. Dedicated GraphQL/gRPC/WebSocket/MQTT clients, OAuth flow management, monitors, mocks, team sync, roles and cloud operations remain absent. Cookies and the collection runner are now implemented; the cookie jar is in-memory, without a persistent cookie editor.
 
-Postman import is partial: inherited auth/scripts and several advanced body/auth modes are unsupported. Imported URLs with a query in both `url.raw` and `url.query` can duplicate parameters. Raw text is currently imported as JSON. Inferred specifications describe observed examples, not a complete contract; falsy JSON bodies and same-path operations from different hosts need particular review. Generated SDKs/snippets need review and do not guarantee production correctness.
+Postman v2.1 import supports the tested HTTP subset, including inherited scripts/auth and normalized query parameters. Unsupported advanced body/auth modes are preserved with warnings and execution blocked. Full sandbox/Collection SDK compatibility and lossless round-tripping are not claimed. Inferred specs describe observations rather than complete contracts; select an origin to avoid conflating servers. Generated SDKs/snippets still need review.
+
+Read [current readiness and launch gates](docs/PLATFORM_READINESS.md), [Postman research provenance](docs/POSTMAN_RESEARCH.md), and [CLI/editor/agent setup](docs/INTEGRATIONS.md).
 
 See the [product assessment](docs/PRODUCT_ASSESSMENT.md) for evidence, a broad capability inventory, weighted ratings, and priorities. The original speed/memory comparisons with Postman were not reproducible benchmarks and have been removed. Server RSS excludes browser memory.
 
@@ -80,7 +85,7 @@ npm run build:web    # Rebundle frontend after changing web/*
 
 Tests use real loopback HTTP fixtures and temporary workspaces. They do not depend on a public echo service or modify your `.rea-api` directory. Frontend CSS and the existing application logic are separate from `studio.html`; editing `public/app.js` or the hand-authored CSS takes effect on reload. Rebuild after changing bundled modules or server TypeScript.
 
-`node scripts/assessment-probes.mjs` reproduces known compatibility/spec limitations; it is diagnostic evidence, not a passing conformance suite.
+`node scripts/assessment-probes.mjs` now gates the formerly reproduced import/spec defects. It is a focused regression probe, not full Postman conformance.
 
 GitHub Actions builds and tests Node 22 and 24. A separate workflow publishes **only `dist-site/`** to GitHub Pages on updates to `main`.
 
