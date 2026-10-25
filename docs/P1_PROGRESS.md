@@ -37,7 +37,9 @@ The first CI submission of the path increment timed out in the oversized-file te
 
 ## Cooperating-process ownership
 
-The next increment implements single-writer ownership before migration/seeding, with read-only owner status and explicit reviewed-token recovery after an exited same-host process. It also fixes overlapping startup/shutdown, interrupted release cleanup, readiness/signal ordering and port-exhaustion cleanup. Thirteen new public workspace/CLI cases bring the local suite to **137 tests in 18 files**. See [WORKSPACE_OWNERSHIP.md](WORKSPACE_OWNERSHIP.md) for the supported protocol, retained recovery markers and limitations.
+Source: `59b7fd34b75bbb64944eaa4061ca389754877283`. This increment implements single-writer ownership before migration/seeding, with read-only owner status and explicit reviewed-token recovery after an exited same-host process. It also fixes overlapping startup/shutdown, interrupted release cleanup, readiness/signal ordering and port-exhaustion cleanup. Thirteen new public workspace/CLI cases bring the local suite to **137 tests in 18 files**. See [WORKSPACE_OWNERSHIP.md](WORKSPACE_OWNERSHIP.md) for the supported protocol, retained recovery markers and limitations.
+
+A clean-source 30-process [ownership baseline](verification/P1_OWNERSHIP_COLD_START.json) recorded readiness p95 **71.939 ms** and backend RSS p95 **71.50 MiB** on the reference machine, with warm OS caches. This measures fresh temporary workspaces, not representative large-workspace startup or guaranteed peak RSS.
 
 This closes the first local cooperating-process lease/recovery slice; external-editor reconciliation and the broader repository/manifest design remain open. No automatic lock expiry, distributed lock or independent crash-durability certification is claimed.
 
