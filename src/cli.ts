@@ -1,5 +1,6 @@
 import { readFile, writeFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { parseJsonDocument } from "./core/models/JsonDocument.js";
 import { StudioServer } from "./server/StudioServer.js";
 import { PostmanConverter } from "./core/models/PostmanConverter.js";
 import {
@@ -106,19 +107,22 @@ export async function main(args: string[]): Promise<number> {
   }
   if (command !== "run") throw new Error(`Unknown command ${command}`);
   if (!file) throw new Error("Specify a collection JSON file");
-  const source = JSON.parse(await readDocument(file));
+  const source = parseJsonDocument(await readDocument(file), "collection");
   const collection: ApiCollection = Array.isArray(source.items)
     ? source
     : PostmanConverter.fromPostman(source);
   const environment = flags.environment
-    ? JSON.parse(await readDocument(String(flags.environment)))
+    ? parseJsonDocument(
+        await readDocument(String(flags.environment)),
+        "environment",
+      )
     : undefined;
   let data;
   if (flags.data) {
     const content = await readDocument(String(flags.data));
     data = String(flags.data).toLowerCase().endsWith(".csv")
       ? parseCsv(content)
-      : JSON.parse(content);
+      : parseJsonDocument(content, "data");
   }
   const controller = new AbortController();
   const cancel = () => controller.abort();
@@ -133,24 +137,10 @@ export async function main(args: string[]): Promise<number> {
       stopOnFailure: !!flags.bail,
       signal: controller.signal,
     });
-    // Redact explicitly marked secret values from assertion/error text in exported reports.
-    const secrets = (environment?.values || [])
-      .filter((v) => v.secret || v.type === "secret")
-      .map((v) => String(v.value))
-      .filter(Boolean);
-    const filtered = JSON.parse(
-      JSON.stringify(reportWithoutBodies(result), (key, value) =>
-        typeof value === "string"
-          ? secrets.reduce(
-              (text, secret) => text.split(secret).join("[redacted]"),
-              value,
-            )
-          : value,
-      ),
-    );
+    const filtered = reportWithoutBodies(result);
     let output: string;
     if (reporter === "json") output = JSON.stringify(filtered, null, 2);
-    else if (reporter === "junit") output = junitReport(filtered);
+    else if (reporter === "junit") output = junitReport(result);
     else if (reporter === "cli")
       output = `${result.status.toUpperCase()}: ${result.summary.requests} requests, ${result.summary.passed} assertions passed, ${result.summary.failed} failed, ${result.summary.errors} errors${filtered.error ? "\n" + filtered.error : ""}`;
     else throw new Error("Reporter must be cli, json, or junit");

@@ -21,6 +21,7 @@ export interface SandboxExecutionResult {
   nextRequest?: string | null;
   skipRequest?: boolean;
   pending?: number;
+  budgetExceeded?: boolean;
 }
 export interface ResponseContext {
   code: number;
@@ -30,6 +31,7 @@ export interface ResponseContext {
   responseTimeMs: number;
 }
 export interface SandboxOptions {
+  onSecret?: (key: string, value: string) => void;
   environment?: Record<string, string>;
   collection?: Record<string, string>;
   globals?: Record<string, string>;
@@ -83,6 +85,13 @@ function prepare(
     () => Date.now() > deadline || !!options.signal?.aborted,
   );
   const context = runtime.newContext();
+  if (options.onSecret) {
+    const observe = context.newFunction("__reaSecret", (key, value) => {
+      options.onSecret(context.getString(key), context.getString(value));
+    });
+    context.setProp(context.global, "__reaSecret", observe);
+    observe.dispose();
+  }
   const input = {
     environment: options.environment ?? variables,
     collection: options.collection || {},
@@ -169,6 +178,7 @@ export class ScriptSandbox {
     let active = true;
     let requests = 0;
     let operations = 0;
+    let deadlineViolation = false;
     const deferreds: QuickJSDeferredPromise[] = [];
     const hostTasks = new Set<Promise<any>>();
     const controller = new AbortController();
@@ -183,12 +193,12 @@ export class ScriptSandbox {
       const task = (async () => {
         if (action.kind === "sleep") {
           const delay = Number(action.ms);
-          if (
-            !Number.isFinite(delay) ||
-            delay < 0 ||
-            delay > Math.max(0, deadline - Date.now())
-          )
+          if (!Number.isFinite(delay) || delay < 0)
+            throw new Error("Invalid script timer");
+          if (delay > Math.max(0, deadline - Date.now())) {
+            deadlineViolation = true;
             throw new Error("Timer exceeds script timeout");
+          }
           await new Promise<void>((resolve, reject) => {
             const timer = setTimeout(() => {
               controller.signal.removeEventListener("abort", abort);
@@ -253,7 +263,7 @@ export class ScriptSandbox {
           evaluate(context, "JSON.stringify(__reaResult())"),
         );
         if (!result.pending && !hostTasks.size && !runtime.hasPendingJob())
-          return result;
+          return { ...result, budgetExceeded: deadlineViolation };
         if (hostTasks.size)
           await Promise.race([
             ...hostTasks,
@@ -267,7 +277,10 @@ export class ScriptSandbox {
         else await new Promise((resolve) => setTimeout(resolve, 1));
       }
     } catch (error) {
-      return failure(variables, error.message, options);
+      return {
+        ...failure(variables, error.message, options),
+        budgetExceeded: deadlineViolation || Date.now() >= deadline,
+      };
     } finally {
       active = false;
       controller.abort();

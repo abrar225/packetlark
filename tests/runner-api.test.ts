@@ -117,4 +117,73 @@ describe("runner workbench API", () => {
     expect(state.result.status).toBe("cancelled");
     expect(state.result.summary.requests).toBe(0);
   });
+  it("keeps run API reports and downloadable assertions free of rotated marked secrets", async () => {
+    const imported = await (
+      await post(
+        "/api/import/postman",
+        source(
+          `pm.environment.set("opaque","api-rotation-one"); pm.test("api-rotation-one",()=>pm.expect(false).to.equal(true)); pm.environment.set("opaque","api-rotation-two");`,
+        ),
+      )
+    ).json();
+    const env = await (
+      await post("/api/environments", {
+        name: "Private",
+        values: [{ key: "opaque", value: "api-initial-secret", secret: true }],
+      })
+    ).json();
+    const job = await (
+      await post("/api/runs", {
+        collectionId: imported.id,
+        environmentId: env.id,
+      })
+    ).json();
+    let state: any;
+    for (let i = 0; i < 100; i++) {
+      state = await (await fetch(origin + "/api/runs/" + job.id)).json();
+      if (state.state === "completed") break;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    expect(state.state).toBe("completed");
+    expect(state.result.status).toBe("failed");
+    const serialized = JSON.stringify(state);
+    for (const secret of [
+      "api-initial-secret",
+      "api-rotation-one",
+      "api-rotation-two",
+    ])
+      expect(serialized).not.toContain(secret);
+    expect(state.result.environment).toBeUndefined();
+  });
+  it("bounds aggregate completed run history by bytes as well as count", async () => {
+    const collection = await (
+      await post(
+        "/api/import/postman",
+        source(
+          'const label="x".repeat(4096);for(let i=0;i<1000;i++)pm.test(label,()=>pm.expect(true).to.equal(true));',
+        ),
+      )
+    ).json();
+    const jobs: string[] = [];
+    for (let n = 0; n < 4; n++) {
+      const job = await (
+        await post("/api/runs", { collectionId: collection.id, iterations: 3 })
+      ).json();
+      jobs.push(job.id);
+      let state: any;
+      for (let i = 0; i < 200; i++) {
+        state = await (await fetch(origin + "/api/runs/" + job.id)).json();
+        if (state.state === "completed") break;
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      expect(state.result.status).toBe("passed");
+      expect(state.result.summary.requests).toBe(3);
+    }
+    expect((await fetch(origin + "/api/runs/" + jobs[0])).status).toBe(404);
+    expect((await fetch(origin + "/api/runs/" + jobs[3])).status).toBe(200);
+    const health = await (await fetch(origin + "/api/health")).json();
+    expect(health.runHistory.retainedBytes).toBeLessThanOrEqual(
+      32 * 1024 * 1024,
+    );
+  }, 20000);
 });

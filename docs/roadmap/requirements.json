@@ -1,0 +1,1870 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-25",
+  "baseline_commit": "c25e02ca2415dd7b2e2826c96ea4ff0df34de311",
+  "coverage": "All 92 reviewed comparison rows; not a universal proprietary-feature inventory",
+  "requirements": [
+    {
+      "id": "REA-001",
+      "area": "HTTP",
+      "feature": "Methods, URL, query and headers",
+      "workstream": "WS1",
+      "current_status": "Implemented",
+      "current_evidence": "GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS; editable params/headers.",
+      "documented_comparator": "Request builder with broader settings and protocol tools.",
+      "required_work": "Validate encoding and uncommon header/method cases.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-002",
+      "area": "HTTP",
+      "feature": "JSON, text and URL-encoded bodies",
+      "workstream": "WS1",
+      "current_status": "Implemented",
+      "current_evidence": "Raw JSON/text and URL-encoded fields.",
+      "documented_comparator": "Body editors and structured body options.",
+      "required_work": "Add schema-aware editing and better validation.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-003",
+      "area": "HTTP",
+      "feature": "Multipart and binary uploads",
+      "workstream": "WS1",
+      "current_status": "Partial",
+      "current_evidence": "Text multipart fields; imported file modes blocked.",
+      "documented_comparator": "File and binary request-body workflows.",
+      "required_work": "Add safe local file selection and streaming upload.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/models/PostmanConverter.ts"
+    },
+    {
+      "id": "REA-004",
+      "area": "HTTP",
+      "feature": "Response inspection",
+      "workstream": "WS1",
+      "current_status": "Implemented",
+      "current_evidence": "Body/headers/status, timings, search/copy/download, tests/logs.",
+      "documented_comparator": "Response views, cookies, examples and visualizations.",
+      "required_work": "Add richer inspectors and saved examples.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "API client",
+          "url": "https://www.postman.com/product/api-client/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+    },
+    {
+      "id": "REA-005",
+      "area": "HTTP",
+      "feature": "Binary response download",
+      "workstream": "WS1",
+      "current_status": "Implemented",
+      "current_evidence": "Retains original base64 bytes for download; buffers with cap.",
+      "documented_comparator": "Response inspection/save workflows.",
+      "required_work": "Exercise larger files and broaden media-type handling.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-006",
+      "area": "HTTP",
+      "feature": "Timeout, cancellation and redirects",
+      "workstream": "WS1",
+      "current_status": "Implemented",
+      "current_evidence": "Bounded executor; max 10 redirects; strips cross-origin credentials.",
+      "documented_comparator": "Configurable request execution/settings.",
+      "required_work": "Differential redirect/encoding/cancellation fixtures.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "API client",
+          "url": "https://www.postman.com/product/api-client/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-007",
+      "area": "HTTP",
+      "feature": "Cookies",
+      "workstream": "WS1",
+      "current_status": "Partial",
+      "current_evidence": "In-memory session jar and redirect cookies; no editor or persistent vault.",
+      "documented_comparator": "Cookie manager and capture/sync workflows.",
+      "required_work": "Cookie editor, clear controls and optional persistence.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-008",
+      "area": "HTTP",
+      "feature": "Streaming / SSE UI",
+      "workstream": "WS1",
+      "current_status": "Missing",
+      "current_evidence": "Response buffered to completion; no live event viewer.",
+      "documented_comparator": "Streams, searches and inspects SSE messages in the response viewer.",
+      "required_work": "Implement only after bounded streaming architecture.",
+      "candidate_phase": "P6",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Responses and SSE",
+          "url": "https://learning.postman.com/docs/use/send-requests/response-data/responses"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-009",
+      "area": "Auth",
+      "feature": "Basic, Bearer and API key",
+      "workstream": "WS2",
+      "current_status": "Implemented",
+      "current_evidence": "Built-in helpers, including API key in header/query.",
+      "documented_comparator": "Built-in helpers and additional authentication types.",
+      "required_work": "Improve sensitive-input UI and diagnostics.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Authorization",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/authorization/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-010",
+      "area": "Auth",
+      "feature": "Inherited authentication",
+      "workstream": "WS2",
+      "current_status": "Implemented",
+      "current_evidence": "Collection/folder inheritance and explicit no-auth for imported context.",
+      "documented_comparator": "Request, folder and collection auth configuration.",
+      "required_work": "Finish authoring inherited settings directly in the UI.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Authorization",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/authorization/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/models/PostmanConverter.ts"
+    },
+    {
+      "id": "REA-011",
+      "area": "Auth",
+      "feature": "OAuth 2.0 / PKCE / refresh",
+      "workstream": "WS2",
+      "current_status": "Missing",
+      "current_evidence": "Paste an already acquired bearer token only.",
+      "documented_comparator": "Acquire/manage tokens with browser grants, PKCE and refresh workflows.",
+      "required_work": "High priority: OAuth with secure token lifecycle.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "OAuth 2.0",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/oauth-20"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-012",
+      "area": "Auth",
+      "feature": "OAuth 1.0",
+      "workstream": "WS2",
+      "current_status": "Missing",
+      "current_evidence": "No OAuth 1.0 signing/flow helper.",
+      "documented_comparator": "OAuth 1.0a signing configuration.",
+      "required_work": "Only prioritize if target users require legacy APIs.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "OAuth 1.0",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/oauth-10"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-013",
+      "area": "Auth",
+      "feature": "JWT generation/signing",
+      "workstream": "WS2",
+      "current_status": "Missing",
+      "current_evidence": "Can transmit an existing JWT as bearer token.",
+      "documented_comparator": "JWT bearer generation with selectable signing algorithms.",
+      "required_work": "Add after vault/key-storage design.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Auth types / JWT",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/authorization-types/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-014",
+      "area": "Auth",
+      "feature": "Digest / NTLM / AWS signing",
+      "workstream": "WS2",
+      "current_status": "Missing",
+      "current_evidence": "No built-in challenge or request-signing helpers.",
+      "documented_comparator": "Dedicated Digest, NTLM and AWS Signature workflows.",
+      "required_work": "Prioritize AWS or enterprise auth from user demand.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "AWS signing",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/aws-signature"
+        },
+        {
+          "title": "Digest",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/digest-auth"
+        },
+        {
+          "title": "NTLM",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/ntlm-authentication"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-015",
+      "area": "Auth",
+      "feature": "Client certificates / custom CA",
+      "workstream": "WS2",
+      "current_status": "Missing",
+      "current_evidence": "No supported configuration UI.",
+      "documented_comparator": "CA and client certificate management documented.",
+      "required_work": "Add mTLS/custom CA fixtures; never default to disabled verification.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Authorization",
+          "url": "https://learning.postman.com/docs/use/send-requests/authorization/authorization/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-016",
+      "area": "Protocols",
+      "feature": "GraphQL explorer",
+      "workstream": "WS3",
+      "current_status": "Partial",
+      "current_evidence": "Can POST manually authored GraphQL as HTTP JSON.",
+      "documented_comparator": "Dedicated schema-aware GraphQL client.",
+      "required_work": "Schema introspection, variables, explorer and errors.",
+      "candidate_phase": "P6",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-017",
+      "area": "Protocols",
+      "feature": "gRPC",
+      "workstream": "WS3",
+      "current_status": "Missing",
+      "current_evidence": "No protobuf/reflection/message or streaming client.",
+      "documented_comparator": "Dedicated gRPC client.",
+      "required_work": "Defer until HTTP release quality and demand.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-018",
+      "area": "Protocols",
+      "feature": "WebSocket / Socket.IO",
+      "workstream": "WS3",
+      "current_status": "Missing",
+      "current_evidence": "No connection/message UI or engine.",
+      "documented_comparator": "Dedicated WebSocket and Socket.IO request types.",
+      "required_work": "Likely next protocol after core HTTP if users request it.",
+      "candidate_phase": "P6",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-019",
+      "area": "Protocols",
+      "feature": "MQTT",
+      "workstream": "WS3",
+      "current_status": "Missing",
+      "current_evidence": "No broker/topic/pub-sub client.",
+      "documented_comparator": "Dedicated MQTT client.",
+      "required_work": "Defer unless targeting IoT developers.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-020",
+      "area": "Protocols",
+      "feature": "Webhook listener workflows",
+      "workstream": "WS3",
+      "current_status": "Missing",
+      "current_evidence": "No incoming event listener product flow.",
+      "documented_comparator": "Webhook listeners and event scripts; plan dependent.",
+      "required_work": "Add explicit local listener/forwarding only with demand.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-021",
+      "area": "Protocols",
+      "feature": "MCP client / inspector",
+      "workstream": "WS3",
+      "current_status": "Missing",
+      "current_evidence": "Exposes an MCP server; does not inspect other MCP servers.",
+      "documented_comparator": "Can act as an MCP client.",
+      "required_work": "Do not confuse server integration with a client inspector.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/integrations/mcp.ts"
+    },
+    {
+      "id": "REA-022",
+      "area": "Protocols",
+      "feature": "AI model request type",
+      "workstream": "WS3",
+      "current_status": "Missing",
+      "current_evidence": "Manual HTTP calls possible; no model-specific playground.",
+      "documented_comparator": "AI request types and AI blocks.",
+      "required_work": "Defer a model playground; avoid unnecessary scope.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-023",
+      "area": "Workspace",
+      "feature": "Collection/request storage",
+      "workstream": "WS4",
+      "current_status": "Implemented",
+      "current_evidence": "Readable local JSON and basic create/save/delete request operations.",
+      "documented_comparator": "Collections, folders, environments and broader organization tools.",
+      "required_work": "Complete collection/folder authoring and rename/reorder.",
+      "candidate_phase": "P1",
+      "status": "in-progress",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
+      "p0_implementation_evidence": "Canonical commit before memory, retained legacy migration source, resumable migration, revision-aware saves and deletes; complete workspace UI/recovery still P1."
+    },
+    {
+      "id": "REA-024",
+      "area": "Workspace",
+      "feature": "Nested folder authoring",
+      "workstream": "WS4",
+      "current_status": "Partial",
+      "current_evidence": "Imported folders render and execute; native organization limited.",
+      "documented_comparator": "Create/organize collection folders.",
+      "required_work": "Drag/reorder/move/duplicate and folder settings.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+    },
+    {
+      "id": "REA-025",
+      "area": "Workspace",
+      "feature": "Multi-request tabs and history",
+      "workstream": "WS4",
+      "current_status": "Missing",
+      "current_evidence": "One active editor; no full request history.",
+      "documented_comparator": "History, saved requests and multiple request tabs.",
+      "required_work": "High priority daily-workflow improvement.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+    },
+    {
+      "id": "REA-026",
+      "area": "Workspace",
+      "feature": "Unsaved edits and recovery",
+      "workstream": "WS4",
+      "current_status": "Partial",
+      "current_evidence": "Dirty indicator and async save; no validated conflict/recovery workflow.",
+      "documented_comparator": "Save/autosave and collection restore workflows.",
+      "required_work": "Await switching saves, preserve failed edits, inject disk failures.",
+      "candidate_phase": "P1",
+      "status": "in-progress",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
+      "p0_implementation_evidence": "In-memory per-request drafts, delayed-completion ownership and unload guard verified in browser; durable crash recovery/tabs remain P1."
+    },
+    {
+      "id": "REA-027",
+      "area": "Workspace",
+      "feature": "Environment variables",
+      "workstream": "WS4",
+      "current_status": "Implemented",
+      "current_evidence": "Local environment files, selector, edits and script updates.",
+      "documented_comparator": "Environment and variable management.",
+      "required_work": "Vault references and clear scope diagnostics.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-028",
+      "area": "Workspace",
+      "feature": "Postman v2.1 JSON migration",
+      "workstream": "WS4",
+      "current_status": "Partial",
+      "current_evidence": "Tested HTTP subset; unsupported modes preserved/blocked; not lossless.",
+      "documented_comparator": "Own ecosystem; import/export and migration tooling.",
+      "required_work": "Real sanitized fixture corpus plus semantic diff report.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Native Git",
+          "url": "https://www.postman.com/product/native-git/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/models/PostmanConverter.ts"
+    },
+    {
+      "id": "REA-029",
+      "area": "Workspace",
+      "feature": "Native Git v3 YAML format",
+      "workstream": "WS4",
+      "current_status": "Missing",
+      "current_evidence": "Rea JSON differs; no v3 YAML import/manifest support.",
+      "documented_comparator": "Per-request/spec/environment YAML plus resource manifest.",
+      "required_work": "State v2.1-only boundary; evaluate a native request-file format.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Native Git",
+          "url": "https://www.postman.com/product/native-git/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/models/PostmanConverter.ts"
+    },
+    {
+      "id": "REA-030",
+      "area": "Workspace",
+      "feature": "Git collaboration",
+      "workstream": "WS4",
+      "current_status": "Partial",
+      "current_evidence": "Manual Git on whole-collection JSON; ignored by default; mirrors remain.",
+      "documented_comparator": "Native Git files plus optional Cloud View sharing.",
+      "required_work": "Per-request diffs, secret exclusion, external edits/conflicts.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Native Git",
+          "url": "https://www.postman.com/product/native-git/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-031",
+      "area": "Workspace",
+      "feature": "cURL and other import formats",
+      "workstream": "WS4",
+      "current_status": "Partial",
+      "current_evidence": "Token-only basic cURL parser; rejects unsupported flags and file reads.",
+      "documented_comparator": "Broader import/export tooling.",
+      "required_work": "Explicit compatibility diagnostics; OpenAPI/HAR import later.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/models/PostmanConverter.ts"
+    },
+    {
+      "id": "REA-032",
+      "area": "Scripting",
+      "feature": "Pre/post scripts and inheritance",
+      "workstream": "WS5",
+      "current_status": "Implemented",
+      "current_evidence": "Collection \u2192 folder \u2192 request scripts for tested HTTP flows.",
+      "documented_comparator": "Same documented hierarchy plus protocol-specific events.",
+      "required_work": "Differential fixtures for nesting and event behavior.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/web/sandbox-bootstrap.js"
+    },
+    {
+      "id": "REA-033",
+      "area": "Scripting",
+      "feature": "Chai and asynchronous tests",
+      "workstream": "WS5",
+      "current_status": "Implemented",
+      "current_evidence": "Real Chai, promises/callback tests and console output.",
+      "documented_comparator": "Sandbox assertions, asynchronous scripts and console.",
+      "required_work": "Expand fixtures; do not label every pm API compatible.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/web/sandbox-bootstrap.js"
+    },
+    {
+      "id": "REA-034",
+      "area": "Scripting",
+      "feature": "Scope and iteration variables",
+      "workstream": "WS5",
+      "current_status": "Partial",
+      "current_evidence": "Separate environment/collection/global/local/data scopes; run-local globals.",
+      "documented_comparator": "Full variable system with broader UI and lifecycle.",
+      "required_work": "Document persistence and match scope semantics.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/web/sandbox-bootstrap.js"
+    },
+    {
+      "id": "REA-035",
+      "area": "Scripting",
+      "feature": "pm.sendRequest and chaining",
+      "workstream": "WS5",
+      "current_status": "Partial",
+      "current_evidence": "Bounded HTTP bridge, setNextRequest and skip for runner.",
+      "documented_comparator": "Scriptable request workflows and fuller SDK APIs.",
+      "required_work": "Full request/response mutation compatibility remains absent.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/web/sandbox-bootstrap.js"
+    },
+    {
+      "id": "REA-036",
+      "area": "Scripting",
+      "feature": "Dynamic variables",
+      "workstream": "WS5",
+      "current_status": "Partial",
+      "current_evidence": "UUID, timestamp, ISO timestamp and random integer helpers.",
+      "documented_comparator": "Broader Faker-backed dynamic variable catalogue.",
+      "required_work": "Only add high-demand variables with deterministic tests.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/VariableResolver.ts"
+    },
+    {
+      "id": "REA-037",
+      "area": "Scripting",
+      "feature": "Package libraries / pm.require",
+      "workstream": "WS5",
+      "current_status": "Missing",
+      "current_evidence": "No user-imported npm/JSR or shared script package system.",
+      "documented_comparator": "Reusable package libraries and external package imports; plan dependent.",
+      "required_work": "Avoid unsafe arbitrary host imports; design isolation first.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/web/sandbox-bootstrap.js"
+    },
+    {
+      "id": "REA-038",
+      "area": "Scripting",
+      "feature": "Response visualizer",
+      "workstream": "WS5",
+      "current_status": "Missing",
+      "current_evidence": "No user-defined visualization template engine.",
+      "documented_comparator": "Response visualization supported.",
+      "required_work": "Optional later; separate from ordinary JSON inspection.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-039",
+      "area": "Scripting",
+      "feature": "Hostile-script assurance",
+      "workstream": "WS5",
+      "current_status": "Unverified",
+      "current_evidence": "QuickJS limits reduce host-object exposure; no independent audit.",
+      "documented_comparator": "Documented sandbox; no direct comparative security test here.",
+      "required_work": "Threat model, adversarial testing and independent review.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Scripting",
+          "url": "https://learning.postman.com/docs/tests-and-scripts/write-scripts/intro-to-scripts/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/VERIFICATION.md"
+    },
+    {
+      "id": "REA-040",
+      "area": "Automation",
+      "feature": "Collection runs",
+      "workstream": "WS6",
+      "current_status": "Implemented",
+      "current_evidence": "Sequential local HTTP runs, iterations, bail, delay and budgets.",
+      "documented_comparator": "Collection Runner and broader execution workflows.",
+      "required_work": "Improve reports/history and failure debugging.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/runner/CollectionRunner.ts"
+    },
+    {
+      "id": "REA-041",
+      "area": "Automation",
+      "feature": "CSV / JSON data runs",
+      "workstream": "WS6",
+      "current_status": "Implemented",
+      "current_evidence": "Free local CLI CSV/JSON; JSON data in workbench runner.",
+      "documented_comparator": "Desktop runner data-file support is plan-dependent.",
+      "required_work": "Keep local data runs free; improve file picker and previews.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/runner/CollectionRunner.ts"
+    },
+    {
+      "id": "REA-042",
+      "area": "Automation",
+      "feature": "CLI / CI / reports",
+      "workstream": "WS6",
+      "current_status": "Implemented",
+      "current_evidence": "Exit codes and JSON/JUnit summaries; Node 22+.",
+      "documented_comparator": "Postman CLI; Newman also provides v2.1 CLI/reporters.",
+      "required_work": "Do not claim free CLI reporting is exclusive to Rea.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Newman",
+          "url": "https://github.com/postmanlabs/newman"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/cli.ts"
+    },
+    {
+      "id": "REA-043",
+      "area": "Automation",
+      "feature": "Multi-protocol runs",
+      "workstream": "WS6",
+      "current_status": "Missing",
+      "current_evidence": "HTTP only.",
+      "documented_comparator": "Current platform supports broader protocol automation; plan dependent.",
+      "required_work": "Follow protocol demand, not breadth for its own sake.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Current platform",
+          "url": "https://www.postman.com/new-postman/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/runner/CollectionRunner.ts"
+    },
+    {
+      "id": "REA-044",
+      "area": "Automation",
+      "feature": "Durable run history",
+      "workstream": "WS6",
+      "current_status": "Missing",
+      "current_evidence": "Bounded in-memory web jobs and report files; no durable dashboard.",
+      "documented_comparator": "Run summaries and monitoring/reporting surfaces.",
+      "required_work": "Persistent local results with retention and redaction.",
+      "candidate_phase": "P3",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/runner/CollectionRunner.ts"
+    },
+    {
+      "id": "REA-045",
+      "area": "Automation",
+      "feature": "Scheduled monitors and alerts",
+      "workstream": "WS6",
+      "current_status": "Missing",
+      "current_evidence": "No scheduler/alerting service.",
+      "documented_comparator": "Scheduled monitoring, results and integrations.",
+      "required_work": "Start with user-owned CI scheduling rather than free hosted infrastructure.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-046",
+      "area": "Automation",
+      "feature": "Load / performance testing",
+      "workstream": "WS6",
+      "current_status": "Missing",
+      "current_evidence": "Iterations are functional testing, not a load-testing engine.",
+      "documented_comparator": "Local/cloud performance testing; plan dependent.",
+      "required_work": "Integrate an existing load tool if users need it.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/runner/CollectionRunner.ts"
+    },
+    {
+      "id": "REA-047",
+      "area": "Automation",
+      "feature": "Visual Flows",
+      "workstream": "WS6",
+      "current_status": "Missing",
+      "current_evidence": "No visual workflow canvas/runtime.",
+      "documented_comparator": "Manual/automated Flows; plans and credits vary.",
+      "required_work": "Defer: high maintenance and no proven demand.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-048",
+      "area": "Capture",
+      "feature": "Explicit HTTP forwarding",
+      "workstream": "WS7",
+      "current_status": "Implemented",
+      "current_evidence": "Path/header target and plain HTTP proxy; last 500 records in memory.",
+      "documented_comparator": "Proxy and Interceptor capture into Postman workflows.",
+      "required_work": "Protect capture before expanding distribution.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts"
+    },
+    {
+      "id": "REA-049",
+      "area": "Capture",
+      "feature": "Browser HTTPS capture",
+      "workstream": "WS7",
+      "current_status": "Missing",
+      "current_evidence": "HTTPS target forwarding is not HTTPS CONNECT interception.",
+      "documented_comparator": "Interceptor browser extensions and HTTP/HTTPS capture.",
+      "required_work": "Separate consent, domain permissions and bridge design.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Browser capture",
+          "url": "https://www.postman.com/product/postman-interceptor/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts"
+    },
+    {
+      "id": "REA-050",
+      "area": "Capture",
+      "feature": "Capture filtering / sessions",
+      "workstream": "WS7",
+      "current_status": "Partial",
+      "current_evidence": "Origin filtering and clear; no durable session manager.",
+      "documented_comparator": "Capture/session inspection tooling.",
+      "required_work": "Method/URL/status filters, pause, sessions and retention.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+    },
+    {
+      "id": "REA-051",
+      "area": "Capture",
+      "feature": "Capture body limits / redaction",
+      "workstream": "WS7",
+      "current_status": "Partial",
+      "current_evidence": "500-record count cap; proxy separately buffers bodies without executor caps.",
+      "documented_comparator": "Capture capability exists; comparative redaction/limit behavior not audited.",
+      "required_work": "Critical before beta expansion: byte budgets, timeouts and secret scrubber.",
+      "candidate_phase": "P0",
+      "status": "in-progress",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts",
+      "p0_implementation_evidence": "Byte/lifecycle/history budgets and heuristic redaction before observation retention/subscription verified; further threat-model and export/secret work remains."
+    },
+    {
+      "id": "REA-052",
+      "area": "Capture",
+      "feature": "Capture \u2192 test / replay",
+      "workstream": "WS7",
+      "current_status": "Partial",
+      "current_evidence": "Inspect captured bodies and export drafts; no full saved replay/test workflow.",
+      "documented_comparator": "Save captured traffic to collections for inspection/replay.",
+      "required_work": "Turn selected captures into editable requests and regression fixtures.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+    },
+    {
+      "id": "REA-053",
+      "area": "Capture",
+      "feature": "Repeated-query fidelity",
+      "workstream": "WS7",
+      "current_status": "Partial",
+      "current_evidence": "Main imported requests preserve repeats; capture map overwrites repeated keys.",
+      "documented_comparator": "Query editing/capture workflows; no differential fidelity test conducted.",
+      "required_work": "Preserve ordered duplicate query/header values in capture model.",
+      "candidate_phase": "P0",
+      "status": "in-progress",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Protocol documentation",
+          "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts",
+      "p0_implementation_evidence": "Ordered repeated query entries survive capture/redaction; raw duplicate-header fidelity and downstream contract semantics remain incomplete."
+    },
+    {
+      "id": "REA-054",
+      "area": "Contracts",
+      "feature": "Observed traffic \u2192 OpenAPI",
+      "workstream": "WS8",
+      "current_status": "Partial",
+      "current_evidence": "OpenAPI 3.1 draft with provenance, origin selection and schema inference.",
+      "documented_comparator": "Capture plus broader spec design/import workflows; exact same inference not verified.",
+      "required_work": "Potential focus area, not proven exclusive superiority.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Spec Hub",
+          "url": "https://www.postman.com/product/spec-hub/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/OpenApiGenerator.ts"
+    },
+    {
+      "id": "REA-055",
+      "area": "Contracts",
+      "feature": "Inference vs actual contract",
+      "workstream": "WS8",
+      "current_status": "Partial",
+      "current_evidence": "Observed types/falsy/null/unions; cannot infer unseen errors or business rules.",
+      "documented_comparator": "Spec-first design and validation tools.",
+      "required_work": "Confidence/provenance editor and explicit human confirmation.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Spec Hub",
+          "url": "https://www.postman.com/product/spec-hub/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/OpenApiGenerator.ts"
+    },
+    {
+      "id": "REA-056",
+      "area": "Contracts",
+      "feature": "Spec authoring / multi-file",
+      "workstream": "WS8",
+      "current_status": "Missing",
+      "current_evidence": "No proper spec-first/multi-file editor or import product flow.",
+      "documented_comparator": "Visual/code spec editor, multiple formats and multi-file definitions.",
+      "required_work": "OpenAPI import/validation and minimal editor first.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-057",
+      "area": "Contracts",
+      "feature": "Spec validation / governance",
+      "workstream": "WS8",
+      "current_status": "Missing",
+      "current_evidence": "No standards-linting or organization rule engine.",
+      "documented_comparator": "Spec Hub validation/governance and CLI enforcement.",
+      "required_work": "Integrate a validator; defer organization policy engine.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Spec Hub",
+          "url": "https://www.postman.com/product/spec-hub/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-058",
+      "area": "Contracts",
+      "feature": "Spec \u2194 collection sync",
+      "workstream": "WS8",
+      "current_status": "Missing",
+      "current_evidence": "One-way inference/export; no maintained bidirectional linkage.",
+      "documented_comparator": "Collection generation/sync listed in current platform.",
+      "required_work": "Track provenance and drift before automatic updates.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/OpenApiGenerator.ts"
+    },
+    {
+      "id": "REA-059",
+      "area": "Contracts",
+      "feature": "Mocks / failure simulation",
+      "workstream": "WS8",
+      "current_status": "Missing",
+      "current_evidence": "No mock product; test fixtures are not user mock servers.",
+      "documented_comparator": "Local/hosted programmable mocks and failure simulation.",
+      "required_work": "Small local mock from approved examples is a later useful addition.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Mocks and simulation",
+          "url": "https://www.postman.com/product/mock-servers/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-060",
+      "area": "Contracts",
+      "feature": "SDK generation",
+      "workstream": "WS8",
+      "current_status": "Partial",
+      "current_evidence": "TypeScript draft; compilation fixtures; no broad schema/runtime guarantee.",
+      "documented_comparator": "SDK generation and distribution workflows; plan dependent.",
+      "required_work": "Execute generated clients against fixtures, not compilation alone.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Current platform",
+          "url": "https://www.postman.com/new-postman/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/SdkGenerator.ts"
+    },
+    {
+      "id": "REA-061",
+      "area": "Contracts",
+      "feature": "Published documentation",
+      "workstream": "WS8",
+      "current_status": "Missing",
+      "current_evidence": "JSON export/preview; no developer documentation portal.",
+      "documented_comparator": "Published/customized documentation and code examples.",
+      "required_work": "Local static docs export before hosted portal.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-062",
+      "area": "Teams",
+      "feature": "Shared workspaces and sync",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "User-owned local files only.",
+      "documented_comparator": "Shared/private/public/partner workspace options; plans vary.",
+      "required_work": "Defer cloud sync until individual workflow retains users.",
+      "candidate_phase": "P9",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-063",
+      "area": "Teams",
+      "feature": "Comments / forks / reviews",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "External Git PRs possible; no in-product collaboration.",
+      "documented_comparator": "Comments, version control and workspace activity.",
+      "required_work": "Use Git first; do not count it as in-product parity.",
+      "candidate_phase": "P9",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-064",
+      "area": "Teams",
+      "feature": "API catalog / discovery",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "Local collection list only.",
+      "documented_comparator": "Public/private API networks, catalog/search and discovery.",
+      "required_work": "Defer organization catalogue; improve local search.",
+      "candidate_phase": "P9",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-065",
+      "area": "Teams",
+      "feature": "Roles / organization controls",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "No multi-user authorization model.",
+      "documented_comparator": "Basic/advanced RBAC and organization controls; plan dependent.",
+      "required_work": "Not required for a strictly local single-user beta.",
+      "candidate_phase": "P10",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-066",
+      "area": "Teams",
+      "feature": "SSO / SCIM / audit trails",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "No enterprise identity/provisioning/audit service.",
+      "documented_comparator": "Paid/enterprise SSO, SCIM and audit capabilities.",
+      "required_work": "Enterprise expansion only after explicit demand/funding.",
+      "candidate_phase": "P10",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-067",
+      "area": "Teams",
+      "feature": "Integrations / operations",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "Own CLI can be invoked in CI; no comparable integration catalogue.",
+      "documented_comparator": "CI, collaboration, gateway and monitoring integrations.",
+      "required_work": "Add a small set from real workflows.",
+      "candidate_phase": "P9",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-068",
+      "area": "Security",
+      "feature": "Encrypted local secrets",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "Environment files are plaintext; secret marker is not encryption.",
+      "documented_comparator": "Local Vault encrypted secrets on all plans.",
+      "required_work": "High priority: OS keychain/vault references, migration and export controls.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Encrypted vaults",
+          "url": "https://learning.postman.com/docs/use/postman-vault/postman-vault-secrets/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-069",
+      "area": "Security",
+      "feature": "Shared / external vaults",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "No team vault or managed-secret integration.",
+      "documented_comparator": "Shared Vault and enterprise external vault integrations.",
+      "required_work": "Defer team vault; support user-owned providers if demanded.",
+      "candidate_phase": "P10",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Encrypted vaults",
+          "url": "https://learning.postman.com/docs/use/postman-vault/postman-vault-secrets/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-070",
+      "area": "Security",
+      "feature": "Secret scanning / redaction",
+      "workstream": "WS9",
+      "current_status": "Partial",
+      "current_evidence": "CLI/MCP scrub explicitly marked environment secrets; not all channels.",
+      "documented_comparator": "Local/cloud secret scanner features; plan dependent.",
+      "required_work": "Redact capture/log/export paths; test unknown/derived secrets.",
+      "candidate_phase": "P0",
+      "status": "in-progress",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/integrations/mcp.ts",
+      "p0_implementation_evidence": "Seeded header/query/form/JSON/cookie secrets absent from retained observations, subscribers and generated draft output; unknown/derived secrets and all other report/log paths are not comprehensively covered."
+    },
+    {
+      "id": "REA-071",
+      "area": "Security",
+      "feature": "Local service exposure",
+      "workstream": "WS9",
+      "current_status": "Partial",
+      "current_evidence": "Loopback/origin restrictions; not an authenticated multi-user service.",
+      "documented_comparator": "Desktop/web/cloud with managed product controls.",
+      "required_work": "Retain local-only scope; independently review boundaries.",
+      "candidate_phase": "P0",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-072",
+      "area": "Security",
+      "feature": "Recovery and concurrent writers",
+      "workstream": "WS9",
+      "current_status": "Partial",
+      "current_evidence": "Atomic per-item replacement; mirrors and concurrency are not transactional.",
+      "documented_comparator": "Collection restore/version and collaboration workflows.",
+      "required_work": "Backups, file watchers, conflict detection and disk-failure tests.",
+      "candidate_phase": "P0",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-073",
+      "area": "Distribution",
+      "feature": "Local account-free workflow",
+      "workstream": "WS10",
+      "current_status": "Implemented",
+      "current_evidence": "Runs locally without Rea account; local assets and user-owned data.",
+      "documented_comparator": "Local client workflows and Native Git; requirements differ by surface.",
+      "required_work": "Account-free simplicity is useful, not proof Postman is cloud-only.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Native Git",
+          "url": "https://www.postman.com/product/native-git/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/cli.ts"
+    },
+    {
+      "id": "REA-074",
+      "area": "Distribution",
+      "feature": "Web app / desktop installer",
+      "workstream": "WS10",
+      "current_status": "Partial",
+      "current_evidence": "Node-backed local browser UI; no signed desktop installer.",
+      "documented_comparator": "Web and desktop product distribution.",
+      "required_work": "Simple installation first; desktop wrapper only if demanded.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-075",
+      "area": "Distribution",
+      "feature": "VS Code extension",
+      "workstream": "WS10",
+      "current_status": "Partial",
+      "current_evidence": "Packaged preview requires built checkout; host test outstanding.",
+      "documented_comparator": "Published IDE extension; docs require sign-in and list feature differences.",
+      "required_work": "Finish extension-host QA and onboarding before Marketplace.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "VS Code",
+          "url": "https://learning.postman.com/docs/developer/vs-code-extension/overview/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/extensions/vscode/README.md"
+    },
+    {
+      "id": "REA-076",
+      "area": "Distribution",
+      "feature": "Browser extension",
+      "workstream": "WS10",
+      "current_status": "Missing",
+      "current_evidence": "No browser extension shipped.",
+      "documented_comparator": "Interceptor available for major browsers.",
+      "required_work": "Later capture-specific extension; not another generic UI.",
+      "candidate_phase": "P7",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Browser capture",
+          "url": "https://www.postman.com/product/postman-interceptor/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-077",
+      "area": "Distribution",
+      "feature": "MCP server / agent integration",
+      "workstream": "WS10",
+      "current_status": "Implemented",
+      "current_evidence": "Three local stdio tools; actual handshake checked, client examples documented.",
+      "documented_comparator": "Remote/local MCP toolsets and broader platform automation.",
+      "required_work": "Add granular permissions and useful local tools; avoid tool-count competition.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "MCP server",
+          "url": "https://www.postman.com/product/mcp-server/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/integrations/mcp.ts"
+    },
+    {
+      "id": "REA-078",
+      "area": "Distribution",
+      "feature": "Built-in AI / Context Graph",
+      "workstream": "WS10",
+      "current_status": "Missing",
+      "current_evidence": "MCP lets external agents use tools; no built-in AI or dependency graph.",
+      "documented_comparator": "Agent Mode, cloud agent workflows and Context Graph.",
+      "required_work": "Defer built-in AI; improve deterministic tooling first.",
+      "candidate_phase": "P10",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/integrations/mcp.ts"
+    },
+    {
+      "id": "REA-079",
+      "area": "Distribution",
+      "feature": "Open-source modification",
+      "workstream": "WS10",
+      "current_status": "Implemented",
+      "current_evidence": "Project source MIT; dependencies retain licenses, including GSAP terms.",
+      "documented_comparator": "Open-source Newman/runtime components; this is not whole-platform source parity.",
+      "required_work": "Keep licenses clear and make contributions easy.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Newman",
+          "url": "https://github.com/postmanlabs/newman"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/THIRD_PARTY_NOTICES.md"
+    },
+    {
+      "id": "REA-080",
+      "area": "Distribution",
+      "feature": "Free usage and operating cost",
+      "workstream": "WS10",
+      "current_status": "Implemented",
+      "current_evidence": "No Rea subscription; local data/CI use user hardware.",
+      "documented_comparator": "Free core plus paid/enterprise features and usage quotas.",
+      "required_work": "Free local product is viable; hosted compute/AI still costs money.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-081",
+      "area": "Quality",
+      "feature": "Speed / memory superiority",
+      "workstream": "WS10",
+      "current_status": "Unverified",
+      "current_evidence": "No identical-task Postman benchmark; Node RSS excludes browser memory.",
+      "documented_comparator": "No matched measurement in this assessment.",
+      "required_work": "Benchmark cold start, task time, combined RSS and long runs.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "API client",
+          "url": "https://www.postman.com/product/api-client/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/VERIFICATION.md"
+    },
+    {
+      "id": "REA-082",
+      "area": "Quality",
+      "feature": "Release evidence",
+      "workstream": "WS10",
+      "current_status": "Partial",
+      "current_evidence": "72 recorded tests; Linux Node 22/24 CI and package smoke; browser/editor gates open.",
+      "documented_comparator": "Broad documented capability; not independently tested here.",
+      "required_work": "Finish browser/IDE/cross-platform QA and publish a support contract.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/VERIFICATION.md"
+    },
+    {
+      "id": "REA-083",
+      "area": "Quality",
+      "feature": "Real-user usefulness",
+      "workstream": "WS10",
+      "current_status": "Unverified",
+      "current_evidence": "No measured task success, retention or support evidence supplied.",
+      "documented_comparator": "Public product ecosystem; no comparable user study conducted here.",
+      "required_work": "Observe 10 target developers, task completion and repeat use.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/VERIFICATION.md"
+    },
+    {
+      "id": "REA-084",
+      "area": "HTTP",
+      "feature": "Code snippets",
+      "workstream": "WS1",
+      "current_status": "Partial",
+      "current_evidence": "cURL/Fetch/Python/Go snippets; escaping and inherited context need broader checks.",
+      "documented_comparator": "Code examples/snippet workflows in the API platform.",
+      "required_work": "Compile or execute generated snippets against fixtures.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+    },
+    {
+      "id": "REA-085",
+      "area": "HTTP",
+      "feature": "Saved response examples",
+      "workstream": "WS1",
+      "current_status": "Partial",
+      "current_evidence": "Imported examples may survive metadata; no full example-authoring workflow.",
+      "documented_comparator": "Save responses/examples and use them in documentation/mocks.",
+      "required_work": "Example editor with secret exclusion and reusable fixtures.",
+      "candidate_phase": "P4",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Responses and SSE",
+          "url": "https://learning.postman.com/docs/use/send-requests/response-data/responses"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/models/PostmanConverter.ts"
+    },
+    {
+      "id": "REA-086",
+      "area": "HTTP",
+      "feature": "Detailed network diagnostics",
+      "workstream": "WS1",
+      "current_status": "Partial",
+      "current_evidence": "First-byte and total timing plus normalized errors; limited transport diagnostics.",
+      "documented_comparator": "Network information and console troubleshooting.",
+      "required_work": "Explain DNS/TLS/connect errors without claiming complete timing breakdown.",
+      "candidate_phase": "P2",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Responses and SSE",
+          "url": "https://learning.postman.com/docs/use/send-requests/response-data/responses"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/engine/HttpExecutor.ts"
+    },
+    {
+      "id": "REA-087",
+      "area": "Workspace",
+      "feature": "Restore/version history",
+      "workstream": "WS4",
+      "current_status": "Missing",
+      "current_evidence": "External Git can restore tracked files; no in-product restore history.",
+      "documented_comparator": "Collection restoration and API versioning workflows.",
+      "required_work": "Local snapshots and tested backup/restore before cloud collaboration.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Use Postman",
+          "url": "https://learning.postman.com/docs/use/overview"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-088",
+      "area": "Workspace",
+      "feature": "External edits and file watching",
+      "workstream": "WS4",
+      "current_status": "Missing",
+      "current_evidence": "Local files exist, but live edit reconciliation/conflict handling absent.",
+      "documented_comparator": "Native Git on-disk resource workflows.",
+      "required_work": "Watch/debounce changes and explicitly resolve conflicts.",
+      "candidate_phase": "P1",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Native Git",
+          "url": "https://www.postman.com/product/native-git/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+    },
+    {
+      "id": "REA-089",
+      "area": "Security",
+      "feature": "Governance rules and reports",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "No Spectral/rule library, organization policy or compliance reports.",
+      "documented_comparator": "Rule library, custom rules, Spectral and reporting listed.",
+      "required_work": "Local spec linting first; enterprise reporting later.",
+      "candidate_phase": "P10",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-090",
+      "area": "Security",
+      "feature": "Enterprise encryption administration",
+      "workstream": "WS9",
+      "current_status": "Missing",
+      "current_evidence": "No cloud key administration or BYOK.",
+      "documented_comparator": "BYOK and advanced security/identity administration documented.",
+      "required_work": "Only relevant if building a hosted enterprise platform.",
+      "candidate_phase": "P10",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Postman platform",
+          "url": "https://www.postman.com/product/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/PLATFORM_READINESS.md"
+    },
+    {
+      "id": "REA-091",
+      "area": "Contracts",
+      "feature": "SDK distribution / updates",
+      "workstream": "WS8",
+      "current_status": "Missing",
+      "current_evidence": "Exportable TypeScript draft only; no publishing/update automation.",
+      "documented_comparator": "SDK generation/distribution, with automatic distribution features by plan.",
+      "required_work": "First prove client runtime correctness; publishing can wait.",
+      "candidate_phase": "P8",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/SdkGenerator.ts"
+    },
+    {
+      "id": "REA-092",
+      "area": "Distribution",
+      "feature": "Support and release operations",
+      "workstream": "WS10",
+      "current_status": "Partial",
+      "current_evidence": "GitHub source/prerelease; no defined support SLA, signed updater or recovery policy.",
+      "documented_comparator": "Published support plans and maintained distribution; no support quality benchmark here.",
+      "required_work": "Versioned changelog, support policy and reproducible installation.",
+      "candidate_phase": "P5",
+      "status": "planned-or-revalidation-required",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "postman_sources": [
+        {
+          "title": "Plans and limits",
+          "url": "https://www.postman.com/pricing/"
+        }
+      ],
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/VERIFICATION.md"
+    }
+  ],
+  "delivery_policy": "Candidate phase identifies the first planned increment, not proof of parity or completion. Workstream gates and later increments also apply.",
+  "implementation_progress": {
+    "phase": "P1",
+    "status": "starting",
+    "record": "../P0_PROGRESS.md",
+    "implementation_commit": "0a7fc307cded932dc41213df88c7b7f29be05666",
+    "note": "P0 local-core gates passed. The baseline comparison remains historical and remaining phase requirements stay open.",
+    "p0_gate": "../P0_GATE.json"
+  }
+}

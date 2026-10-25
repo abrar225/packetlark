@@ -1,3 +1,5 @@
+import { BodyBudgetError, readResponseBody } from "./BodyBudget.js";
+import type { SecretRedactor } from "../security/SecretRedactor.js";
 import {
   HttpRequest,
   HttpResponse,
@@ -132,6 +134,7 @@ export function normalizeNetworkError(
 }
 
 export interface ExecutionOptions {
+  secrets?: SecretRedactor;
   signal?: AbortSignal;
   cookieJar?: CookieJar;
   globals?: Record<string, string>;
@@ -152,6 +155,18 @@ export class HttpExecutor {
     envVars: KeyValueParam[] = [],
     options: ExecutionOptions = {},
   ): Promise<HttpResponse> {
+    const start = performance.now();
+    let transportAttempted = false;
+    options.secrets?.observeParameters(envVars);
+    options.secrets?.observeParameters(collectionVars);
+    options.secrets?.observeParameters(request.body?.formData);
+    for (const scope of [
+      options.iterationData,
+      options.globals,
+      options.localVariables,
+    ])
+      for (const [key, value] of Object.entries(scope || {}))
+        options.secrets?.observe(key, value);
     let environment = valueMap(envVars),
       collection = valueMap(collectionVars),
       globals = { ...options.globals },
@@ -186,7 +201,11 @@ export class HttpExecutor {
       headers: {},
       body: JSON.stringify({ error: message }),
       sizeBytes: 0,
-      timings: { firstByteMs: 0, totalMs: 0 },
+      transportAttempted,
+      timings: {
+        firstByteMs: 0,
+        totalMs: Math.round(performance.now() - start),
+      },
       error: {
         category,
         message,
@@ -200,6 +219,17 @@ export class HttpExecutor {
     });
     const timeout = request.timeoutMs ?? 30000;
     const maxBytes = request.maxResponseBytes ?? 10 * 1024 * 1024;
+    const maxRequestBytes = request.maxRequestBytes ?? 4 * 1024 * 1024;
+    if (
+      !Number.isSafeInteger(maxRequestBytes) ||
+      maxRequestBytes < 1 ||
+      maxRequestBytes > 50 * 1024 * 1024
+    )
+      return failed(
+        "Invalid Settings",
+        "Request limit must be between 1 byte and 50 MiB",
+        "ERR_SETTINGS",
+      );
     if (!Number.isInteger(timeout) || timeout < 1 || timeout > 300000)
       return failed(
         "Invalid Settings",
@@ -226,9 +256,37 @@ export class HttpExecutor {
         "Resolve inherited authentication through a collection, or choose a supported auth/body mode. Imported unsupported data remains preserved for export.",
         "ERR_UNSUPPORTED",
       );
+    const deadline = start + timeout;
+    const timeoutSignal = AbortSignal.timeout(
+      Math.max(1, Math.ceil(deadline - performance.now())),
+    );
+    const signal = options.signal
+      ? AbortSignal.any([timeoutSignal, options.signal])
+      : timeoutSignal;
+    let scriptBudgetExceeded = false;
+    const budgetFailure = () => {
+      if (options.signal?.aborted)
+        return failed(
+          "Request Cancelled",
+          "Execution cancelled. A previously attempted request may have completed; review before retrying.",
+          "ERR_ABORTED",
+        );
+      if (
+        scriptBudgetExceeded ||
+        timeoutSignal.aborted ||
+        performance.now() >= deadline
+      )
+        return failed(
+          "Request Timeout",
+          "Overall execution deadline exceeded. A previously attempted request may have completed; review before retrying.",
+          "ETIMEDOUT",
+        );
+    };
     const jar = options.cookieJar ?? new CookieJar();
     const scripts = async (codes: string[], response?: ResponseContext) => {
       for (const code of codes.filter(Boolean)) {
+        if (budgetFailure()) return false;
+        const remaining = deadline - performance.now();
         const result = await ScriptSandbox.executeAsync(
           code,
           context(),
@@ -244,7 +302,11 @@ export class HttpExecutor {
               eventName: response ? "test" : "prerequest",
             },
             request,
-            signal: options.signal,
+            signal,
+            timeoutMs: Math.max(1, Math.ceil(Math.min(2000, remaining))),
+            onSecret: options.secrets
+              ? (key, value) => options.secrets.observe(key, value)
+              : undefined,
             sendRequest: async (desc, signal) => {
               const configured =
                 typeof desc === "string" ? { url: desc } : desc;
@@ -275,6 +337,7 @@ export class HttpExecutor {
               const response = await this.execute(child, [], [], {
                 signal,
                 cookieJar: jar,
+                secrets: options.secrets,
               });
               if (response.error) throw new Error(response.error.message);
               return {
@@ -287,6 +350,8 @@ export class HttpExecutor {
             },
           },
         );
+        if (result.budgetExceeded && remaining <= 2000)
+          scriptBudgetExceeded = true;
         environment = result.updatedEnvironment;
         collection = result.updatedCollectionVariables;
         globals = result.updatedGlobals;
@@ -300,12 +365,13 @@ export class HttpExecutor {
       }
       return true;
     };
-    if (
-      !(await scripts([
-        ...(request.preRequestScripts || []),
-        request.preRequestScript,
-      ]))
-    )
+    const prePassed = await scripts([
+      ...(request.preRequestScripts || []),
+      request.preRequestScript,
+    ]);
+    const preBudgetFailure = budgetFailure();
+    if (preBudgetFailure) return preBudgetFailure;
+    if (!prePassed)
       return failed(
         "Pre-request Script Failed",
         "A pre-request script failed. The request was not sent.",
@@ -329,10 +395,11 @@ export class HttpExecutor {
         "Request URL cannot be empty",
         "ERR_EMPTY_URL",
       );
-    const resolve = (text: string) => VariableResolver.resolve(text, context());
+    const resolve = (text: string, budget = maxRequestBytes) =>
+      VariableResolver.resolve(text, context(), budget);
     let url: URL;
     try {
-      let raw = resolve(request.url).trim();
+      let raw = resolve(request.url, 8192).trim();
       if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) raw = "http://" + raw;
       url = new URL(raw);
       if (!["http:", "https:"].includes(url.protocol))
@@ -340,44 +407,100 @@ export class HttpExecutor {
       for (const param of request.queryParams || [])
         if (param.enabled !== false && param.key)
           url.searchParams.append(
-            resolve(param.key),
-            resolve(param.value ?? ""),
+            resolve(param.key, 8192),
+            resolve(param.value ?? "", 8192),
           );
+      if (Buffer.byteLength(url.href) > 8192)
+        throw new BodyBudgetError(
+          "Resolved URL exceeds 8 KiB",
+          "ERR_REQUEST_LIMIT",
+          413,
+        );
     } catch (error) {
-      return failed("Invalid Request URL", error.message, "ERR_INVALID_URL");
+      return failed(
+        "Invalid Request URL",
+        error.message,
+        error instanceof BodyBudgetError ? error.code : "ERR_INVALID_URL",
+      );
     }
     const headers = new Headers();
+    const credentialHeaders = new Set([
+      "authorization",
+      "proxy-authorization",
+      "cookie",
+    ]);
+    let headerBytes = 0;
+    const setHeader = (key: string, value: string) => {
+      const previous = headers.has(key)
+        ? Buffer.byteLength(key) + Buffer.byteLength(headers.get(key)) + 4
+        : 0;
+      const next =
+        headerBytes -
+        previous +
+        Buffer.byteLength(key) +
+        Buffer.byteLength(value) +
+        4;
+      if (next > 64 * 1024)
+        throw new BodyBudgetError(
+          "Request headers exceed 64 KiB",
+          "ERR_REQUEST_LIMIT",
+          413,
+        );
+      options.secrets?.observeHeader(key, value);
+      headers.set(key, value);
+      headerBytes = next;
+    };
     try {
-      for (const h of request.headers || [])
-        if (h.enabled !== false && h.key)
-          headers.set(resolve(h.key), resolve(h.value ?? ""));
-    } catch (error) {
-      return failed("Invalid Headers", error.message, "ERR_HEADERS");
-    }
-    if (request.auth?.type === "bearer")
-      headers.set(
-        "Authorization",
-        "Bearer " + resolve(request.auth.bearerToken || ""),
-      );
-    if (request.auth?.type === "basic")
-      headers.set(
-        "Authorization",
-        "Basic " +
-          Buffer.from(
-            resolve(request.auth.basicUsername || "") +
-              ":" +
-              resolve(request.auth.basicPassword || ""),
-          ).toString("base64"),
-      );
-    if (request.auth?.type === "apikey") {
-      const key = resolve(request.auth.apiKeyName || "");
-      const value = resolve(request.auth.apiKeyValue || "");
-      if (key) {
-        if (request.auth.apiKeyIn === "query")
-          url.searchParams.append(key, value);
-        else headers.set(key, value);
+      for (const header of request.headers || [])
+        if (header.enabled !== false && header.key)
+          setHeader(
+            resolve(header.key, 64 * 1024),
+            resolve(header.value ?? "", 64 * 1024),
+          );
+      if (request.auth?.type === "bearer")
+        setHeader(
+          "Authorization",
+          "Bearer " + resolve(request.auth.bearerToken || "", 64 * 1024),
+        );
+      if (request.auth?.type === "basic")
+        setHeader(
+          "Authorization",
+          "Basic " +
+            Buffer.from(
+              resolve(request.auth.basicUsername || "", 64 * 1024) +
+                ":" +
+                resolve(request.auth.basicPassword || "", 64 * 1024),
+            ).toString("base64"),
+        );
+      if (request.auth?.type === "apikey") {
+        const key = resolve(request.auth.apiKeyName || "", 8192),
+          value = resolve(request.auth.apiKeyValue || "", 64 * 1024);
+        options.secrets?.add(value);
+        if (key) {
+          if (request.auth.apiKeyIn === "query")
+            url.searchParams.append(key, value);
+          else {
+            setHeader(key, value);
+            credentialHeaders.add(key.toLowerCase());
+          }
+        }
       }
+      if (Buffer.byteLength(url.href) > 8192)
+        throw new BodyBudgetError(
+          "Resolved URL exceeds 8 KiB",
+          "ERR_REQUEST_LIMIT",
+          413,
+        );
+    } catch (error) {
+      return failed(
+        "Invalid Headers or Authentication",
+        error instanceof BodyBudgetError
+          ? error.message
+          : "Invalid request header name or value",
+        error instanceof BodyBudgetError ? error.code : "ERR_HEADERS",
+      );
     }
+    options.secrets?.observeUrl(url);
     let method = (request.method || "GET").toUpperCase();
     if (
       !["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
@@ -390,37 +513,90 @@ export class HttpExecutor {
         "ERR_METHOD",
       );
     let body: any;
-    if (!["GET", "HEAD"].includes(method)) {
-      if (
-        request.body?.mode === "raw-json" ||
-        request.body?.mode === "raw-text"
-      ) {
-        body = resolve(request.body.raw || "");
-        if (request.body.mode === "raw-json" && !headers.has("content-type"))
-          headers.set("content-type", "application/json");
-      } else if (request.body?.mode === "x-www-form-urlencoded") {
-        const params = new URLSearchParams();
-        for (const field of request.body.formData || [])
-          if (field.enabled !== false && field.key)
-            params.append(resolve(field.key), resolve(field.value));
-        body = request.body.formData?.length
-          ? params.toString()
-          : resolve(request.body.raw || "");
-        headers.set("content-type", "application/x-www-form-urlencoded");
-      } else if (request.body?.mode === "form-data") {
-        body = new FormData();
-        for (const field of request.body.formData || [])
-          if (field.enabled !== false && field.key)
-            body.append(resolve(field.key), resolve(field.value));
-        headers.delete("content-type");
+    let formBytes = 0,
+      formFields = 0;
+    const resolveField = (key: string, value: string) => {
+      if (++formFields > 1000)
+        throw new BodyBudgetError(
+          "Request exceeds 1000 form fields",
+          "ERR_REQUEST_LIMIT",
+          413,
+        );
+      const resolvedKey = resolve(key),
+        resolvedValue = resolve(value);
+      formBytes +=
+        Buffer.byteLength(resolvedKey) + Buffer.byteLength(resolvedValue);
+      if (formBytes > maxRequestBytes)
+        throw new BodyBudgetError(
+          "Request fields exceed configured limit",
+          "ERR_REQUEST_LIMIT",
+          413,
+        );
+      options.secrets?.observe(resolvedKey, resolvedValue);
+      return [resolvedKey, resolvedValue] as const;
+    };
+    try {
+      if (!["GET", "HEAD"].includes(method)) {
+        if (
+          request.body?.mode === "raw-json" ||
+          request.body?.mode === "raw-text"
+        ) {
+          body = resolve(request.body.raw || "");
+          if (request.body.mode === "raw-json" && !headers.has("content-type"))
+            headers.set("content-type", "application/json");
+        } else if (request.body?.mode === "x-www-form-urlencoded") {
+          const params = new URLSearchParams();
+          for (const field of request.body.formData || [])
+            if (field.enabled !== false && field.key)
+              params.append(...resolveField(field.key, field.value));
+          body = request.body.formData?.length
+            ? params.toString()
+            : resolve(request.body.raw || "");
+          headers.set("content-type", "application/x-www-form-urlencoded");
+        } else if (request.body?.mode === "form-data") {
+          body = new FormData();
+          for (const field of request.body.formData || [])
+            if (field.enabled !== false && field.key)
+              body.append(...resolveField(field.key, field.value));
+          headers.delete("content-type");
+        }
       }
+      if (body instanceof FormData) {
+        const prepared = new Request(url.href, { method, headers, body });
+        // Only bounded text fields reach this encoder. Complete its in-memory stream:
+        // cancelling Undici's multipart encoder mid-chunk can reject outside its reader.
+        const bytes = await prepared.arrayBuffer();
+        if (bytes.byteLength > maxRequestBytes)
+          throw new BodyBudgetError(
+            "Serialized multipart body exceeds configured limit",
+            "ERR_REQUEST_LIMIT",
+            413,
+          );
+        headers.set("content-type", prepared.headers.get("content-type"));
+        body = new Uint8Array(bytes);
+      }
+      if (typeof body === "string" && Buffer.byteLength(body) > maxRequestBytes)
+        throw new BodyBudgetError(
+          "Request body exceeds configured limit",
+          "ERR_REQUEST_LIMIT",
+          413,
+        );
+      if (typeof body === "string")
+        options.secrets?.observeBody(body, headers.get("content-type") || "");
+    } catch (error) {
+      const boundaryFailure = budgetFailure();
+      if (boundaryFailure) return boundaryFailure;
+      return failed(
+        "Request Body Limit",
+        error instanceof BodyBudgetError
+          ? error.message
+          : "Invalid request body",
+        error instanceof BodyBudgetError ? error.code : "ERR_BODY",
+      );
     }
-    const start = performance.now();
+    const bodyBudgetFailure = budgetFailure();
+    if (bodyBudgetFailure) return bodyBudgetFailure;
     let firstByteMs = 0;
-    const timeoutSignal = AbortSignal.timeout(timeout);
-    const signal = options.signal
-      ? AbortSignal.any([timeoutSignal, options.signal])
-      : timeoutSignal;
     try {
       let response: Response;
       for (let redirects = 0; ; redirects++) {
@@ -430,6 +606,20 @@ export class HttpExecutor {
           const cookie = await jar.getCookieString(url.href);
           if (cookie) outgoing.set("cookie", cookie);
         }
+        if (
+          [...outgoing].reduce(
+            (size, [key, value]) =>
+              size + Buffer.byteLength(key) + Buffer.byteLength(value) + 4,
+            0,
+          ) >
+          64 * 1024
+        )
+          throw new BodyBudgetError(
+            "Outgoing headers exceed 64 KiB",
+            "ERR_REQUEST_LIMIT",
+            413,
+          );
+        transportAttempted = true;
         response = await fetch(url.href, {
           method,
           headers: outgoing,
@@ -455,8 +645,7 @@ export class HttpExecutor {
         if (!["http:", "https:"].includes(next.protocol))
           throw new Error("Redirect target must use HTTP or HTTPS");
         if (next.origin !== url.origin) {
-          headers.delete("authorization");
-          headers.delete("cookie");
+          for (const name of credentialHeaders) headers.delete(name);
         }
         if (
           (response.status === 303 && method !== "HEAD") ||
@@ -470,28 +659,7 @@ export class HttpExecutor {
         url = next;
       }
       firstByteMs = Math.round(performance.now() - start);
-      const chunks: Uint8Array[] = [];
-      let size = 0;
-      const reader = response.body?.getReader();
-      if (reader)
-        try {
-          while (true) {
-            const chunk = await reader.read();
-            if (chunk.done) break;
-            size += chunk.value.byteLength;
-            if (size > maxBytes) {
-              await reader.cancel();
-              throw Object.assign(
-                new Error(`Response exceeds ${maxBytes} byte limit`),
-                { code: "ERR_RESPONSE_LIMIT" },
-              );
-            }
-            chunks.push(chunk.value);
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      const bytes = Buffer.concat(chunks);
+      const bytes = await readResponseBody(response, maxBytes, signal);
       const mime = response.headers.get("content-type") || "";
       const binary =
         !!mime &&
@@ -508,7 +676,10 @@ export class HttpExecutor {
         body: text,
         responseTimeMs: totalMs,
       });
+      const postBudgetFailure = budgetFailure();
+      if (postBudgetFailure) return postBudgetFailure;
       return {
+        transportAttempted,
         status: response.status,
         statusText: response.statusText,
         headers: resHeaders,
@@ -516,7 +687,10 @@ export class HttpExecutor {
         bodyEncoding: binary ? "base64" : "utf8",
         ...(binary ? { bodyBase64: bytes.toString("base64") } : {}),
         sizeBytes: bytes.length,
-        timings: { firstByteMs, totalMs },
+        timings: {
+          firstByteMs,
+          totalMs: Math.round(performance.now() - start),
+        },
         testResults,
         logs: allLogs,
         ...updates(),
