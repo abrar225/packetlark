@@ -4,6 +4,7 @@ import http from "node:http";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { StudioServer } from "../src/server/StudioServer.js";
+import { startHttpFixture } from "./http-fixture.js";
 
 async function workspace(
   test: (
@@ -41,6 +42,191 @@ async function workspace(
 }
 
 describe("workspace API and restart integrity", () => {
+  it.skipIf(process.platform === "win32")(
+    "rejects symlinked managed directories before initialization writes outside the workspace",
+    async () => {
+      const root = fs.mkdtempSync(path.join(tmpdir(), "rea-linked-root-"));
+      const outside = fs.mkdtempSync(
+        path.join(tmpdir(), "rea-linked-outside-"),
+      );
+      try {
+        fs.symlinkSync(outside, path.join(root, "collections"), "dir");
+        expect(() => new StudioServer(0, 0, root)).toThrow(
+          /workspace.*(directory|path)/i,
+        );
+        expect(fs.readdirSync(outside)).toEqual([]);
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+        fs.rmSync(outside, { recursive: true, force: true });
+      }
+    },
+  );
+  it.skipIf(process.platform === "win32")(
+    "stops reading, saving and deleting when a managed directory is redirected after startup",
+    () =>
+      workspace(async (root, api) => {
+        for (const kind of ["collections", "environments"]) {
+          const original = (await (await api(kind)).json())[0];
+          const directory = path.join(root, kind);
+          const retained = directory + "-retained";
+          const outside = fs.mkdtempSync(
+            path.join(tmpdir(), "rea-redirected-"),
+          );
+          const file = path.join(outside, original.id + ".json");
+          const data = fs.readFileSync(
+            path.join(directory, original.id + ".json"),
+          );
+          fs.writeFileSync(file, data);
+          fs.renameSync(directory, retained);
+          fs.symlinkSync(outside, directory, "dir");
+          try {
+            const update = await api(`${kind}/${original.id}`, "PUT", {
+              name: "Must not escape",
+            });
+            expect(update.status).toBe(503);
+            expect((await update.json()).error.code).toBe(
+              "ERR_WORKSPACE_UNSAFE",
+            );
+            expect((await api(kind)).status).toBe(503);
+            expect((await api(`${kind}/${original.id}`)).status).toBe(503);
+            expect(
+              (
+                await api("execute", "POST", {
+                  request: { method: "GET", url: "http://127.0.0.1:1/" },
+                })
+              ).status,
+            ).toBe(503);
+            expect((await api("health")).ok).toBe(true);
+            expect((await api(`${kind}/${original.id}`, "DELETE")).status).toBe(
+              503,
+            );
+            expect(fs.readFileSync(file)).toEqual(data);
+          } finally {
+            fs.unlinkSync(directory);
+            fs.renameSync(retained, directory);
+            fs.rmSync(outside, { recursive: true, force: true });
+          }
+          expect((await api(kind)).ok).toBe(true);
+        }
+      }),
+  );
+  it("rejects oversized external files during revision checks without replacing their contents", () =>
+    workspace(async (root, api) => {
+      const original = (await (await api("collections")).json())[0];
+      const file = path.join(root, "collections", original.id + ".json");
+      const oversized = Buffer.alloc(2 * 1024 * 1024 + 1, "x");
+      fs.writeFileSync(file, oversized);
+      const result = await api(`collections/${original.id}`, "PUT", {
+        name: "Must not replace",
+      });
+      expect(result.status).toBe(503);
+      expect((await result.json()).error.code).toBe("ERR_WORKSPACE_INVALID");
+      expect(fs.readFileSync(file).equals(oversized)).toBe(true);
+    }));
+  it("requires restart when a managed directory is replaced by a different real directory", () =>
+    workspace(async (root, api) => {
+      const original = (await (await api("collections")).json())[0];
+      const directory = path.join(root, "collections");
+      const retained = directory + "-original";
+      fs.cpSync(directory, retained, { recursive: true });
+      // Keep the original inode alive so a new directory cannot reuse it.
+      fs.renameSync(directory, directory + "-old");
+      fs.renameSync(retained, directory);
+      try {
+        expect((await api("collections")).status).toBe(503);
+        expect(
+          (
+            await api(`collections/${original.id}`, "PUT", {
+              name: "Must not commit",
+            })
+          ).status,
+        ).toBe(503);
+      } finally {
+        fs.rmSync(directory, { recursive: true, force: true });
+        fs.renameSync(directory + "-old", directory);
+      }
+      expect((await api("collections")).status).toBe(200);
+    }));
+  it.skipIf(process.platform === "win32")(
+    "rejects a linked initialization marker instead of treating it as a committed workspace",
+    async () => {
+      const root = fs.mkdtempSync(path.join(tmpdir(), "rea-linked-marker-"));
+      const outside = path.join(root, "outside-marker");
+      const original = new StudioServer(0, 0, root);
+      await original.stop();
+      const marker = path.join(root, "collections", ".initialized");
+      fs.writeFileSync(outside, "1\n");
+      fs.unlinkSync(marker);
+      fs.symlinkSync(outside, marker);
+      try {
+        expect(() => new StudioServer(0, 0, root)).toThrow(/workspace/i);
+        expect(fs.lstatSync(marker).isSymbolicLink()).toBe(true);
+        expect(fs.readFileSync(outside, "utf8")).toBe("1\n");
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    },
+  );
+  it("rejects ambiguous request and item identities without replacing the collection", () =>
+    workspace(async (_root, api) => {
+      const original = (await (await api("collections")).json())[0];
+      for (const ids of [
+        ["one", "same", "two", "same"],
+        ["one", "one", "two", "one"],
+        ["one", "two", "two", "three"],
+      ]) {
+        const items = [0, 1].map((index) => ({
+          id: ids[index * 2],
+          name: "Request " + index,
+          request: {
+            id: ids[index * 2 + 1],
+            method: "GET",
+            url: "http://example.test/",
+          },
+        }));
+        const response = await api(`collections/${original.id}`, "PUT", {
+          items,
+        });
+        expect(response.status).toBe(400);
+        expect(
+          (await (await api(`collections/${original.id}`)).json()).revision,
+        ).toBe(original.revision);
+      }
+    }));
+  it("executes a native item without a separate request ID and retains inherited context after restart", () =>
+    workspace(async (_root, api, restart) => {
+      const target = await startHttpFixture();
+      try {
+        const created = await api("collections", "POST", {
+          id: "native_identity",
+          name: "Native identity",
+          variables: [{ key: "baseUrl", value: target.url, enabled: true }],
+          testScript:
+            'pm.test("inherited", () => pm.expect(pm.response.code).to.equal(200))',
+          items: [
+            {
+              id: "native_item",
+              name: "Native request",
+              request: { method: "GET", url: "{{baseUrl}}/get" },
+            },
+          ],
+        });
+        expect(created.ok).toBe(true);
+        await restart();
+        const response = await api("execute", "POST", {
+          collectionId: "native_identity",
+          request: { id: "native_item", method: "GET", url: "{{baseUrl}}/get" },
+        });
+        expect(response.status).toBe(200);
+        const result = await response.json();
+        expect(result.status).toBe(200);
+        expect(result.testResults).toEqual([
+          { name: "inherited", passed: true },
+        ]);
+      } finally {
+        await target.stop();
+      }
+    }));
   it("keeps deliberately emptied collections and environments empty after refresh and restart", () =>
     workspace(async (root, api, restart) => {
       for (const kind of ["collections", "environments"]) {

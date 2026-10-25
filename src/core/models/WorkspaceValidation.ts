@@ -56,6 +56,18 @@ export function validWorkspaceResource(
     (value.followRedirects === undefined ||
       typeof value.followRedirects === "boolean");
   let visited = 0;
+  const identities = new Set<string>();
+  const uniqueIdentity = (item: any) => {
+    const aliases = new Set([
+      item.id,
+      ...(!item.isFolder && item.request?.id ? [item.request.id] : []),
+    ]);
+    for (const alias of aliases) {
+      if (identities.has(alias)) return false;
+      identities.add(alias);
+    }
+    return true;
+  };
   const items = (value: any, depth = 0): boolean =>
     Array.isArray(value) &&
     depth <= 24 &&
@@ -64,6 +76,7 @@ export function validWorkspaceResource(
         ++visited <= 10000 &&
         object(item) &&
         id(item.id) &&
+        uniqueIdentity(item) &&
         typeof item.name === "string" &&
         optionalParams(item.variables) &&
         auth(item.auth) &&

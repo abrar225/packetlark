@@ -1188,3 +1188,33 @@ mark {
     font-size: 11px;
   }
 }
+
+/* Fixed-height native-scroll window: work scales with the visible rows. */
+.collection-tree .virtual-row {
+  height: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+.collection-tree .virtual-row > .req-main-info {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+.virtual-request-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.virtual-row .tree-folder-title {
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.collection-tree:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}

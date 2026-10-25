@@ -84,6 +84,7 @@ export class StudioServer {
   private sniffer: TrafficSnifferProxy;
   private collections: Map<string, ApiCollection> = new Map();
   private environments: Map<string, Environment> = new Map();
+  private directoryIdentities = new Map<string, string>();
 
   constructor(
     port: number = 4040,
@@ -102,14 +103,54 @@ export class StudioServer {
 
   private ensureStorage() {
     if (!fs.existsSync(this.storageDir)) {
-      fs.mkdirSync(this.storageDir, { recursive: true });
+      fs.mkdirSync(this.storageDir, { recursive: true, mode: 0o700 });
     }
-    if (!fs.existsSync(this.collectionsDir)) {
-      fs.mkdirSync(this.collectionsDir, { recursive: true });
+    this.assertDirectory(this.storageDir);
+    // Bind paths once to the chosen root, resolving platform aliases such as /var.
+    this.storageDir = fs.realpathSync(this.storageDir);
+    this.collectionsDir = path.join(this.storageDir, "collections");
+    this.environmentsDir = path.join(this.storageDir, "environments");
+    for (const directory of [this.collectionsDir, this.environmentsDir]) {
+      if (!fs.existsSync(directory)) fs.mkdirSync(directory, { mode: 0o700 });
+      this.assertDirectory(directory);
     }
-    if (!fs.existsSync(this.environmentsDir)) {
-      fs.mkdirSync(this.environmentsDir, { recursive: true });
+    for (const directory of [
+      this.storageDir,
+      this.collectionsDir,
+      this.environmentsDir,
+    ]) {
+      const stat = fs.lstatSync(directory, { bigint: true });
+      this.directoryIdentities.set(directory, `${stat.dev}:${stat.ino}`);
     }
+  }
+
+  private assertDirectory(directory: string) {
+    try {
+      const stat = fs.lstatSync(directory, { bigint: true });
+      const bound = this.directoryIdentities.get(directory);
+      if (
+        stat.isDirectory() &&
+        !stat.isSymbolicLink() &&
+        (!bound || bound === `${stat.dev}:${stat.ino}`) &&
+        (!bound || fs.realpathSync(directory) === directory)
+      )
+        return;
+    } catch {}
+    throw Object.assign(
+      new Error(
+        "Unsafe workspace directory path. Restore the original directories before continuing.",
+      ),
+      { statusCode: 503, code: "ERR_WORKSPACE_UNSAFE" },
+    );
+  }
+
+  private assertWorkspaceDirectories() {
+    for (const directory of [
+      this.storageDir,
+      this.collectionsDir,
+      this.environmentsDir,
+    ])
+      this.assertDirectory(directory);
   }
 
   private workspaceError(file: string) {
@@ -121,11 +162,60 @@ export class StudioServer {
     );
   }
 
-  private readWorkspaceJson(file: string, includeRevision = false) {
+  private workspaceFileExists(file: string) {
+    this.assertWorkspaceDirectories();
     try {
       const stat = fs.lstatSync(file);
-      if (!stat.isFile() || stat.size > 2 * 1024 * 1024) throw new Error();
-      const raw = fs.readFileSync(file, "utf8");
+      if (!stat.isFile() || stat.size > 2 * 1024 * 1024)
+        throw this.workspaceError(file);
+      return true;
+    } catch (error: any) {
+      if (error.code === "ENOENT") return false;
+      throw this.workspaceError(file);
+    }
+  }
+
+  private readWorkspaceText(file: string) {
+    this.assertWorkspaceDirectories();
+    let descriptor: number | undefined;
+    try {
+      if (!fs.lstatSync(file).isFile()) throw new Error();
+      descriptor = fs.openSync(
+        file,
+        fs.constants.O_RDONLY |
+          (fs.constants.O_NOFOLLOW || 0) |
+          (fs.constants.O_NONBLOCK || 0),
+      );
+      const stat = fs.fstatSync(descriptor);
+      const maximum = 2 * 1024 * 1024;
+      if (!stat.isFile() || stat.size > maximum) throw new Error();
+      const buffer = Buffer.allocUnsafe(64 * 1024);
+      const chunks: Buffer[] = [];
+      let bytes = 0;
+      for (;;) {
+        const count = fs.readSync(
+          descriptor,
+          buffer,
+          0,
+          Math.min(buffer.length, maximum + 1 - bytes),
+          null,
+        );
+        if (!count) break;
+        bytes += count;
+        if (bytes > maximum) throw new Error();
+        chunks.push(Buffer.from(buffer.subarray(0, count)));
+      }
+      return Buffer.concat(chunks, bytes).toString("utf8");
+    } catch {
+      throw this.workspaceError(file);
+    } finally {
+      if (descriptor !== undefined) fs.closeSync(descriptor);
+    }
+  }
+
+  private readWorkspaceJson(file: string, includeRevision = false) {
+    const raw = this.readWorkspaceText(file);
+    try {
       const value = JSON.parse(raw);
       if (includeRevision && value && typeof value === "object")
         value.revision = this.revision(raw);
@@ -145,7 +235,7 @@ export class StudioServer {
       if (statusCode === 503) throw this.workspaceError(file);
       throw Object.assign(
         new Error(
-          `Invalid ${kind} data. Check IDs, request structure, variables and value types.`,
+          `Invalid ${kind} data. Check unique IDs, request structure, variables and value types.`,
         ),
         { statusCode, code: "ERR_RESOURCE_INVALID" },
       );
@@ -156,6 +246,7 @@ export class StudioServer {
     directory: string,
     kind: "collections" | "environments",
   ): Map<string, T> {
+    this.assertWorkspaceDirectories();
     const resources = new Map<string, T>();
     for (const file of fs
       .readdirSync(directory)
@@ -179,11 +270,11 @@ export class StudioServer {
     const journal = path.join(directory, ".migration");
     const legacy = path.join(this.storageDir, kind + ".json");
     if (
-      !fs.existsSync(journal) &&
-      (canonicalCount > 0 || !fs.existsSync(legacy))
+      !this.workspaceFileExists(journal) &&
+      (canonicalCount > 0 || !this.workspaceFileExists(legacy))
     )
       return;
-    const source = fs.existsSync(journal) ? journal : legacy;
+    const source = this.workspaceFileExists(journal) ? journal : legacy;
     const resources = this.readWorkspaceJson(source);
     if (!Array.isArray(resources)) throw this.workspaceError(source);
     const ids = new Set();
@@ -197,11 +288,11 @@ export class StudioServer {
       data: this.serializeResource(value),
     }));
     // Preflight every canonical record before journaling or replacing any file.
-    if (!fs.existsSync(journal))
+    if (!this.workspaceFileExists(journal))
       this.atomicWrite(journal, JSON.stringify(resources));
     for (const { value, data } of records) {
       const file = this.resourceFile(kind, value.id);
-      if (fs.existsSync(file)) {
+      if (this.workspaceFileExists(file)) {
         if (
           JSON.stringify(this.readWorkspaceJson(file)) !==
           JSON.stringify(JSON.parse(data))
@@ -221,7 +312,7 @@ export class StudioServer {
 
   private loadInitialCollections() {
     const marker = path.join(this.collectionsDir, ".initialized");
-    const initialized = fs.existsSync(marker);
+    const initialized = this.workspaceFileExists(marker);
     this.collections = this.readResourceDirectory<ApiCollection>(
       this.collectionsDir,
       "collections",
@@ -323,7 +414,7 @@ pm.test("Has valid repo name", function () {
 
   private loadInitialEnvironments() {
     const marker = path.join(this.environmentsDir, ".initialized");
-    const initialized = fs.existsSync(marker);
+    const initialized = this.workspaceFileExists(marker);
     this.environments = this.readResourceDirectory<Environment>(
       this.environmentsDir,
       "environments",
@@ -357,6 +448,8 @@ pm.test("Has valid repo name", function () {
   }
 
   private atomicWrite(file: string, data: string) {
+    this.assertWorkspaceDirectories();
+    this.workspaceFileExists(file); // Reject non-regular destinations, including dangling links.
     const temporary = file + "." + crypto.randomUUID() + ".tmp";
     try {
       const descriptor = fs.openSync(temporary, "wx", 0o600);
@@ -377,6 +470,7 @@ pm.test("Has valid repo name", function () {
   }
 
   private resourceFile(kind: "collections" | "environments", id: string) {
+    this.assertWorkspaceDirectories();
     if (typeof id !== "string" || !/^[a-zA-Z0-9_-]+$/.test(id))
       throw Object.assign(
         new Error(
@@ -392,11 +486,11 @@ pm.test("Has valid repo name", function () {
 
   private checkRevision(file: string, expected?: string | null) {
     if (expected === undefined) return; // Initial migration/creation has no prior revision.
-    const exists = fs.existsSync(file);
+    const exists = this.workspaceFileExists(file);
     if (
       (expected === null && exists) ||
       (expected !== null &&
-        (!exists || this.revision(fs.readFileSync(file, "utf8")) !== expected))
+        (!exists || this.revision(this.readWorkspaceText(file)) !== expected))
     )
       throw Object.assign(
         new Error(
@@ -457,7 +551,7 @@ pm.test("Has valid repo name", function () {
   ) {
     const file = this.resourceFile("collections", id);
     this.checkRevision(file, expected);
-    if (fs.existsSync(file)) fs.unlinkSync(file);
+    if (this.workspaceFileExists(file)) fs.unlinkSync(file);
     this.collections.delete(id);
   }
 
@@ -478,7 +572,7 @@ pm.test("Has valid repo name", function () {
   ) {
     const file = this.resourceFile("environments", id);
     this.checkRevision(file, expected);
-    if (fs.existsSync(file)) fs.unlinkSync(file);
+    if (this.workspaceFileExists(file)) fs.unlinkSync(file);
     this.environments.delete(id);
   }
 
@@ -653,6 +747,12 @@ pm.test("Has valid repo name", function () {
     pathname: string,
     urlObj: URL,
   ) {
+    const workspacePath =
+      /^\/api\/(collections|environments)(\/|$)/.test(pathname) ||
+      pathname === "/api/execute" ||
+      pathname === "/api/import/postman" ||
+      (pathname === "/api/runs" && req.method === "POST");
+    if (workspacePath) this.assertWorkspaceDirectories();
     const clientRevision =
       typeof req.headers["if-match"] === "string"
         ? req.headers["if-match"].replace(/^"|"$/g, "")
@@ -668,6 +768,7 @@ pm.test("Has valid repo name", function () {
         2 * 1024 * 1024,
         AbortSignal.timeout(10000),
       );
+      if (workspacePath) this.assertWorkspaceDirectories();
       const str = bytes.toString("utf8");
       if (!str.trim()) return {};
       try {

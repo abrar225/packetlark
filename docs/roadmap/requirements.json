@@ -471,7 +471,8 @@
         }
       ],
       "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
-      "p0_implementation_evidence": "Canonical commit before memory, retained legacy migration source, resumable migration, revision-aware saves and deletes; complete workspace UI/recovery still P1."
+      "p0_implementation_evidence": "Canonical commit before memory, retained legacy migration source, resumable migration, revision-aware saves and deletes; complete workspace UI/recovery still P1.",
+      "p1_implementation_evidence": "0961215: bounded visible-row collection renderer; native item/request identity fallback; rejects ambiguous cross-item aliases. Full authoring/recovery remains open. f6eebb4: canonical root/directory identity guards, nonregular marker/destination rejection and descriptor-bound 2MiB reads/revisions; cross-process lease/recovery remains open."
     },
     {
       "id": "REA-024",
@@ -532,7 +533,8 @@
         }
       ],
       "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
-      "p0_implementation_evidence": "In-memory per-request drafts, delayed-completion ownership and unload guard verified in browser; durable crash recovery/tabs remain P1."
+      "p0_implementation_evidence": "In-memory per-request drafts, delayed-completion ownership and unload guard verified in browser; durable crash recovery/tabs remain P1.",
+      "p1_implementation_evidence": "0961215: existing 16 ownership checks pass under virtualization; draft switching/search/scroll and native first-load execution verified. Durable recovery/tabs remain open."
     },
     {
       "id": "REA-027",
