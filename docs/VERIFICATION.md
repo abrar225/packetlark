@@ -88,3 +88,7 @@ No direct Postman/Newman differential run, full sandbox conformance, independent
 VERDICT: PASS
 
 This verdict covers the observed automated/core/package checks only. Browser-harness completion and editor-host validation remain open and prevent calling the entire distribution stable or assigning a 9/10 platform score.
+
+# First P0 trust implementation — 25 October 2026
+
+See [P0_PROGRESS.md](P0_PROGRESS.md) for the current implementation, **98 passing tests in 15 files**, the completed 16-case targeted browser run, package/extension checks and exact limitations. These P0 browser ownership checks supersede uncertainty about those specific workflows; they do not complete the older broad browser/accessibility suite or editor-host QA. The source-pinned loopback measurement is [P0_BASELINE.json](verification/P0_BASELINE.json). No competitor speed claim or independent security certification is made.

@@ -462,7 +462,7 @@
       "documented_comparator": "Collections, folders, environments and broader organization tools.",
       "required_work": "Complete collection/folder authoring and rename/reorder.",
       "candidate_phase": "P1",
-      "status": "planned-or-revalidation-required",
+      "status": "in-progress",
       "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "postman_sources": [
         {
@@ -470,7 +470,8 @@
           "url": "https://learning.postman.com/docs/use/overview"
         }
       ],
-      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
+      "p0_implementation_evidence": "Canonical commit before memory, retained legacy migration source, resumable migration, revision-aware saves and deletes; complete workspace UI/recovery still P1."
     },
     {
       "id": "REA-024",
@@ -522,7 +523,7 @@
       "documented_comparator": "Save/autosave and collection restore workflows.",
       "required_work": "Await switching saves, preserve failed edits, inject disk failures.",
       "candidate_phase": "P1",
-      "status": "planned-or-revalidation-required",
+      "status": "in-progress",
       "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "postman_sources": [
         {
@@ -530,7 +531,8 @@
           "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
         }
       ],
-      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js"
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
+      "p0_implementation_evidence": "In-memory per-request drafts, delayed-completion ownership and unload guard verified in browser; durable crash recovery/tabs remain P1."
     },
     {
       "id": "REA-027",
@@ -638,7 +640,7 @@
       "feature": "Pre/post scripts and inheritance",
       "workstream": "WS5",
       "current_status": "Implemented",
-      "current_evidence": "Collection → folder → request scripts for tested HTTP flows.",
+      "current_evidence": "Collection \u2192 folder \u2192 request scripts for tested HTTP flows.",
       "documented_comparator": "Same documented hierarchy plus protocol-specific events.",
       "required_work": "Differential fixtures for nesting and event behavior.",
       "candidate_phase": "P3",
@@ -1022,7 +1024,7 @@
       "documented_comparator": "Capture capability exists; comparative redaction/limit behavior not audited.",
       "required_work": "Critical before beta expansion: byte budgets, timeouts and secret scrubber.",
       "candidate_phase": "P0",
-      "status": "planned-or-revalidation-required",
+      "status": "in-progress",
       "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "postman_sources": [
         {
@@ -1030,12 +1032,13 @@
           "url": "https://learning.postman.com/docs/use/overview"
         }
       ],
-      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts"
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts",
+      "p0_implementation_evidence": "Byte/lifecycle/history budgets and heuristic redaction before observation retention/subscription verified; further threat-model and export/secret work remains."
     },
     {
       "id": "REA-052",
       "area": "Capture",
-      "feature": "Capture → test / replay",
+      "feature": "Capture \u2192 test / replay",
       "workstream": "WS7",
       "current_status": "Partial",
       "current_evidence": "Inspect captured bodies and export drafts; no full saved replay/test workflow.",
@@ -1062,7 +1065,7 @@
       "documented_comparator": "Query editing/capture workflows; no differential fidelity test conducted.",
       "required_work": "Preserve ordered duplicate query/header values in capture model.",
       "candidate_phase": "P0",
-      "status": "planned-or-revalidation-required",
+      "status": "in-progress",
       "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "postman_sources": [
         {
@@ -1070,12 +1073,13 @@
           "url": "https://learning.postman.com/docs/sending-requests/create-requests/request-basics/"
         }
       ],
-      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts"
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/core/sniffing/TrafficSnifferProxy.ts",
+      "p0_implementation_evidence": "Ordered repeated query entries survive capture/redaction; raw duplicate-header fidelity and downstream contract semantics remain incomplete."
     },
     {
       "id": "REA-054",
       "area": "Contracts",
-      "feature": "Observed traffic → OpenAPI",
+      "feature": "Observed traffic \u2192 OpenAPI",
       "workstream": "WS8",
       "current_status": "Partial",
       "current_evidence": "OpenAPI 3.1 draft with provenance, origin selection and schema inference.",
@@ -1155,7 +1159,7 @@
     {
       "id": "REA-058",
       "area": "Contracts",
-      "feature": "Spec ↔ collection sync",
+      "feature": "Spec \u2194 collection sync",
       "workstream": "WS8",
       "current_status": "Missing",
       "current_evidence": "One-way inference/export; no maintained bidirectional linkage.",
@@ -1402,7 +1406,7 @@
       "documented_comparator": "Local/cloud secret scanner features; plan dependent.",
       "required_work": "Redact capture/log/export paths; test unknown/derived secrets.",
       "candidate_phase": "P0",
-      "status": "planned-or-revalidation-required",
+      "status": "in-progress",
       "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "postman_sources": [
         {
@@ -1410,7 +1414,8 @@
           "url": "https://www.postman.com/pricing/"
         }
       ],
-      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/integrations/mcp.ts"
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/integrations/mcp.ts",
+      "p0_implementation_evidence": "Seeded header/query/form/JSON/cookie secrets absent from retained observations, subscribers and generated draft output; unknown/derived secrets and all other report/log paths are not comprehensively covered."
     },
     {
       "id": "REA-071",
@@ -1853,5 +1858,12 @@
       "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/docs/VERIFICATION.md"
     }
   ],
-  "delivery_policy": "Candidate phase identifies the first planned increment, not proof of parity or completion. Workstream gates and later increments also apply."
+  "delivery_policy": "Candidate phase identifies the first planned increment, not proof of parity or completion. Workstream gates and later increments also apply.",
+  "implementation_progress": {
+    "phase": "P0",
+    "status": "in-progress",
+    "record": "../P0_PROGRESS.md",
+    "implementation_commit": "039d2e81415d4351140d95c3d020ff624ffc20d2",
+    "note": "Baseline comparison fields remain historical. These changes do not close all listed requirements or establish Postman parity."
+  }
 }

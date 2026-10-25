@@ -361,7 +361,7 @@ describe("public capture transport boundaries", () => {
   it("releases a blocked downstream response at the total deadline", async () => {
     const isolated = new TrafficSnifferProxy(0, {
       maxResponseBytes: 20 * 1024 * 1024,
-      timeoutMs: 200,
+      timeoutMs: 500,
       maxConcurrentRequests: 1,
     });
     const endpoint = await isolated.start();
@@ -373,12 +373,16 @@ describe("public capture transport boundaries", () => {
           (response) => {
             response.on("error", () => {});
             response.pause();
-            resolve();
+            if (response.statusCode !== 200)
+              reject(
+                new Error("Fixture did not reach the downstream write phase"),
+              );
+            else resolve();
           },
         );
         client.on("error", reject);
       });
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 800));
       expect(isolated.getCaptureStats().activeRequests).toBe(0);
       expect(
         (await fetch(`http://127.0.0.1:${endpoint}/${origin}/echo`)).status,

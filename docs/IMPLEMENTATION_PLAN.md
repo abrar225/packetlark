@@ -1,6 +1,6 @@
 # Rea implementation program: local reliability to broader platform capability
 
-Status: **detailed draft for final shared-understanding confirmation; product implementation has not started under this plan**.
+Status: **approved; P0 implementation in progress**. The first trust-foundation bundle is implemented and verified locally. See [P0 progress and remaining gates](P0_PROGRESS.md); this roadmap is not a statement of completed parity.
 
 Date: 25 October 2026. Baseline: `c25e02ca2415dd7b2e2826c96ea4ff0df34de311` (Rea 1.1 preview). Capacity: one maintainer assisted by coding agents. Scope: all ten comparison areas, delivered in stages. This document describes intended work, not completed capabilities or a new product rating.
 
@@ -13,7 +13,7 @@ Date: 25 October 2026. Baseline: `c25e02ca2415dd7b2e2826c96ea4ff0df34de311` (Rea
 5. Signature workflow: **capture → redact → infer a reviewable contract → generate regression fixtures → validate generated clients**, with evidence/provenance and uncertainty visible.
 6. Defaults: no telemetry or implicit cloud upload; review/grants for imported scripts and agent destinations; secret-safe exports. Users can explicitly authorize local/private services. Compatibility mode can relax a particular control only through informed local consent.
 
-One final confirmation remains: that this concrete plan and the public test interfaces in section 10 match that shared understanding. The explicitly requested `grill-me` delegates to `grilling`, which says not to act on the design until shared understanding is confirmed. The TDD skill requires confirming test interfaces before product tests are written. No extra confirmation should be requested for routine fixes already covered by the confirmed scope.
+The user confirmed Q7: “Yes — plan and test interfaces match; start P0.” All six decisions and the eight public test interfaces below are approved. The requested grilling/TDD confirmation is complete; routine implementation within this scope needs no additional confirmation.
 
 ## 2. Outcome and definition of competitive
 
@@ -95,7 +95,7 @@ P0–P5 total **17–31 engineer-weeks before contingency**. All listed phases t
 
 ## 5. Immediate, source-grounded defect backlog
 
-These are source-audit findings, not new exploitation demonstrations or a completed security audit.
+These are **baseline** source-audit findings; line references refer to the pre-P0 source. They are not a completed security audit. Current disposition and executable evidence are tracked in [P0 progress](P0_PROGRESS.md).
 
 - **TR-001: bounded capture transport.** `src/core/sniffing/TrafficSnifferProxy.ts:99` accumulates inbound bytes, `:155` reads the full upstream body and `:140` has no explicit abort signal. The 500-record cap at `:34` is not a byte budget. Add stream caps, deadlines, connection/concurrency caps and abort-on-disconnect/shutdown. Test large and slow streams, compression expansion and cleanup.
 - **TR-002: binary forwarding fidelity.** Capture decodes a request to UTF-8 at `TrafficSnifferProxy.ts:104` and forwards text at `:143`. Keep transport bytes unchanged; decode only a bounded inspection copy. Test exact binary request and response bytes, duplicate/hop-by-hop headers and compressed responses. Existing binary coverage checks only response length.
@@ -105,7 +105,7 @@ These are source-audit findings, not new exploitation demonstrations or a comple
 - **TR-006: conflict/reload integrity.** Malformed file input is silently ignored (`StudioServer.ts:124`); collection reload (`:756`) lacks complete deletion/revision reconciliation. Validate IDs/paths/symlinks, reject stale writes with conflict metadata, surface corruption and never overwrite valid user data with starter examples.
 - **TR-007: honest script/scope semantics.** `web/sandbox-bootstrap.js:12–20` string-coerces writes and exposes plain-object `pm.request`; typed data becomes strings in `CollectionRunner.ts:164`. Single Send persists only environments while runs retain several scopes in memory (`StudioServer.ts:566–589`, `:643`). Define and expose the policy, then cross-run typed/precedence/mutation fixtures before claiming compatibility.
 
-First implementation PR: TR-001 + TR-002 shared byte/lifecycle primitives with focused integration tests. Second: TR-003 plus secret-safe capture tests. Third: TR-004 save/execution ownership. Fourth: TR-005/006 repository durability/conflict behavior. Keep unrelated UI and protocol additions out of these PRs. If investigation shows a safer order, record the evidence and amend the plan.
+Implementation sequencing amendment after investigation: capture bounds and redaction share the observation commit point, so the first commit covers TR-001/002/003 together. Client ownership and workspace revision handling must agree on save/delete responses and conflict semantics, so the next commit covers TR-004/005/006 together. These are separate commits in one draft review bundle, with test fixtures covering their integration. This replaces the initial four-PR suggestion; unrelated UI redesign and protocol additions remain out of scope.
 
 ## 6. Ten workstreams and acceptance gates
 
