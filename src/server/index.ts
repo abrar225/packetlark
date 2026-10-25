@@ -1,22 +1,11 @@
-import { StudioServer } from './StudioServer.js';
-
-const PORT = Number(process.env.PORT || 4040);
-const SNIFFER_PORT = Number(process.env.SNIFFER_PORT || 8085);
-
-const server = new StudioServer(PORT, SNIFFER_PORT);
-
-server.start().then(actualPort => {
-  const mem = (process.memoryUsage().rss / 1024 / 1024).toFixed(1);
-  console.log('='.repeat(65));
-  console.log('  🚀 ReaAPI Studio — Local API Workbench');
-  console.log('='.repeat(65));
-  console.log(`  ⚡ Web / Desktop Studio:  http://localhost:${actualPort}/studio`);
-  console.log(`  🛰️ Live Traffic Sniffer:  http://localhost:${SNIFFER_PORT}`);
-  console.log(`  💾 Local-First Git Data:  .rea-api/collections/ & .rea-api/environments/`);
-  console.log(`  Server RSS:              ${mem} MB (browser memory excluded)`);
-  console.log(`  Local workspace:         No Rea account required`);
-  console.log('='.repeat(65));
-}).catch(err => {
-  console.error('Failed to launch ReaAPI Studio:', err);
-  process.exit(1);
-});
+// Keep the legacy/dev entry on the CLI's workspace and shutdown lifecycle.
+import { main } from "../cli.js";
+main(["studio"]).then(
+  (code) => {
+    process.exitCode = code;
+  },
+  (error) => {
+    console.error("Rea: " + error.message);
+    process.exitCode = 2;
+  },
+);

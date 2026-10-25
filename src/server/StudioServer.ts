@@ -2,6 +2,7 @@ import http from "node:http";
 import { readIncomingBody } from "../core/engine/BodyBudget.js";
 import { createHash } from "node:crypto";
 import { validWorkspaceResource } from "../core/models/WorkspaceValidation.js";
+import { WorkspaceLease } from "../core/workspace/WorkspaceLease.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -85,6 +86,12 @@ export class StudioServer {
   private collections: Map<string, ApiCollection> = new Map();
   private environments: Map<string, Environment> = new Map();
   private directoryIdentities = new Map<string, string>();
+  private lease: WorkspaceLease;
+  private lifecycle:
+    "created" | "starting" | "running" | "stopping" | "stopped" = "created";
+  private startPromise: Promise<number>;
+  private listeningPromise: Promise<number>;
+  private stopPromise: Promise<void>;
 
   constructor(
     port: number = 4040,
@@ -96,9 +103,16 @@ export class StudioServer {
     this.environmentsDir = path.join(workspaceDir, "environments");
     this.port = port;
     this.sniffer = new TrafficSnifferProxy(snifferPort);
-    this.ensureStorage();
-    this.loadInitialCollections();
-    this.loadInitialEnvironments();
+    this.lease = WorkspaceLease.acquire(workspaceDir);
+    this.storageDir = this.lease.root;
+    try {
+      this.ensureStorage();
+      this.loadInitialCollections();
+      this.loadInitialEnvironments();
+    } catch (error) {
+      this.lease.release();
+      throw error;
+    }
   }
 
   private ensureStorage() {
@@ -151,6 +165,7 @@ export class StudioServer {
       this.environmentsDir,
     ])
       this.assertDirectory(directory);
+    this.lease.assertOwned();
   }
 
   private workspaceError(file: string) {
@@ -623,9 +638,46 @@ pm.test("Has valid repo name", function () {
     }
   }
 
-  public async start(): Promise<number> {
-    // Start sniffer proxy in parallel
+  public start(): Promise<number> {
+    if (this.lifecycle === "starting" || this.lifecycle === "running")
+      return this.startPromise;
+    if (this.lifecycle !== "created")
+      return Promise.reject(
+        Object.assign(
+          new Error(
+            "This Studio has stopped. Create a new instance to reopen it.",
+          ),
+          { code: "ERR_STUDIO_STOPPED" },
+        ),
+      );
+    this.lifecycle = "starting";
+    this.listeningPromise = this.startListening();
+    this.startPromise = this.listeningPromise
+      .then((port) => {
+        this.assertStarting();
+        this.lifecycle = "running";
+        return port;
+      })
+      .catch(async (error) => {
+        await this.stop();
+        throw error;
+      });
+    return this.startPromise;
+  }
+
+  private assertStarting() {
+    if (this.lifecycle !== "starting")
+      throw Object.assign(
+        new Error("Studio startup was cancelled by shutdown."),
+        { code: "ERR_STUDIO_STOPPED" },
+      );
+    this.lease.assertOwned();
+  }
+
+  private async startListening(): Promise<number> {
+    this.assertStarting();
     await this.sniffer.start();
+    this.assertStarting();
 
     return new Promise((resolve, reject) => {
       this.server = http.createServer(
@@ -731,9 +783,17 @@ pm.test("Has valid repo name", function () {
       });
 
       this.server.on("error", (err: any) => {
-        if (err.code === "EADDRINUSE") {
+        if (this.lifecycle !== "starting") {
+          reject(err);
+          return;
+        }
+        if (err.code === "EADDRINUSE" && this.port < 65535) {
           this.port += 1;
-          this.server?.listen(this.port, "127.0.0.1");
+          try {
+            this.server?.listen(this.port, "127.0.0.1");
+          } catch (error) {
+            reject(error);
+          }
         } else {
           reject(err);
         }
@@ -1380,14 +1440,23 @@ pm.test("Has valid repo name", function () {
     });
   }
 
-  public async stop(): Promise<void> {
+  public stop(): Promise<void> {
+    if (this.stopPromise) return this.stopPromise;
+    this.lifecycle = "stopping";
     for (const run of this.runs.values()) run.controller.abort();
     for (const execution of this.executions) execution.abort();
-    await this.sniffer.stop();
-    if (!this.server) return;
-    return new Promise((resolve) => {
-      this.server?.close(() => resolve());
-      this.server?.closeAllConnections();
-    });
+    this.stopPromise = (async () => {
+      // Wait for the raw listener attempt, never the startup wrapper that awaits stop.
+      await this.listeningPromise?.catch(() => {});
+      await this.sniffer.stop();
+      if (this.server)
+        await new Promise<void>((resolve) => {
+          this.server?.close(() => resolve());
+          this.server?.closeAllConnections();
+        });
+      this.lease.release();
+      this.lifecycle = "stopped";
+    })();
+    return this.stopPromise;
   }
 }

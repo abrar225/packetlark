@@ -289,7 +289,7 @@ describe("workspace API and restart integrity", () => {
   );
 
   it("reports malformed canonical files without hiding them or creating replacement samples", () =>
-    workspace(async (root, api) => {
+    workspace(async (root, api, restart) => {
       const resource = (await (await api("collections")).json())[0];
       const file = path.join(root, "collections", resource.id + ".json");
       fs.writeFileSync(file, "{truncated");
@@ -297,7 +297,9 @@ describe("workspace API and restart integrity", () => {
       expect(response.status).toBe(503);
       expect((await response.json()).error.code).toBe("ERR_WORKSPACE_INVALID");
       expect(fs.readFileSync(file, "utf8")).toBe("{truncated");
-      expect(() => new StudioServer(0, 0, root)).toThrow(/workspace/i);
+      await expect(restart()).rejects.toMatchObject({
+        code: "ERR_WORKSPACE_INVALID",
+      });
     }));
 
   it("rejects stale client revisions and external disk edits instead of overwriting them", () =>
