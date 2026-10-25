@@ -49,6 +49,37 @@ let activeReqTab = "params";
 let activeResTab = "body";
 let currentResponseData = null;
 let isDirty = false;
+const requestDrafts = new Map();
+const collectionSaves = new Map();
+const environmentSaves = new Map();
+const dirtyEnvironments = new Set();
+let activeDraft = null;
+let selectionRevision = 0;
+const draftKey = (collectionId, requestId) =>
+  JSON.stringify([collectionId, requestId]);
+
+function adoptCollectionCommit(collection, baseRevision) {
+  collections = collections.map((col) =>
+    col.id === collection.id ? collection : col,
+  );
+  for (const draft of requestDrafts.values())
+    if (
+      draft.collectionId === collection.id &&
+      draft.collectionRevision === baseRevision
+    )
+      draft.collectionRevision = collection.revision;
+  if (activeCollection?.id === collection.id) activeCollection = collection;
+}
+
+window.addEventListener("beforeunload", (event) => {
+  if (
+    [...requestDrafts.values()].some((draft) => draft.dirty) ||
+    dirtyEnvironments.size
+  ) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
 
 async function init() {
   refreshIcons();
@@ -101,7 +132,16 @@ async function updateHealth() {
 async function loadEnvironments() {
   try {
     const res = await fetch("/api/environments");
-    environments = await res.json();
+    if (!res.ok)
+      throw new Error(
+        (await res.json()).error?.message || "Environment load failed",
+      );
+    const loaded = await res.json();
+    environments = loaded.map((env) =>
+      dirtyEnvironments.has(env.id)
+        ? environments.find((existing) => existing.id === env.id) || env
+        : env,
+    );
     renderEnvironmentSelector();
   } catch (e) {
     console.error("Failed to load environments:", e);
@@ -136,6 +176,10 @@ function onEnvironmentSelected(val) {
 async function loadCollections() {
   try {
     const res = await fetch("/api/collections");
+    if (!res.ok)
+      throw new Error(
+        (await res.json()).error?.message || "Collection load failed",
+      );
     collections = await res.json();
     renderCollectionsTree();
     if (
@@ -164,18 +208,21 @@ function findFirstRequestItem(items) {
   return null;
 }
 
-function markDirty() {
-  isDirty = true;
-  document.getElementById("dirty-badge").style.display = "inline";
-  document.getElementById("btn-save-req").classList.add("is-dirty");
+function refreshDirtyState() {
+  isDirty = !!activeDraft?.dirty;
+  document.getElementById("dirty-badge").style.display = isDirty
+    ? "inline"
+    : "none";
+  document.getElementById("btn-save-req").classList.toggle("is-dirty", isDirty);
   renderCollectionsTree();
 }
-
-function markClean() {
-  isDirty = false;
-  document.getElementById("dirty-badge").style.display = "none";
-  document.getElementById("btn-save-req").classList.remove("is-dirty");
-  renderCollectionsTree();
+function markDirty() {
+  if (activeDraft) {
+    activeDraft.dirty = true;
+    activeDraft.version++;
+  }
+  document.getElementById("save-status").textContent = "Unsaved changes";
+  refreshDirtyState();
 }
 
 function renderCollectionsTree() {
@@ -248,12 +295,16 @@ function renderTreeItems(items, parentEl, col, depth) {
       parentEl.appendChild(folderDiv);
     } else if (item.request) {
       const reqDiv = document.createElement("div");
-      const isSelected = activeRequest?.id === item.request.id;
+      const isSelected =
+        activeCollection?.id === col.id &&
+        activeRequest?.id === item.request.id;
       reqDiv.className = `request-item ${isSelected ? "selected" : ""}`;
       if (depth > 0) reqDiv.style.paddingLeft = `${14 + depth * 8}px`;
 
       const mClass = `method-${item.request.method.toLowerCase()}`;
-      const isCurrentDirty = isSelected && isDirty;
+      const isCurrentDirty = requestDrafts.get(
+        draftKey(col.id, item.request.id),
+      )?.dirty;
 
       reqDiv.innerHTML = `
             <button class="req-main-info" type="button">
@@ -279,14 +330,43 @@ function renderTreeItems(items, parentEl, col, depth) {
 }
 
 function selectRequest(req, col) {
-  if (isDirty && activeRequest && activeCollection) {
-    saveActiveRequest();
-  } else {
-    syncCurrentFieldsToActiveRequest();
+  syncCurrentFieldsToActiveRequest();
+  selectionRevision++;
+  requestAbortController?.abort();
+  requestAbortController = null;
+  document.getElementById("btn-send-main").disabled = false;
+  document.getElementById("btn-send-main").removeAttribute("aria-busy");
+  document.getElementById("cancel-request").style.display = "none";
+  currentResponseData = null;
+  for (const id of ["res-body", "res-headers", "res-tests", "res-logs"])
+    document.getElementById(id).textContent =
+      id === "res-body" ? "Send this request to inspect its response." : "";
+  for (const id of ["res-status", "res-time", "res-size"])
+    document.getElementById(id).textContent = "—";
+  for (const id of ["tests-count", "logs-count"])
+    document.getElementById(id).textContent = "0";
+  const key = draftKey(col.id, req.id);
+  let draft = requestDrafts.get(key);
+  if (
+    !draft ||
+    (!draft.dirty && !draft.saving && draft.collectionRevision !== col.revision)
+  ) {
+    draft = {
+      request: structuredClone(req),
+      collectionId: col.id,
+      collectionRevision: col.revision,
+      dirty: false,
+      version: 0,
+    };
+    requestDrafts.set(key, draft);
   }
-  activeRequest = JSON.parse(JSON.stringify(req));
+  activeDraft = draft;
+  activeRequest = draft.request;
   activeCollection = col;
-  markClean();
+  document.getElementById("save-status").textContent = draft.dirty
+    ? "Unsaved changes"
+    : "";
+  refreshDirtyState();
 
   document.getElementById("req-method").value = activeRequest.method || "GET";
   document.getElementById("req-url").value = activeRequest.url || "";
@@ -334,33 +414,53 @@ function syncCurrentFieldsToActiveRequest() {
 }
 
 async function saveActiveRequest() {
-  if (!activeRequest || !activeCollection) return;
+  if (!activeRequest || !activeCollection || !activeDraft) return;
   syncCurrentFieldsToActiveRequest();
-
+  const owner = activeDraft;
+  if (owner.saving) return owner.saving;
+  const version = owner.version;
+  const snapshot = structuredClone(owner.request);
+  const prior = collectionSaves.get(owner.collectionId) || Promise.resolve();
+  const task = prior
+    .catch(() => {})
+    .then(async () => {
+      const base = owner.collectionRevision;
+      const res = await fetch(
+        `/api/collections/${owner.collectionId}/requests`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(base ? { "If-Match": `"${base}"` } : {}),
+          },
+          body: JSON.stringify({ request: snapshot }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok || !data.ok)
+        throw new Error(data.error?.message || data.error || "Save failed");
+      adoptCollectionCommit(data.collection, base);
+      if (owner.version === version) owner.dirty = false;
+      if (activeDraft === owner) {
+        document.getElementById("save-status").textContent = owner.dirty
+          ? "Newer changes remain unsaved"
+          : "Saved";
+        refreshDirtyState();
+      } else renderCollectionsTree();
+    });
+  owner.saving = task;
+  collectionSaves.set(owner.collectionId, task);
   try {
-    const res = await fetch(
-      `/api/collections/${activeCollection.id}/requests`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ request: activeRequest }),
-      },
-    );
-    const data = await res.json();
-    if (!res.ok || !data.ok)
-      throw new Error(data.error?.message || data.error || "Save failed");
-    if (data.ok) {
-      markClean();
-      await loadCollections();
-      const btn = document.getElementById("btn-save-req");
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "Saved";
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-      }, 1200);
-    }
+    await task;
   } catch (err) {
-    alert("Failed to save request: " + err.message);
+    if (activeDraft === owner)
+      document.getElementById("save-status").textContent =
+        "Save failed · draft retained";
+    alert(`Failed to save ${snapshot.name || "request"}: ${err.message}`);
+  } finally {
+    owner.saving = null;
+    if (collectionSaves.get(owner.collectionId) === task)
+      collectionSaves.delete(owner.collectionId);
   }
 }
 
@@ -376,8 +476,12 @@ async function createNewRequest() {
   const reqName = prompt("Enter request name:", "New Request");
   if (!reqName) return;
 
+  const ownerCollection =
+    collections.find((col) => col.id === activeCollection.id) ||
+    activeCollection;
+  const ownerSelection = selectionRevision;
   const newReq = {
-    id: "req_" + Date.now(),
+    id: crypto.randomUUID(),
     name: reqName,
     method: "GET",
     url: "https://httpbin.org/get",
@@ -389,39 +493,59 @@ async function createNewRequest() {
   };
 
   try {
-    const res = await fetch(
-      `/api/collections/${activeCollection.id}/requests`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ request: newReq }),
+    const res = await fetch(`/api/collections/${ownerCollection.id}/requests`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "If-Match": `"${ownerCollection.revision}"`,
       },
-    );
+      body: JSON.stringify({ request: newReq }),
+    });
     const data = await res.json();
-    if (data.ok) {
-      await loadCollections();
-      selectRequest(newReq, activeCollection);
-    }
+    if (!res.ok || !data.ok)
+      throw new Error(data.error?.message || data.error || "Create failed");
+    adoptCollectionCommit(data.collection, ownerCollection.revision);
+    if (selectionRevision === ownerSelection)
+      selectRequest(newReq, data.collection);
+    else renderCollectionsTree();
   } catch (e) {
     alert("Failed to create request: " + e.message);
   }
 }
 
 async function deleteRequest(reqId, colId) {
-  if (!confirm("Are you sure you want to delete this request?")) return;
+  if (!confirm("Delete this request and discard its unsaved draft?")) return;
   try {
+    await collectionSaves.get(colId)?.catch(() => {});
+    const base = collections.find((col) => col.id === colId)?.revision;
     const res = await fetch(`/api/collections/${colId}/requests/${reqId}`, {
       method: "DELETE",
+      headers: base ? { "If-Match": `"${base}"` } : {},
     });
     const data = await res.json();
-    if (data.ok) {
-      if (activeRequest?.id === reqId) {
-        activeRequest = null;
-      }
-      await loadCollections();
+    if (!res.ok || !data.ok)
+      throw new Error(data.error?.message || data.error || "Delete failed");
+    requestDrafts.delete(draftKey(colId, reqId));
+    adoptCollectionCommit(data.collection, base);
+    if (activeCollection?.id === colId && activeRequest?.id === reqId) {
+      activeRequest = null;
+      activeDraft = null;
+      selectionRevision++;
+      requestAbortController?.abort();
+      requestAbortController = null;
+      currentResponseData = null;
+      document.getElementById("req-url").value = "";
+      document.getElementById("request-name").textContent =
+        "No request selected";
+      document.getElementById("save-status").textContent = "Request deleted";
+      document.getElementById("res-body").textContent = "Select a request.";
+      document.getElementById("btn-send-main").disabled = false;
+      document.getElementById("cancel-request").style.display = "none";
+      refreshDirtyState();
     }
-  } catch (e) {
-    alert("Failed to delete request: " + e.message);
+    await loadCollections();
+  } catch (error) {
+    alert("Failed to delete request: " + error.message);
   }
 }
 
@@ -708,7 +832,10 @@ async function sendActiveRequest() {
     return;
   const sendButton = document.getElementById("btn-send-main");
   sendButton.disabled = true;
-  requestAbortController = new AbortController();
+  const ownerSelection = selectionRevision;
+  const environmentId = activeEnvironmentId;
+  const controller = new AbortController();
+  requestAbortController = controller;
   document.getElementById("cancel-request").style.display = "inline-flex";
   sendButton.setAttribute("aria-busy", "true");
   syncCurrentFieldsToActiveRequest();
@@ -726,17 +853,32 @@ async function sendActiveRequest() {
       request: activeRequest,
       collectionId: activeCollection?.id,
       collectionVariables: activeCollection?.variables || [],
-      environmentId: activeEnvironmentId || undefined,
+      environmentId: environmentId || undefined,
     };
 
+    await environmentSaves.get(environmentId)?.promise;
+    if (ownerSelection !== selectionRevision || controller.signal.aborted)
+      return;
+    if (dirtyEnvironments.has(environmentId))
+      throw new Error(
+        "Environment changes are unsaved. Resolve the save error before sending.",
+      );
+    payload.environmentRevision = environments.find(
+      (env) => env.id === environmentId,
+    )?.revision;
     const res = await fetch("/api/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-      signal: requestAbortController.signal,
+      signal: controller.signal,
     });
 
     const data = await res.json();
+    if (
+      ownerSelection !== selectionRevision ||
+      requestAbortController !== controller
+    )
+      return;
     if (!res.ok)
       throw new Error(
         data.error?.message || data.error || `Request failed (${res.status})`,
@@ -781,6 +923,7 @@ async function sendActiveRequest() {
         easing: "easeOutExpo",
         duration: 220,
         update: function () {
+          if (ownerSelection !== selectionRevision) return;
           document.getElementById("res-time").textContent =
             `${Math.round(metricObj.time)} ms`;
           document.getElementById("res-size").textContent =
@@ -850,21 +993,41 @@ async function sendActiveRequest() {
       logsHtml ||
       '<div style="color: var(--text-muted); padding: 12px;">No console logs emitted. Use console.log() in your scripts.</div>';
 
+    if (
+      data.persistence?.environment &&
+      data.persistence.environment.status !== "saved"
+    ) {
+      document
+        .getElementById("res-logs")
+        .appendChild(
+          document.createTextNode(
+            `Environment changes were not saved: ${data.persistence.environment.message}`,
+          ),
+        );
+    }
+
     // Reload environments if mutated by scripts
     if (data.updatedVariables && activeEnvironmentId) {
       loadEnvironments();
     }
   } catch (err) {
+    if (
+      ownerSelection !== selectionRevision ||
+      requestAbortController !== controller
+    )
+      return;
     statusEl.textContent =
       err.name === "AbortError" ? "Cancelled" : "Request failed";
     statusEl.style.color = "#ef4444";
     statusEl.style.background = "rgba(239, 68, 68, 0.15)";
     document.getElementById("res-body").textContent = String(err);
   } finally {
-    sendButton.disabled = false;
-    requestAbortController = null;
-    document.getElementById("cancel-request").style.display = "none";
-    sendButton.removeAttribute("aria-busy");
+    if (requestAbortController === controller) {
+      sendButton.disabled = false;
+      requestAbortController = null;
+      document.getElementById("cancel-request").style.display = "none";
+      sendButton.removeAttribute("aria-busy");
+    }
   }
 }
 
@@ -979,6 +1142,7 @@ function openEnvironmentManager() {
       `;
 
   document.getElementById("modal-footer").innerHTML = `
+        <span id="env-save-status" role="status" aria-live="polite"></span>
         <button class="nav-btn" onclick="closeModal()">Done</button>
       `;
 
@@ -1055,12 +1219,48 @@ async function createNewEnvironment() {
 }
 
 async function saveEnvironmentDirect(env) {
-  await fetch("/api/environments", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(env),
+  dirtyEnvironments.add(env.id);
+  const running = environmentSaves.get(env.id);
+  if (running) {
+    running.pending = true;
+    return running.promise;
+  }
+  const job = { pending: true, promise: null };
+  const status = (text) => {
+    const label = document.getElementById("env-save-status");
+    if (label) label.textContent = text;
+  };
+  job.promise = Promise.resolve().then(async () => {
+    try {
+      while (job.pending) {
+        job.pending = false;
+        const snapshot = structuredClone(env);
+        status("Saving environment…");
+        const res = await fetch(`/api/environments/${env.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(env.revision ? { "If-Match": `"${env.revision}"` } : {}),
+          },
+          body: JSON.stringify(snapshot),
+        });
+        const data = await res.json();
+        if (!res.ok)
+          throw new Error(data.error?.message || data.error || "Save failed");
+        env.revision = data.revision;
+      }
+      dirtyEnvironments.delete(env.id);
+      renderEnvironmentSelector();
+      status("Environment saved");
+    } catch (error) {
+      status("Environment save failed · changes retained");
+      alert(`Failed to save ${env.name}: ${error.message}`);
+    } finally {
+      environmentSaves.delete(env.id);
+    }
   });
-  loadEnvironments();
+  environmentSaves.set(env.id, job);
+  return job.promise;
 }
 
 function addEnvVarRow(envId) {
@@ -1094,11 +1294,25 @@ function removeEnvVar(envId, idx) {
 }
 
 async function deleteEnvironment(envId) {
-  if (!confirm("Are you sure you want to delete this environment?")) return;
-  await fetch(`/api/environments/${envId}`, { method: "DELETE" });
-  if (activeEnvironmentId === envId) activeEnvironmentId = "";
-  await loadEnvironments();
-  openEnvironmentManager();
+  if (!confirm("Delete this environment and discard its unsaved changes?"))
+    return;
+  try {
+    await environmentSaves.get(envId)?.promise;
+    const env = environments.find((env) => env.id === envId);
+    const res = await fetch(`/api/environments/${envId}`, {
+      method: "DELETE",
+      headers: env?.revision ? { "If-Match": `"${env.revision}"` } : {},
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok)
+      throw new Error(data.error?.message || data.error || "Delete failed");
+    dirtyEnvironments.delete(envId);
+    if (activeEnvironmentId === envId) activeEnvironmentId = "";
+    await loadEnvironments();
+    openEnvironmentManager();
+  } catch (error) {
+    alert("Failed to delete environment: " + error.message);
+  }
 }
 
 function openEnvironmentQuickLook() {
@@ -1348,8 +1562,17 @@ function switchView(view) {
 
 async function pollSnifferTraffic() {
   try {
-    const res = await fetch("/api/sniff/traffic");
+    const [res, statusResponse] = await Promise.all([
+      fetch("/api/sniff/traffic"),
+      fetch("/api/sniff/status"),
+    ]);
+    if (!res.ok || !statusResponse.ok)
+      throw new Error("Capture is unavailable");
     let items = await res.json();
+    const { capture } = await statusResponse.json();
+    const mib = (value) => (value / 1024 / 1024).toFixed(1);
+    document.getElementById("capture-budget").textContent =
+      `Limits: ${mib(capture.limits.maxRequestBytes)} MiB upload · ${mib(capture.limits.maxResponseBytes)} MiB decoded response · ${capture.limits.timeoutMs / 1000}s total · ${capture.limits.maxConcurrentRequests} active. History ${mib(capture.retainedBytes)} / ${mib(capture.limits.maxHistoryBytes)} MiB; ${capture.omittedRecords} observations omitted.`;
     const select = document.getElementById("sniff-origin"),
       selected = select.value;
     const origins = [

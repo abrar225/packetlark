@@ -1,4 +1,6 @@
 import http from "node:http";
+import { createHash } from "node:crypto";
+import { validWorkspaceResource } from "../core/models/WorkspaceValidation.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -106,44 +108,134 @@ export class StudioServer {
     }
   }
 
-  private loadInitialCollections() {
-    // 1. Load multi-file collections from .rea-api/collections/*.json
-    try {
-      const files = fs.readdirSync(this.collectionsDir);
-      for (const file of files) {
-        if (file.endsWith(".json")) {
-          try {
-            const raw = fs.readFileSync(
-              path.join(this.collectionsDir, file),
-              "utf8",
-            );
-            const col = JSON.parse(raw);
-            if (col && col.id) {
-              this.collections.set(col.id, col);
-            }
-          } catch {}
-        }
-      }
-    } catch {}
+  private workspaceError(file: string) {
+    return Object.assign(
+      new Error(
+        `Invalid workspace resource: ${path.basename(file)}. Repair or restore this file before continuing.`,
+      ),
+      { statusCode: 503, code: "ERR_WORKSPACE_INVALID" },
+    );
+  }
 
-    // 2. Fallback to monolithic collections.json for backwards compatibility
-    if (this.collections.size === 0) {
-      const collFile = path.join(this.storageDir, "collections.json");
-      if (fs.existsSync(collFile)) {
-        try {
-          const data = JSON.parse(fs.readFileSync(collFile, "utf8"));
-          if (Array.isArray(data)) {
-            for (const c of data) {
-              this.collections.set(c.id, c);
-              this.persistCollection(c.id);
-            }
-          }
-        } catch {}
-      }
+  private readWorkspaceJson(file: string, includeRevision = false) {
+    try {
+      const stat = fs.lstatSync(file);
+      if (!stat.isFile() || stat.size > 2 * 1024 * 1024) throw new Error();
+      const raw = fs.readFileSync(file, "utf8");
+      const value = JSON.parse(raw);
+      if (includeRevision && value && typeof value === "object")
+        value.revision = this.revision(raw);
+      return value;
+    } catch {
+      throw this.workspaceError(file);
     }
+  }
+
+  private validateResource(
+    value: any,
+    kind: "collections" | "environments",
+    file: string,
+    statusCode = 503,
+  ) {
+    if (!validWorkspaceResource(value, kind)) {
+      if (statusCode === 503) throw this.workspaceError(file);
+      throw Object.assign(
+        new Error(
+          `Invalid ${kind} data. Check IDs, request structure, variables and value types.`,
+        ),
+        { statusCode, code: "ERR_RESOURCE_INVALID" },
+      );
+    }
+  }
+
+  private readResourceDirectory<T>(
+    directory: string,
+    kind: "collections" | "environments",
+  ): Map<string, T> {
+    const resources = new Map<string, T>();
+    for (const file of fs
+      .readdirSync(directory)
+      .filter((file) => file.endsWith(".json"))) {
+      const fullPath = path.join(directory, file);
+      const resource = this.readWorkspaceJson(fullPath, true);
+      this.validateResource(resource, kind, fullPath);
+      if (file !== resource.id + ".json" || resources.has(resource.id))
+        throw this.workspaceError(fullPath);
+      resources.set(resource.id, resource);
+    }
+    return resources;
+  }
+
+  private migrateLegacy(
+    kind: "collections" | "environments",
+    canonicalCount: number,
+  ) {
+    const directory =
+      kind === "collections" ? this.collectionsDir : this.environmentsDir;
+    const journal = path.join(directory, ".migration");
+    const legacy = path.join(this.storageDir, kind + ".json");
+    if (
+      !fs.existsSync(journal) &&
+      (canonicalCount > 0 || !fs.existsSync(legacy))
+    )
+      return;
+    const source = fs.existsSync(journal) ? journal : legacy;
+    const resources = this.readWorkspaceJson(source);
+    if (!Array.isArray(resources)) throw this.workspaceError(source);
+    const ids = new Set();
+    for (const value of resources) {
+      this.validateResource(value, kind, source);
+      if (ids.has(value.id)) throw this.workspaceError(source);
+      ids.add(value.id);
+    }
+    const records = resources.map((value) => ({
+      value,
+      data: this.serializeResource(value),
+    }));
+    // Preflight every canonical record before journaling or replacing any file.
+    if (!fs.existsSync(journal))
+      this.atomicWrite(journal, JSON.stringify(resources));
+    for (const { value, data } of records) {
+      const file = this.resourceFile(kind, value.id);
+      if (fs.existsSync(file)) {
+        if (
+          JSON.stringify(this.readWorkspaceJson(file)) !==
+          JSON.stringify(JSON.parse(data))
+        )
+          throw this.workspaceError(file);
+      } else this.atomicWrite(file, data);
+    }
+  }
+
+  private finishInitialization(directory: string) {
+    this.atomicWrite(path.join(directory, ".initialized"), "1\n");
+    // Marker is the commit point. A leftover journal is ignored once committed.
+    try {
+      fs.unlinkSync(path.join(directory, ".migration"));
+    } catch {}
+  }
+
+  private loadInitialCollections() {
+    const marker = path.join(this.collectionsDir, ".initialized");
+    const initialized = fs.existsSync(marker);
+    this.collections = this.readResourceDirectory<ApiCollection>(
+      this.collectionsDir,
+      "collections",
+    );
+
+    if (initialized) return;
+
+    this.migrateLegacy("collections", this.collections.size);
+    this.collections = this.readResourceDirectory<ApiCollection>(
+      this.collectionsDir,
+      "collections",
+    );
 
     // 3. If empty, create starter sample collection
-    if (this.collections.size === 0) {
+    if (
+      this.collections.size === 0 &&
+      !fs.existsSync(path.join(this.storageDir, "collections.json"))
+    ) {
       const sampleCol: ApiCollection = {
         id: "col_sample_1",
         name: "GitHub Public API Sample",
@@ -222,46 +314,30 @@ pm.test("Has valid repo name", function () {
       this.collections.set(sampleCol.id, sampleCol);
       this.persistCollection(sampleCol.id);
     }
+    this.finishInitialization(this.collectionsDir);
   }
 
   private loadInitialEnvironments() {
-    // 1. Load multi-file environments from .rea-api/environments/*.json
-    try {
-      const files = fs.readdirSync(this.environmentsDir);
-      for (const file of files) {
-        if (file.endsWith(".json")) {
-          try {
-            const raw = fs.readFileSync(
-              path.join(this.environmentsDir, file),
-              "utf8",
-            );
-            const env = JSON.parse(raw);
-            if (env && env.id) {
-              this.environments.set(env.id, env);
-            }
-          } catch {}
-        }
-      }
-    } catch {}
+    const marker = path.join(this.environmentsDir, ".initialized");
+    const initialized = fs.existsSync(marker);
+    this.environments = this.readResourceDirectory<Environment>(
+      this.environmentsDir,
+      "environments",
+    );
 
-    // 2. Fallback to monolithic environments.json
-    if (this.environments.size === 0) {
-      const envFile = path.join(this.storageDir, "environments.json");
-      if (fs.existsSync(envFile)) {
-        try {
-          const data = JSON.parse(fs.readFileSync(envFile, "utf8"));
-          if (Array.isArray(data)) {
-            for (const env of data) {
-              this.environments.set(env.id, env);
-              this.persistEnvironment(env.id);
-            }
-          }
-        } catch {}
-      }
-    }
+    if (initialized) return;
+
+    this.migrateLegacy("environments", this.environments.size);
+    this.environments = this.readResourceDirectory<Environment>(
+      this.environmentsDir,
+      "environments",
+    );
 
     // 3. If empty, create default Development environment
-    if (this.environments.size === 0) {
+    if (
+      this.environments.size === 0 &&
+      !fs.existsSync(path.join(this.storageDir, "environments.json"))
+    ) {
       const devEnv: Environment = {
         id: "env_dev_1",
         name: "Development",
@@ -273,100 +349,133 @@ pm.test("Has valid repo name", function () {
       this.environments.set(devEnv.id, devEnv);
       this.persistEnvironment(devEnv.id);
     }
+    this.finishInitialization(this.environmentsDir);
   }
 
   private atomicWrite(file: string, data: string) {
     const temporary = file + "." + crypto.randomUUID() + ".tmp";
     try {
-      fs.writeFileSync(temporary, data, { encoding: "utf8", mode: 0o600 });
+      const descriptor = fs.openSync(temporary, "wx", 0o600);
+      try {
+        fs.writeFileSync(descriptor, data, "utf8");
+        fs.fsyncSync(descriptor);
+      } finally {
+        fs.closeSync(descriptor);
+      }
       fs.renameSync(temporary, file);
     } finally {
       if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
     }
   }
 
-  public persistCollection(id: string) {
-    const col = this.collections.get(id);
-    if (!col) return;
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      this.atomicWrite(
-        path.join(this.collectionsDir, `${safeId}.json`),
-        JSON.stringify(col, null, 2),
+  private revision(data: string) {
+    return createHash("sha256").update(data).digest("hex");
+  }
+
+  private resourceFile(kind: "collections" | "environments", id: string) {
+    if (typeof id !== "string" || !/^[a-zA-Z0-9_-]+$/.test(id))
+      throw Object.assign(
+        new Error(
+          "Resource ID must contain only letters, numbers, underscores or hyphens",
+        ),
+        { statusCode: 400, code: "ERR_RESOURCE_ID" },
       );
-      // Backwards compatibility mirror
-      const collFile = path.join(this.storageDir, "collections.json");
-      fs.writeFileSync(
-        collFile,
-        JSON.stringify(Array.from(this.collections.values()), null, 2),
-        "utf8",
+    return path.join(
+      kind === "collections" ? this.collectionsDir : this.environmentsDir,
+      id + ".json",
+    );
+  }
+
+  private checkRevision(file: string, expected?: string | null) {
+    if (expected === undefined) return; // Initial migration/creation has no prior revision.
+    const exists = fs.existsSync(file);
+    if (
+      (expected === null && exists) ||
+      (expected !== null &&
+        (!exists || this.revision(fs.readFileSync(file, "utf8")) !== expected))
+    )
+      throw Object.assign(
+        new Error(
+          "Workspace changed. Reload and review your draft before saving again.",
+        ),
+        {
+          statusCode: expected === null ? 409 : 412,
+          code: "ERR_WORKSPACE_CONFLICT",
+        },
       );
-    } catch (e) {
-      console.error("Failed to persist collection:", e);
-      throw e;
-    }
+  }
+
+  private serializeResource(value: ApiCollection | Environment) {
+    const canonical = { ...value };
+    delete canonical.revision;
+    let data = JSON.stringify(canonical, null, 2);
+    // Formatting must not turn valid compact input into an unreadable resource.
+    if (Buffer.byteLength(data) > 2 * 1024 * 1024)
+      data = JSON.stringify(canonical);
+    if (Buffer.byteLength(data) > 2 * 1024 * 1024)
+      throw Object.assign(new Error("Resource exceeds 2 MiB"), {
+        statusCode: 413,
+      });
+    return data;
+  }
+
+  private commitResource(
+    kind: "collections" | "environments",
+    value: ApiCollection | Environment,
+    expected?: string | null,
+  ) {
+    const file = this.resourceFile(kind, value.id);
+    this.validateResource(value, kind, file, 400);
+    const data = this.serializeResource(value);
+    this.checkRevision(file, expected);
+    this.atomicWrite(file, data);
+    value.revision = this.revision(data);
+  }
+
+  public persistCollection(
+    id: string,
+    next?: ApiCollection,
+    expected: string | null = this.collections.get(id)?.revision,
+  ) {
+    const value = next || this.collections.get(id);
+    if (!value) return;
+    this.commitResource("collections", value, expected);
+    this.collections.set(id, value);
   }
 
   public persistCollections() {
-    for (const id of this.collections.keys()) {
-      this.persistCollection(id);
-    }
+    for (const id of this.collections.keys()) this.persistCollection(id);
   }
 
-  public deleteCollection(id: string) {
+  public deleteCollection(
+    id: string,
+    expected = this.collections.get(id)?.revision,
+  ) {
+    const file = this.resourceFile("collections", id);
+    this.checkRevision(file, expected);
+    if (fs.existsSync(file)) fs.unlinkSync(file);
     this.collections.delete(id);
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const colFile = path.join(this.collectionsDir, `${safeId}.json`);
-      if (fs.existsSync(colFile)) fs.unlinkSync(colFile);
-      const allFile = path.join(this.storageDir, "collections.json");
-      fs.writeFileSync(
-        allFile,
-        JSON.stringify(Array.from(this.collections.values()), null, 2),
-        "utf8",
-      );
-    } catch (e) {
-      console.error("Failed to delete collection file:", e);
-    }
   }
 
-  public persistEnvironment(id: string) {
-    const env = this.environments.get(id);
-    if (!env) return;
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      this.atomicWrite(
-        path.join(this.environmentsDir, `${safeId}.json`),
-        JSON.stringify(env, null, 2),
-      );
-      // Backwards compatibility mirror
-      const envFile = path.join(this.storageDir, "environments.json");
-      fs.writeFileSync(
-        envFile,
-        JSON.stringify(Array.from(this.environments.values()), null, 2),
-        "utf8",
-      );
-    } catch (e) {
-      console.error("Failed to persist environment:", e);
-      throw e;
-    }
+  public persistEnvironment(
+    id: string,
+    next?: Environment,
+    expected: string | null = this.environments.get(id)?.revision,
+  ) {
+    const value = next || this.environments.get(id);
+    if (!value) return;
+    this.commitResource("environments", value, expected);
+    this.environments.set(id, value);
   }
 
-  public deleteEnvironment(id: string) {
+  public deleteEnvironment(
+    id: string,
+    expected = this.environments.get(id)?.revision,
+  ) {
+    const file = this.resourceFile("environments", id);
+    this.checkRevision(file, expected);
+    if (fs.existsSync(file)) fs.unlinkSync(file);
     this.environments.delete(id);
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const envFile = path.join(this.environmentsDir, `${safeId}.json`);
-      if (fs.existsSync(envFile)) fs.unlinkSync(envFile);
-      const allFile = path.join(this.storageDir, "environments.json");
-      fs.writeFileSync(
-        allFile,
-        JSON.stringify(Array.from(this.environments.values()), null, 2),
-        "utf8",
-      );
-    } catch (e) {
-      console.error("Failed to delete environment file:", e);
-    }
   }
 
   public async start(): Promise<number> {
@@ -467,6 +576,10 @@ pm.test("Has valid repo name", function () {
     pathname: string,
     urlObj: URL,
   ) {
+    const clientRevision =
+      typeof req.headers["if-match"] === "string"
+        ? req.headers["if-match"].replace(/^"|"$/g, "")
+        : undefined;
     const sendJson = (data: any, statusCode = 200) => {
       res.writeHead(statusCode, { "Content-Type": "application/json" });
       res.end(JSON.stringify(data));
@@ -519,11 +632,31 @@ pm.test("Has valid repo name", function () {
       let collectionVars = body.collectionVariables || [];
       const envId = body.environmentId;
       let envVars = body.environmentVariables || [];
+      const environmentSnapshot =
+        envId && this.environments.has(envId)
+          ? structuredClone(this.environments.get(envId))
+          : undefined;
 
       if (!httpRequest || !httpRequest.url) {
         sendJson({ error: "Invalid request: url is required" }, 400);
         return;
       }
+
+      if (
+        body.environmentRevision &&
+        environmentSnapshot?.revision !== body.environmentRevision
+      )
+        throw Object.assign(
+          new Error(
+            "Environment changed before execution. Reload and review it before sending.",
+          ),
+          { statusCode: 412, code: "ERR_WORKSPACE_CONFLICT" },
+        );
+      if (environmentSnapshot)
+        this.checkRevision(
+          this.resourceFile("environments", envId),
+          environmentSnapshot.revision,
+        );
 
       if (envId && this.environments.has(envId)) {
         const env = this.environments.get(envId)!;
@@ -535,6 +668,11 @@ pm.test("Has valid repo name", function () {
         }
       }
 
+      const initialEnvironment = Object.fromEntries(
+        envVars
+          .filter((value) => value.enabled !== false)
+          .map((value) => [value.key, String(value.value)]),
+      );
       if (body.collectionId) {
         const collection = this.collections.get(body.collectionId);
         if (!collection) {
@@ -566,10 +704,18 @@ pm.test("Has valid repo name", function () {
       // Auto-sync script mutations back to active environment file on disk
       if (
         envId &&
-        this.environments.has(envId) &&
-        response.updatedEnvironment
+        environmentSnapshot &&
+        response.updatedEnvironment &&
+        [
+          ...new Set([
+            ...Object.keys(initialEnvironment),
+            ...Object.keys(response.updatedEnvironment),
+          ]),
+        ].some(
+          (key) => initialEnvironment[key] !== response.updatedEnvironment[key],
+        )
       ) {
-        const env = this.environments.get(envId)!;
+        const env = structuredClone(environmentSnapshot);
         const original = new Map(env.values.map((value) => [value.key, value]));
         env.values = [
           ...env.values.filter(
@@ -586,7 +732,24 @@ pm.test("Has valid repo name", function () {
             }),
           ),
         ];
-        this.persistEnvironment(env.id);
+        try {
+          this.persistEnvironment(env.id, env, environmentSnapshot.revision);
+          response.persistence = {
+            environment: { status: "saved", revision: env.revision },
+          };
+        } catch (error: any) {
+          response.persistence = {
+            environment: {
+              status:
+                error.code === "ERR_WORKSPACE_CONFLICT" ? "conflict" : "failed",
+              code: error.code || "ERR_ENVIRONMENT_SAVE",
+              message:
+                error.code === "ERR_WORKSPACE_CONFLICT"
+                  ? error.message
+                  : "Request completed, but environment changes could not be saved. Review them before retrying.",
+            },
+          };
+        }
       }
 
       sendJson(response);
@@ -688,8 +851,7 @@ pm.test("Has valid repo name", function () {
         if (!newEnv.name) newEnv.name = "New Environment";
         if (!Array.isArray(newEnv.values)) newEnv.values = [];
 
-        this.environments.set(newEnv.id, newEnv);
-        this.persistEnvironment(newEnv.id);
+        this.persistEnvironment(newEnv.id, newEnv, null);
         sendJson(newEnv);
         return;
       }
@@ -719,8 +881,11 @@ pm.test("Has valid repo name", function () {
           ...body,
           id: envId,
         };
-        this.environments.set(envId, updatedEnv);
-        this.persistEnvironment(envId);
+        this.persistEnvironment(
+          envId,
+          updatedEnv,
+          clientRevision || existing.revision,
+        );
         sendJson(updatedEnv);
         return;
       }
@@ -728,14 +893,17 @@ pm.test("Has valid repo name", function () {
         req.method === "DELETE" &&
         pathname === `/api/environments/${envId}`
       ) {
-        this.deleteEnvironment(envId);
+        this.deleteEnvironment(
+          envId,
+          clientRevision || this.environments.get(envId)?.revision,
+        );
         sendJson({ ok: true, deleted: envId });
         return;
       }
       if (req.method === "POST" && pathname.endsWith("/sync")) {
         const { variables } = await readBody();
         if (variables && this.environments.has(envId)) {
-          const env = this.environments.get(envId)!;
+          const env = structuredClone(this.environments.get(envId)!);
           for (const [k, v] of Object.entries(
             variables as Record<string, string>,
           )) {
@@ -743,7 +911,7 @@ pm.test("Has valid repo name", function () {
             if (existing) existing.value = v;
             else env.values.push({ key: k, value: v, enabled: true });
           }
-          this.persistEnvironment(envId);
+          this.persistEnvironment(envId, env, clientRevision || env.revision);
           sendJson(env);
           return;
         }
@@ -764,8 +932,7 @@ pm.test("Has valid repo name", function () {
         if (!Array.isArray(newCol.items)) newCol.items = [];
         if (!Array.isArray(newCol.variables)) newCol.variables = [];
 
-        this.collections.set(newCol.id, newCol);
-        this.persistCollection(newCol.id);
+        this.persistCollection(newCol.id, newCol, null);
         sendJson(newCol);
         return;
       }
@@ -796,8 +963,11 @@ pm.test("Has valid repo name", function () {
           ...body,
           id: colId,
         };
-        this.collections.set(colId, updatedCol);
-        this.persistCollection(colId);
+        this.persistCollection(
+          colId,
+          updatedCol,
+          clientRevision || collection.revision,
+        );
         sendJson(updatedCol);
         return;
       }
@@ -816,7 +986,10 @@ pm.test("Has valid repo name", function () {
       }
 
       if (req.method === "DELETE" && pathname === `/api/collections/${colId}`) {
-        this.deleteCollection(colId);
+        this.deleteCollection(
+          colId,
+          clientRevision || this.collections.get(colId)?.revision,
+        );
         sendJson({ ok: true, deleted: colId });
         return;
       }
@@ -834,17 +1007,22 @@ pm.test("Has valid repo name", function () {
         const reqToSave: HttpRequest = body.request || body;
         if (!reqToSave.id) reqToSave.id = crypto.randomUUID();
 
-        const updated = findAndUpdateRequest(collection.items, reqToSave);
+        const next = structuredClone(collection);
+        const updated = findAndUpdateRequest(next.items, reqToSave);
         if (!updated) {
-          collection.items.push({
+          next.items.push({
             id: reqToSave.id,
             name: reqToSave.name || "New Request",
             isFolder: false,
             request: reqToSave,
           });
         }
-        this.persistCollection(colId);
-        sendJson({ ok: true, request: reqToSave, collection });
+        this.persistCollection(
+          colId,
+          next,
+          clientRevision || collection.revision,
+        );
+        sendJson({ ok: true, request: reqToSave, collection: next });
         return;
       }
 
@@ -855,9 +1033,14 @@ pm.test("Has valid repo name", function () {
       if (delReqMatch && req.method === "DELETE") {
         const reqId = delReqMatch[2];
         if (collection) {
-          findAndDeleteRequest(collection.items, reqId);
-          this.persistCollection(colId);
-          sendJson({ ok: true, deleted: reqId });
+          const next = structuredClone(collection);
+          findAndDeleteRequest(next.items, reqId);
+          this.persistCollection(
+            colId,
+            next,
+            clientRevision || collection.revision,
+          );
+          sendJson({ ok: true, deleted: reqId, collection: next });
           return;
         }
       }
@@ -872,8 +1055,7 @@ pm.test("Has valid repo name", function () {
       } catch (error) {
         throw Object.assign(error, { statusCode: 400 });
       }
-      this.collections.set(collection.id, collection);
-      this.persistCollection(collection.id);
+      this.persistCollection(collection.id, collection, null);
       sendJson(collection);
       return;
     }
@@ -896,7 +1078,8 @@ pm.test("Has valid repo name", function () {
       sendJson({
         active: this.sniffer.isRunning(),
         port: this.sniffer.getPort(),
-        capturedCount: this.sniffer.getCapturedItems().length,
+        capturedCount: this.sniffer.getCaptureStats().retainedRecords,
+        capture: this.sniffer.getCaptureStats(),
       });
       return;
     }

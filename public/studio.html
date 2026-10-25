@@ -160,6 +160,8 @@
               >
             </button>
 
+            <span id="save-status" role="status" aria-live="polite"></span>
+
             <button
               class="nav-btn"
               title="Generate code snippet"
@@ -441,6 +443,18 @@
 
               <!-- Scripts Tab -->
               <div id="tab-scripts" style="display: none">
+                <p
+                  style="
+                    font-size: 12px;
+                    color: var(--text-muted);
+                    margin-bottom: 12px;
+                  "
+                >
+                  Send saves environment script changes when its revision still
+                  matches. Collection, global and local changes remain in the
+                  response. Runs keep scope changes within the run. Variable
+                  writes and iteration data currently use strings.
+                </p>
                 <div style="margin-bottom: 16px">
                   <div
                     style="
@@ -740,6 +754,21 @@
           </div>
         </div>
 
+        <p
+          id="capture-budget"
+          style="font-size: 12px; color: var(--text-muted); padding: 12px"
+          role="status"
+        ></p>
+        <p
+          style="
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 0 12px 12px;
+          "
+        >
+          Inspection copies redact common credential fields and omit
+          unstructured bodies. Review generated drafts before sharing.
+        </p>
         <table class="traffic-table">
           <thead>
             <tr>
