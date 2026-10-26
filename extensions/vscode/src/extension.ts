@@ -5,7 +5,7 @@ import path from "node:path";
 let child: ChildProcess | undefined;
 let panel: vscode.WebviewPanel | undefined;
 export function activate(context: vscode.ExtensionContext) {
-  const output = vscode.window.createOutputChannel("Rea API Studio");
+  const output = vscode.window.createOutputChannel("PacketLark");
   context.subscriptions.push(output);
   const stop = () => {
     child?.kill();
@@ -14,11 +14,11 @@ export function activate(context: vscode.ExtensionContext) {
     panel = undefined;
   };
   context.subscriptions.push(
-    vscode.commands.registerCommand("rea.stopStudio", stop),
+    vscode.commands.registerCommand("packetlark.stopStudio", stop),
     { dispose: stop },
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("rea.openStudio", async () => {
+    vscode.commands.registerCommand("packetlark.openStudio", async () => {
       if (!vscode.workspace.isTrusted) {
         vscode.window.showErrorMessage(
           "Trust this workspace before running API collections and their scripts.",
@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
       if (child) {
-        vscode.window.showInformationMessage("Rea is starting.");
+        vscode.window.showInformationMessage("PacketLark is starting.");
         return;
       }
       const root = vscode.workspace.workspaceFolders?.[0]?.uri;
@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
         );
         return;
       }
-      const config = vscode.workspace.getConfiguration("rea");
+      const config = vscode.workspace.getConfiguration("packetlark");
       // Machine values only: a repository cannot override the executable location.
       const machine = (key: string, fallback: string) =>
         config.inspect<string>(key)?.globalValue ?? fallback;
@@ -51,14 +51,14 @@ export function activate(context: vscode.ExtensionContext) {
         !existsSync(path.join(runtime, "dist/cli.js"))
       ) {
         vscode.window.showErrorMessage(
-          "Set Rea: Runtime Path to a built Rea checkout in User Settings.",
+          "Set PacketLark: Runtime Path to a built PacketLark checkout in User Settings.",
         );
         return;
       }
       child = spawn(
         node,
         [
-          path.join(runtime, "bin/rea-api.js"),
+          path.join(runtime, "bin/packetlark.js"),
           "studio",
           "--port",
           "0",
@@ -83,7 +83,7 @@ export function activate(context: vscode.ExtensionContext) {
         clearTimeout(timer);
         output.appendLine(error.message);
         vscode.window.showErrorMessage(
-          "Rea failed to start. See Rea API Studio output.",
+          "PacketLark failed to start. See PacketLark output.",
         );
         stop();
       });
@@ -99,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
         output.append(data.toString());
         pending = (pending + data.toString()).slice(-8192);
         const match = pending.match(
-          /Rea API Studio: http:\/\/127\.0\.0\.1:(\d+)\/studio/,
+          /PacketLark: http:\/\/127\.0\.0\.1:(\d+)\/studio/,
         );
         if (!match || ready) return;
         ready = true;
@@ -110,11 +110,11 @@ export function activate(context: vscode.ExtensionContext) {
           const health = (await fetch(origin + "/api/health", {
             signal: AbortSignal.timeout(5000),
           }).then((r) => r.json())) as { product?: string };
-          if (health.product !== "rea-api-studio")
+          if (health.product !== "packetlark")
             throw new Error("Unexpected local service");
           panel = vscode.window.createWebviewPanel(
-            "rea.studio",
-            "Rea API Studio",
+            "packetlark.studio",
+            "PacketLark",
             vscode.ViewColumn.One,
             {
               enableScripts: true,
@@ -123,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
               localResourceRoots: [],
             },
           );
-          panel.webview.html = `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${origin}; style-src 'unsafe-inline';"><style>html,body,iframe{margin:0;width:100%;height:100%;border:0;overflow:hidden}</style></head><body><iframe title="Rea API Studio" src="${origin}/studio"></iframe></body></html>`;
+          panel.webview.html = `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${origin}; style-src 'unsafe-inline';"><style>html,body,iframe{margin:0;width:100%;height:100%;border:0;overflow:hidden}</style></head><body><iframe title="PacketLark" src="${origin}/studio"></iframe></body></html>`;
           panel.onDidDispose(() => {
             panel = undefined;
           });

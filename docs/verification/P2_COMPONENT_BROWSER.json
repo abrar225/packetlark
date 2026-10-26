@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-10-26T18:15:25.471Z",
+  "verdict": "PASS",
+  "cases": [
+    "sensitive auth, plaintext disclosure, explicit session storage and reference replacement",
+    "inherited authorization preserved",
+    "service failure retains credential input",
+    "migration reviews paths without values, requires current selections, session acknowledgement and explicit confirmation, then prompts reload",
+    "stale auth dialog cannot migrate a different draft",
+    "native chosen file uploads Blob and stores only binary selection ID",
+    "TLS private keys require credential references",
+    "split streaming events and artifact downloads",
+    "OAuth starts with endpoint and origin metadata and explicit provider navigation",
+    "cookie persistence requires explicit keychain consent",
+    "saved cookie removal requires confirmation and retains session cookies",
+    "invalid JSON schema retains input and cannot change request"
+  ],
+  "changes": 3
+}

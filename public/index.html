@@ -11,14 +11,19 @@
     <meta name="color-scheme" content="dark light" />
     <meta
       property="og:title"
-      content="Rea API Studio — Make sense of every request."
+      content="PacketLark — Make sense of every request."
     />
     <meta
       property="og:description"
       content="Your APIs. Your machine. A little more clarity."
     />
     <meta property="og:type" content="website" />
-    <title>Rea API Studio — Make sense of every request.</title>
+    <meta property="og:site_name" content="PacketLark" />
+    <meta property="og:url" content="https://abrar225.github.io/packetlark/" />
+    <meta property="og:image" content="https://abrar225.github.io/packetlark/brand/packetlark-social.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://abrar225.github.io/packetlark/" />
+    <title>PacketLark — Make sense of every request.</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/landing.css" />
     <link rel="stylesheet" href="landing.css" />
@@ -27,16 +32,16 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
-      <a class="wordmark" href="#" aria-label="Rea API Studio home"
-        ><img src="brand/rea-symbol.svg" width="40" height="40" alt="" /><span
-          >rea<span class="wordmark-detail"> / api studio</span></span
+      <a class="wordmark" href="#" aria-label="PacketLark home"
+        ><img src="brand/packetlark-symbol.svg" width="40" height="40" alt="" /><span
+          >PacketLark<span class="wordmark-detail"> / api workbench</span></span
         ></a
       >
       <nav aria-label="Main navigation">
         <a href="#workbench">Workbench</a><a href="#capture">Traffic to spec</a
-        ><a href="#principles">Why Rea</a>
+        ><a href="#principles">Why PacketLark</a>
       </nav>
-      <a class="header-github" href="https://github.com/abrar225/rea-api-studio"
+      <a class="header-github" href="https://github.com/abrar225/packetlark"
         ><i data-lucide="github"></i><span>GitHub</span
         ><i data-lucide="arrow-up-right"></i
       ></a>
@@ -114,35 +119,7 @@
                 stroke-opacity=".1"
               />
               <circle cx="280" cy="280" r="250" fill="url(#grid)" />
-              <g class="signal-glyph">
-                <path
-                  d="M144 155h154c76 0 115 40 115 96s-39 96-115 96H203"
-                  stroke="#5e448f"
-                  stroke-width="58"
-                  transform="translate(12 17)"
-                />
-                <path
-                  d="M144 155h154c76 0 115 40 115 96s-39 96-115 96H203"
-                  stroke="url(#ribbon)"
-                  stroke-width="58"
-                />
-                <path
-                  d="M144 411V251h93M295 347l104 96"
-                  stroke="#5e448f"
-                  stroke-width="58"
-                  transform="translate(12 17)"
-                />
-                <path
-                  d="M144 411V251h93M295 347l104 96"
-                  stroke="url(#ribbon)"
-                  stroke-width="58"
-                />
-                <path
-                  d="m402 100 40 40-40 40"
-                  stroke="#f4f1ff"
-                  stroke-width="12"
-                />
-              </g>
+              <g class="signal-glyph"><g transform="translate(50 38) scale(7.4)" fill="#bda9ff"><path d="M8 11 37 25 25 34Z"/><path fill-rule="evenodd" d="M5 40 27 35 42 22C46 18 51 19 54 24L56 27 63 29 55 33C52 44 42 49 29 47L14 54 18 44 5 44ZM30 36 36 30 42 36 36 42ZM49 25a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/></g></g>
               <circle
                 class="packet packet-a"
                 cx="280"
@@ -163,7 +140,7 @@
               <span>200 OK</span>
             </div>
             <div class="art-caption">
-              A little signal. A lot of possibility.
+              A packet of possibility.
             </div>
           </div>
         </div>
@@ -193,7 +170,7 @@
               <div class="window-dots">
                 <span></span><span></span><span></span>
               </div>
-              <span>Rea API Studio</span
+              <span>PacketLark</span
               ><span class="window-local"
                 ><span class="tiny-dot success"></span>Local workspace</span
               >
@@ -337,9 +314,9 @@
           <div class="principles-copy">
             <p class="large-copy">Good tools give you room to think.</p>
             <p>
-              Rea is an independent, open-source side project for developers who
+              PacketLark is an independent, open-source side project for developers who
               want a small, understandable HTTP workspace. It stores its
-              workspace locally and doesn't require a Rea account.
+              workspace locally and doesn't require a PacketLark account.
             </p>
             <p>
               It’s early. It doesn’t replace Postman’s collaboration, protocol
@@ -347,7 +324,7 @@
               you, there’s something useful here.
             </p>
             <a
-              href="https://github.com/abrar225/rea-api-studio"
+              href="https://github.com/abrar225/packetlark"
               class="quiet-link"
               >Explore the source<i data-lucide="arrow-up-right"></i
             ></a>
@@ -370,8 +347,8 @@
               <i data-lucide="copy"></i><span>Copy</span>
             </button>
           </div>
-          <pre><code id="install-code">git clone https://github.com/abrar225/rea-api-studio.git
-cd rea-api-studio
+          <pre><code id="install-code">git clone https://github.com/abrar225/packetlark.git
+cd packetlark
 npm ci
 npm run build
 npm start</code></pre>
@@ -386,13 +363,13 @@ npm start</code></pre>
         <div class="faqs">
           <details>
             <summary>
-              Is Rea a replacement for Postman?<i data-lucide="plus"></i>
+              Is PacketLark a replacement for Postman?<i data-lucide="plus"></i>
             </summary>
             <p>
               For basic local HTTP requests, collections, and scripts, it may
               fit. For OAuth flows, gRPC, WebSockets, team collaboration,
               monitors, mock servers, or mature CI workflows, use a tool with
-              those capabilities. Rea’s most interesting workflow is capturing
+              those capabilities. PacketLark’s most interesting workflow is capturing
               HTTP traffic and inferring a spec.
             </p>
           </details>
@@ -423,9 +400,9 @@ npm start</code></pre>
           <details>
             <summary>Can I contribute?<i data-lucide="plus"></i></summary>
             <p>
-              Yes. Rea is MIT licensed. Read the source, try it against your own
+              Yes. PacketLark is MIT licensed. Read the source, try it against your own
               API, and share an issue or a pull request on
-              <a href="https://github.com/abrar225/rea-api-studio">GitHub</a>.
+              <a href="https://github.com/abrar225/packetlark">GitHub</a>.
               Reliability, migration compatibility, and everyday usability are
               especially valuable contributions.
             </p>
@@ -435,14 +412,14 @@ npm start</code></pre>
     </main>
     <footer class="site-footer wrap">
       <a class="wordmark" href="#" aria-label="Back to top"
-        ><img src="brand/rea-symbol.svg" alt="" width="36" height="36" /><span
-          >rea</span
+        ><img src="brand/packetlark-symbol.svg" alt="" width="36" height="36" /><span
+          >packetlark</span
         ></a
       ><span>Made for the curious. Built in the open.</span>
       <div>
-        <a href="https://github.com/abrar225/rea-api-studio"
+        <a href="https://github.com/abrar225/packetlark"
           >GitHub<i data-lucide="arrow-up-right"></i></a
-        ><a href="https://github.com/abrar225/rea-api-studio/blob/main/LICENSE"
+        ><a href="https://github.com/abrar225/packetlark/blob/main/LICENSE"
           >MIT license</a
         >
       </div>

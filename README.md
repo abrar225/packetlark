@@ -1,16 +1,20 @@
-# Rea API Studio
+<img src="public/brand/packetlark-symbol.svg" width="64" height="64" alt="PacketLark lark logo" />
 
-A small, local API workbench with HTTP traffic capture and inferred OpenAPI exports. An independent MIT-licensed side project.
+# PacketLark
 
-![Rea API Studio](assets/preview.png)
+A local API development workbench for requests, repeatable tests, and traffic discovery. Independent, open source, and MIT licensed.
+
+[PacketLark website](https://abrar225.github.io/packetlark/) · [Vector logo](public/brand/packetlark-symbol.svg)
+
+![PacketLark](assets/preview.png)
 
 ## Run locally
 
 Requires **Node.js 22+** and npm.
 
 ```sh
-git clone https://github.com/abrar225/rea-api-studio.git
-cd rea-api-studio
+git clone https://github.com/abrar225/packetlark.git
+cd packetlark
 npm ci
 npm run build
 npm start
@@ -18,7 +22,7 @@ npm start
 
 Open **http://localhost:4040/studio** for the workbench or **http://localhost:4040/** for the product site. The services bind to `127.0.0.1`. Set `PORT` and `SNIFFER_PORT` to change the defaults (4040 and 8085). If a port is occupied, the service tries the next one; the interface reports the actual proxy port.
 
-The website published on [GitHub Pages](https://abrar225.github.io/rea-api-studio/) contains a clearly labeled sample preview and installation instructions. **GitHub Pages cannot run the Node API or save local collections.**
+The website published on [GitHub Pages](https://abrar225.github.io/packetlark/) contains a clearly labeled sample preview and installation instructions. **GitHub Pages cannot run the Node API or save local collections.**
 
 ## What works
 
@@ -27,6 +31,7 @@ The website published on [GitHub Pages](https://abrar225.github.io/rea-api-studi
 - Local collections, nested imported folders, environments, and variables.
 - QuickJS-isolated pre-request JavaScript, Chai assertions, inherited scripts, async tests and a supported subset of `pm.*`.
 - Redirect-aware cookie sessions, cancellation, response limits and original binary downloads.
+- Origin-bound credential references, macOS Keychain or explicit session storage, OAuth PKCE/refresh/revoke, selected-file uploads, custom CA/mTLS, and bounded JSON Schema validation. See [P2 scope and platform limits](docs/P2_PROGRESS.md).
 - Collection runner with JSON/CSV data, iterations, request chaining and CLI JSON/JUnit summaries.
 - Stdio MCP tools and a packageable VS Code desktop preview; see [integrations](docs/INTEGRATIONS.md).
 - Postman v2.1 collection import/export and basic cURL import.
@@ -58,11 +63,15 @@ The proxy does **not** implement HTTPS CONNECT interception. `curl -x ... https:
 
 ## Data and trust
 
-Workspace data is stored under `.rea-api/collections/` and `.rea-api/environments/`. Legacy monolithic mirror files remain for compatibility. These files are readable JSON, not encrypted storage, and are ignored by Git by default. If you explicitly version collections, exclude credentials first; files do not make merge conflicts impossible. Existing tracked workspace examples from earlier releases are no longer tracked by this revision; local files are preserved.
+Workspace data is stored under `.packetlark/collections/` and `.packetlark/environments/`. Canonical files are authoritative; legacy monolithic sources are retained for resumable migration and are not live mirrors. These files are readable JSON, not encrypted storage, and are ignored by Git by default. If you explicitly version collections, exclude credentials first; files do not make merge conflicts impossible. Existing tracked workspace examples from earlier releases are no longer tracked by this revision; local files are preserved.
 
-After installation/build, fonts, icons, and scripts are served locally. Calls to remote APIs still need a network connection. There is no implemented Rea telemetry service in this source tree.
+Only one Studio may write a workspace at a time. Normal shutdown releases ownership; a hard exit requires reviewing `packetlark workspace status` and explicitly recovering the exited owner's token. See [workspace ownership and recovery](docs/WORKSPACE_OWNERSHIP.md) for commands, supported scope and maintenance details.
 
-Only run scripts and imported collection scripts whose network behavior you trust. The engine now uses a separate QuickJS interpreter with heap/stack/time limits and a narrow JSON bridge instead of Node object references. Scripts can still make HTTP requests and change services; this is not a formal security certification. The server now rejects foreign browser origins and hosts, but it is not an authenticated multi-user server. Do not expose it publicly. Captured traffic may include credentials; it is held in memory and is not automatically redacted.
+The workbench checks external file changes while preserving unsaved drafts and offers explicit conflict review/recovered copies. Browser Send/Run operations bind their selected context revisions. Current workspace limits are 1,000 resource documents and 32 MiB combined, with 2 MiB per resource. See [reconciliation behavior and limits](docs/WORKSPACE_RECONCILIATION.md); durable unsaved-draft recovery remains unfinished.
+
+After installation/build, fonts, icons, and scripts are served locally. Calls to remote APIs still need a network connection. There is no implemented PacketLark telemetry service in this source tree.
+
+Only run scripts and imported collection scripts whose network behavior you trust. The engine now uses a separate QuickJS interpreter with heap/stack/time limits and a narrow JSON bridge instead of Node object references. Scripts can still make HTTP requests and change services; this is not a formal security certification. The server now rejects foreign browser origins and hosts, but it is not an authenticated multi-user server. Do not expose it publicly. Inspection captures are bounded and sanitized before retention; authorized forwarding preserves the request bytes. Redaction is not encryption or universal secret detection.
 
 ## Current limits
 
@@ -83,7 +92,7 @@ npm run dev          # Build, then restart server when dist changes
 npm run build:web    # Rebundle frontend after changing web/*
 ```
 
-Tests use real loopback HTTP fixtures and temporary workspaces. They do not depend on a public echo service or modify your `.rea-api` directory. Frontend CSS and the existing application logic are separate from `studio.html`; editing `public/app.js` or the hand-authored CSS takes effect on reload. Rebuild after changing bundled modules or server TypeScript.
+Tests use real loopback HTTP fixtures and temporary workspaces. They do not depend on a public echo service or modify your `.packetlark` directory. Frontend CSS and the existing application logic are separate from `studio.html`; editing `public/app.js` or the hand-authored CSS takes effect on reload. Rebuild after changing bundled modules or server TypeScript.
 
 `node scripts/assessment-probes.mjs` now gates the formerly reproduced import/spec defects. It is a focused regression probe, not full Postman conformance.
 

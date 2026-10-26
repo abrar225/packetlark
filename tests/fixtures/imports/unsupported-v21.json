@@ -1,0 +1,9 @@
+{
+  "info":{"_postman_id":"corpus_unsupported", "name":"Preservation with explicit execution limits", "schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "auth":{"type":"oauth2", "oauth2":[{"key":"accessToken", "value":"fixture-only"}], "x-auth":"keep"},
+  "item":[
+    {"id":"files", "name":"File body", "request":{"method":"POST", "url":"https://fixture.invalid/upload", "body":{"mode":"formdata", "formdata":[{"key":"upload", "type":"file", "src":"fixture-do-not-read.txt"},{"key":"label", "type":"text", "value":"fixture", "disabled":true}]}}},
+    {"id":"graphql", "name":"GraphQL body", "request":{"method":"POST", "url":"https://fixture.invalid/graphql", "auth":{"type":"noauth"}, "body":{"mode":"graphql", "graphql":{"query":"query { fixture }", "variables":"{}"}, "x-body":"keep"}}},
+    {"id":"xml", "name":"Raw XML", "request":{"method":"POST", "url":"https://fixture.invalid/xml", "body":{"mode":"raw", "raw":"<fixture/>", "options":{"raw":{"language":"xml", "x-option":"keep"}}}}}
+  ]
+}

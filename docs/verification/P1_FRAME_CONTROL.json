@@ -1,0 +1,156 @@
+{
+  "methodology": "Same Ego Page API, 30 separate DOM-event-to-frame evaluations in an about:blank control with one input and no PacketLark code. No samples discarded.",
+  "samples": [
+    {
+      "ms": 0.7999999998137355,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 3.3999999999068677,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.7999999998137355,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.100000000093132,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.900000000372529,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.199999999720603,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.800000000279397,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.399999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.600000000093132,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.100000000093132,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.399999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.299999999813735,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.399999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.7000000001862645,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.399999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.5,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.600000000093132,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.2999999998137355,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.399999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.2000000001862645,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.300000000279397,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.399999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 6.5,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 7.899999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 8.400000000372529,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 6.899999999906868,
+      "focused": true,
+      "visibility": "visible"
+    },
+    {
+      "ms": 5.699999999720603,
+      "focused": true,
+      "visibility": "visible"
+    }
+  ],
+  "p95_ms": 8.600000000093132
+}

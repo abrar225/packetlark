@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "input": "Ego Page.dragAndDrop native HTML5 gesture",
+  "cases": [
+    "native drag moves a request into a folder without changing IDs",
+    "drop on a request inserts before it in canonical order",
+    "folder cycle drop is rejected without mutation",
+    "dirty draft blocks structural drop and retains its input",
+    "failed drop commit preserves the canonical collection"
+  ]
+}

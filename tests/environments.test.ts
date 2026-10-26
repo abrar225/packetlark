@@ -12,7 +12,7 @@ describe('StudioServer Environment Management & Request Persistence', () => {
   beforeAll(async()=>{target=await startHttpFixture();});
   afterAll(async()=>{await target.stop();});
   let server: StudioServer;
-  const testWorkspace = mkdtempSync(join(tmpdir(), 'rea-test-'));
+  const testWorkspace = mkdtempSync(join(tmpdir(), 'packetlark-test-'));
   const serverPort = 4288;
   const snifferPort = 8288;
 
@@ -127,14 +127,16 @@ describe('StudioServer Environment Management & Request Persistence', () => {
     expect(delReqRes.status).toBe(200);
   });
 
-  it('auto-syncs script pm.environment mutations to disk when executing with environmentId', async () => {
+  it.each(['token', 'counter'])('applies persistence policy to script mutations of %s with environmentId', async (key) => {
+    const initialValue = `${key}-initial-value`;
+    const mutatedValue = `${key}-script-value`;
     // 1. Create temporary environment
     const createRes = await fetch(`http://localhost:${serverPort}/api/environments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: 'AutoSync Test Env',
-        values: [{ key: 'token', value: 'initial-val', enabled: true }]
+        values: [{ key, value: initialValue, enabled: true }]
       })
     });
     const env = await createRes.json();
@@ -152,21 +154,25 @@ describe('StudioServer Environment Management & Request Persistence', () => {
           queryParams: [],
           body: { mode: 'none' },
           auth: { type: 'none' },
-          testScript: `pm.environment.set("token", "mutated-by-test-script");`
+          testScript: `pm.environment.set(${JSON.stringify(key)}, ${JSON.stringify(mutatedValue)});`
         }
       })
     });
 
     expect(execRes.status).toBe(200);
     const execData = await execRes.json();
-    expect(execData.updatedVariables.token).toBe('mutated-by-test-script');
+    expect(execData.updatedVariables[key]).toBe(key === 'token' ? '[REDACTED]' : mutatedValue);
+    expect(execData.persistence.environment).toMatchObject(key === 'token'
+      ? { status: 'failed', code: 'ERR_SECRET_PERSISTENCE' }
+      : { status: 'saved' });
+    if (key === 'token') expect(JSON.stringify(execData)).not.toContain(mutatedValue);
 
     // 3. Fetch environments and verify disk persistence
     const checkRes = await fetch(`http://localhost:${serverPort}/api/environments`);
     const envList = await checkRes.json();
     const updatedEnv = envList.find((e: any) => e.id === env.id);
-    const tokenVal = updatedEnv.values.find((v: any) => v.key === 'token')?.value;
-    expect(tokenVal).toBe('mutated-by-test-script');
+    const storedValue = updatedEnv.values.find((v: any) => v.key === key)?.value;
+    expect(storedValue).toBe(key === 'token' ? initialValue : mutatedValue);
 
     // Cleanup
     await fetch(`http://localhost:${serverPort}/api/environments/${env.id}`, { method: 'DELETE' });

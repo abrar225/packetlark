@@ -61,6 +61,8 @@ function authFrom(source: any, warnings: string[]): AuthConfig {
 function authTo(auth?: AuthConfig): any {
   if (!auth || auth.type === "inherit") return undefined;
   if (auth.type === "unsupported") return auth.postman;
+  if (auth.type === "oauth2")
+    throw new Error("Postman export cannot represent a local OAuth connection. Export a copy with that connection removed and configure OAuth separately in Postman.");
   if (auth.type === "none") return { type: "noauth" };
   const pairs =
     auth.type === "bearer"
@@ -88,12 +90,16 @@ export class PostmanConverter {
   static fromPostman(source: any): ApiCollection {
     if (!source || typeof source !== "object" || !Array.isArray(source.item))
       throw new Error("Expected a Postman v2.1 collection with an item array");
-    if (source.info?.schema && !source.info.schema.includes("/v2.1.0/"))
+    if (source.info?.schema !== undefined &&
+      (typeof source.info.schema !== "string" ||
+       !/^https?:\/\/schema\.(?:getpostman|postman)\.com\/json\/collection\/v2\.1\.0\/collection\.json$/.test(source.info.schema)))
       throw new Error(
         "Only Postman Collection v2.1 JSON is supported. Export v2.1 before importing.",
       );
     const warnings: string[] = [];
     const convert = (item: any): CollectionItem => {
+      if (!item || typeof item !== "object" || Array.isArray(item))
+        throw new Error("Postman items must be objects");
       const id = /^[a-zA-Z0-9_-]{1,200}$/.test(string(item.id))
         ? string(item.id)
         : crypto.randomUUID();
@@ -121,6 +127,8 @@ export class PostmanConverter {
         typeof item.request === "string"
           ? { url: item.request }
           : item.request || {};
+      if (!["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"].includes(string(req.method || "GET").toUpperCase()))
+        throw new Error(`${name}: unsupported HTTP method ${req.method}`);
       let urlRaw = typeof req.url === "string" ? req.url : string(req.url?.raw);
       if (!urlRaw && req.url?.host) {
         const protocol = req.url.protocol || "https";
@@ -159,7 +167,9 @@ export class PostmanConverter {
       const url =
         (question < 0 ? withoutHash : withoutHash.slice(0, question)) + hash;
       const body: RequestBody = { mode: "none" };
-      if (req.body?.mode === "raw") {
+      if (req.body?.disabled === true) {
+        // Disabled payload is metadata only and must never be sent.
+      } else if (req.body?.mode === "raw") {
         body.mode =
           req.body.options?.raw?.language === "json" ||
           (!req.body.options?.raw?.language &&
@@ -224,30 +234,50 @@ export class PostmanConverter {
   static toPostman(collection: ApiCollection): any {
     const encode = (s: string) =>
       encodeURIComponent(s).replace(/%7B/g, "{").replace(/%7D/g, "}");
-    const vars = (values: KeyValueParam[]) =>
-      values.map((v) => ({
-        key: v.key,
-        value: v.value,
-        disabled: v.enabled === false,
-        type: v.secret ? "secret" : "string",
-        description: v.description,
-      }));
+    // Match repeated rows by value first, then occurrence. Retain opaque metadata
+    // while allowing editable fields to change without resurrecting deleted rows.
+    const vars = (values: KeyValueParam[], original: any[] = []) => {
+      const remaining = [...original];
+      return values.map((v) => {
+        let index = remaining.findIndex((row) => row.key === v.key && string(row.value) === v.value);
+        if (index < 0) index = remaining.findIndex((row) => row.key === v.key);
+        const base = index < 0 ? {} : remaining.splice(index, 1)[0];
+        const row: any = { ...base, key: v.key, value: v.value };
+        if (base.disabled !== undefined || v.enabled === false) row.disabled = v.enabled === false;
+        if (base.type === "secret" || v.secret) row.type = v.secret ? "secret" : "string";
+        if (v.description !== undefined) row.description = v.description;
+        else delete row.description;
+        return row;
+      });
+    };
     const event = (source: any, base: any) => {
-      const other = (base.event || []).filter(
-        (e) => !["prerequest", "test"].includes(e.listen),
-      );
-      return [
-        ...other,
-        ...[
-          ["prerequest", source.preRequestScript],
-          ["test", source.testScript],
-        ]
-          .filter(([, code]) => code)
-          .map(([listen, code]) => ({
-            listen,
-            script: { type: "text/javascript", exec: code.split("\n") },
-          })),
-      ];
+      const result = [...(base.event || [])];
+      for (const [listen, code] of [["prerequest", source.preRequestScript], ["test", source.testScript]]) {
+        if ((code || "") === events(base, listen)) continue;
+        const first = result.find((e) => e.listen === listen && e.disabled !== true);
+        const next = result.filter((e) => e.listen !== listen || e.disabled === true);
+        if (code) next.push({
+          ...first, listen,
+          script: { ...first?.script, type: "text/javascript", exec: code.split("\n") },
+        });
+        result.splice(0, result.length, ...next);
+      }
+      return result;
+    };
+    const auth = (value: AuthConfig | undefined, original: any) => {
+      const converted = authTo(value);
+      if (!converted || original?.type !== converted.type) return converted;
+      // Leave unedited auth arrays intact, including duplicate/unknown keys.
+      if (JSON.stringify(authFrom(original, [])) === JSON.stringify(value)) return original;
+      const output = { ...original, ...converted };
+      if (Array.isArray(converted[converted.type])) {
+        const pending = [...converted[converted.type]];
+        output[converted.type] = (original[converted.type] || []).map((row: any) => {
+          const index = pending.findIndex((entry: any) => entry.key === row.key);
+          return index < 0 ? row : { ...row, ...pending.splice(index, 1)[0] };
+        }).concat(pending);
+      }
+      return output;
     };
     const convert = (item: CollectionItem): any => {
       const base = structuredClone(item.postman || {});
@@ -257,20 +287,31 @@ export class PostmanConverter {
           id: item.id,
           name: item.name,
           item: (item.items || []).map(convert),
-          auth: authTo(item.auth),
-          variable: vars(item.variables || []),
+          auth: auth(item.auth, base.auth),
+          variable: vars(item.variables || [], base.variable),
           event: event(item, base),
         };
       const req = item.request;
       if (!req) throw new Error("Collection item has no request");
+      if (req.tls && Object.keys(req.tls).length)
+        throw new Error("Postman collection export cannot represent request TLS settings or credential references. Export a copy with TLS settings removed and configure CA/client certificates separately in Postman.");
+      if (req.body.mode === "binary" ||
+          (req.body.mode === "form-data" && req.body.formData?.some(row => row.fileId)))
+        throw new Error("Postman export cannot include selected upload files: selection IDs are private session capabilities, not portable file bytes. Export a copy with file bodies removed and select the files separately in Postman.");
+      const original = structuredClone(req.postman || {});
       let body: any;
-      if (req.body.mode === "unsupported") body = req.body.postman;
+      if (req.body.mode === "none" && original.body?.disabled === true) body = original.body;
+      else if (req.body.mode === "unsupported") body = req.body.postman;
       else if (req.body.mode.startsWith("raw"))
         body = {
+          ...(original.body?.mode === "raw" ? original.body : {}),
           mode: "raw",
           raw: req.body.raw || "",
           options: {
-            raw: { language: req.body.mode === "raw-json" ? "json" : "text" },
+            ...original.body?.options,
+            raw: { ...original.body?.options?.raw,
+              language: req.body.mode === "raw-json" ? "json" :
+                original.body?.options?.raw?.language === "json" ? "text" : original.body?.options?.raw?.language || "text" },
           },
         };
       else if (
@@ -278,7 +319,8 @@ export class PostmanConverter {
         req.body.mode === "x-www-form-urlencoded"
       ) {
         const mode = req.body.mode === "form-data" ? "formdata" : "urlencoded";
-        body = { mode, [mode]: vars(req.body.formData || []) };
+        body = { ...(original.body?.mode === mode ? original.body : {}), mode,
+          [mode]: vars(req.body.formData || [...new URLSearchParams(req.body.raw || "")].map(([key, value]) => ({ key, value })), original.body?.[mode]) };
       }
       const q = (req.queryParams || [])
         .filter((p) => p.enabled !== false && p.key)
@@ -295,12 +337,12 @@ export class PostmanConverter {
         name: item.name,
         event: event(req, base),
         request: {
-          ...structuredClone(req.postman || {}),
+          ...original,
           method: req.method,
-          auth: authTo(req.auth),
-          header: vars(req.headers || []),
+          auth: auth(req.auth, original.auth),
+          header: vars(req.headers || [], original.header),
           body,
-          url: { raw, query: vars(req.queryParams || []) },
+          url: { ...(typeof original.url === "object" ? original.url : {}), raw, query: vars(req.queryParams || [], original.url?.query) },
         },
       };
     };
@@ -311,13 +353,14 @@ export class PostmanConverter {
         ...base.info,
         _postman_id: collection.id,
         name: collection.name,
-        description: collection.description || "",
+        description: typeof base.info?.description === "object"
+          ? { ...base.info.description, content: collection.description || "" } : collection.description || "",
         schema:
           "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
       },
-      auth: authTo(collection.auth),
+      auth: auth(collection.auth, base.auth),
       event: event(collection, base),
-      variable: vars(collection.variables || []),
+      variable: vars(collection.variables || [], base.variable),
       item: collection.items.map(convert),
     };
   }
@@ -368,7 +411,7 @@ export class PostmanConverter {
     const chunks: string[] = [];
     let json = false;
     const value = (i: number) => {
-      if (!tokens[i]) throw new Error("Missing cURL option value");
+      if (tokens[i] === undefined) throw new Error("Missing cURL option value");
       return tokens[i];
     };
     for (let i = 0; i < tokens.length; i++) {
@@ -380,6 +423,8 @@ export class PostmanConverter {
         const h = value(++i);
         const colon = h.indexOf(":");
         if (colon < 1) throw new Error("Invalid cURL header");
+        if (!h.slice(colon + 1).trim())
+          throw new Error("cURL header suppression is not supported");
         headers.push({
           key: h.slice(0, colon).trim(),
           value: h.slice(colon + 1).trim(),
@@ -389,13 +434,18 @@ export class PostmanConverter {
         ["-d", "--data", "--data-raw", "--data-binary", "--json"].includes(flag)
       ) {
         const data = value(++i);
-        if (data.startsWith("@"))
+        if (data.startsWith("@") && flag !== "--data-raw")
           throw new Error(
             "cURL file uploads are not supported; no local file was read",
           );
+        if ((json || flag === "--json") && chunks.length)
+          throw new Error("Combining --json with other cURL body options is not supported");
         chunks.push(data);
         json ||= flag === "--json";
-      } else if (flag === "--url") url = value(++i);
+      } else if (flag === "--url") {
+        if (url) throw new Error("Only one cURL URL can be imported at a time");
+        url = value(++i);
+      }
       else if (["-I", "--head"].includes(flag)) {
         method = "HEAD";
         explicit = true;
@@ -407,7 +457,6 @@ export class PostmanConverter {
           "--show-error",
           "-L",
           "--location",
-          "--compressed",
         ].includes(flag)
       ) {
       } else if (flag.startsWith("-"))
@@ -420,6 +469,8 @@ export class PostmanConverter {
     if (!/^https?:\/\//i.test(url))
       throw new Error("cURL must include an HTTP or HTTPS URL");
     if (chunks.length && !explicit) method = "POST";
+    if (!["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"].includes(method))
+      throw new Error(`Unsupported cURL HTTP method ${method}`);
     const raw = chunks.join("&");
     const declared =
       headers.find((h) => h.key.toLowerCase() === "content-type")?.value || "";
@@ -430,6 +481,8 @@ export class PostmanConverter {
         value: "application/x-www-form-urlencoded",
         enabled: true,
       });
+    if (json && !headers.some((h) => h.key.toLowerCase() === "accept"))
+      headers.push({ key: "Accept", value: "application/json", enabled: true });
     if (json && !declared)
       headers.push({
         key: "Content-Type",

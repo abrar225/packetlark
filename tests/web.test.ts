@@ -6,7 +6,7 @@ import http from "node:http";
 import { StudioServer } from "../src/server/StudioServer.js";
 
 describe("Local studio origin and web boundaries", () => {
-  const workspace = mkdtempSync(join(tmpdir(), "rea-web-"));
+  const workspace = mkdtempSync(join(tmpdir(), "packetlark-web-"));
   const studio = new StudioServer(4498, 8498, workspace);
   beforeAll(() => studio.start());
   afterAll(async () => {
@@ -74,9 +74,19 @@ describe("Local studio origin and web boundaries", () => {
   });
   it("accepts standard absolute-form HTTP proxy requests with the target Host", async () => {
     const status = await new Promise<number>((resolve, reject) => {
-      const request = http.get({hostname:'127.0.0.1',port:8498,path:'http://localhost:4498/api/health',headers:{Host:'localhost:4498'}}, response => {
-        response.resume(); resolve(response.statusCode!);
-      }); request.on('error',reject);
+      const request = http.get(
+        {
+          hostname: "127.0.0.1",
+          port: 8498,
+          path: "http://localhost:4498/api/health",
+          headers: { Host: "localhost:4498" },
+        },
+        (response) => {
+          response.resume();
+          resolve(response.statusCode!);
+        },
+      );
+      request.on("error", reject);
     });
     expect(status).toBe(200);
   });
@@ -87,5 +97,17 @@ describe("Local studio origin and web boundaries", () => {
     );
     expect(response.status).toBe(403);
     expect(response.headers.get("access-control-allow-origin")).toBeNull();
+  });
+  it("denies cross-site browser subresources even when no Origin header is supplied", async () => {
+    const response = await fetch("http://localhost:4498/api/health", {
+      headers: { "Sec-Fetch-Site": "cross-site" },
+    });
+    expect(response.status).toBe(403);
+    const capture = await fetch(
+      "http://localhost:8498/http://localhost:4498/api/health",
+      { headers: { "Sec-Fetch-Site": "cross-site" } },
+    );
+    expect(capture.status).toBe(403);
+    expect((await capture.json()).error.code).toBe("ERR_ORIGIN");
   });
 });

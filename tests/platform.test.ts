@@ -3,7 +3,7 @@ import http from "node:http";
 import { once } from "node:events";
 import { PostmanConverter } from "../src/core/models/PostmanConverter.js";
 import { collectionRequests } from "../src/core/models/CollectionContext.js";
-import { HttpExecutor } from "../src/core/engine/HttpExecutor.js";
+import { HttpExecutor, getExecutionState } from "../src/core/engine/HttpExecutor.js";
 import {
   CollectionRunner,
   junitReport,
@@ -19,7 +19,7 @@ beforeAll(async () => {
     const url = new URL(req.url!, "http://fixture");
     if (url.pathname === "/redirect") {
       res.writeHead(302, {
-        "Set-Cookie": "session=rea; Path=/",
+        "Set-Cookie": "session=packetlark; Path=/",
         Location: "/echo",
       });
       res.end();
@@ -195,7 +195,7 @@ describe("Postman migration conformance", () => {
 describe("Interpreter and request reliability", () => {
   it("runs real Chai deep equality, regex and async callback assertions", async () => {
     const res = await ScriptSandbox.executeAsync(
-      `pm.test('deep',()=>pm.expect({a:1,b:2}).to.deep.equal({b:2,a:1}));pm.test('async',done=>setTimeout(()=>{pm.expect('rea').to.match(/^re/);done();},5));`,
+      `pm.test('deep',()=>pm.expect({a:1,b:2}).to.deep.equal({b:2,a:1}));pm.test('async',done=>setTimeout(()=>{pm.expect('packetlark').to.match(/^packet/);done();},5));`,
       {},
     );
     expect(res.testResults).toHaveLength(2);
@@ -247,10 +247,12 @@ describe("Interpreter and request reliability", () => {
       [{ key: "token", value: "env" }],
       { iterationData: { priority: "data" } },
     );
-    expect(result.updatedVariables?.token).toBe("local");
-    expect(result.updatedEnvironment?.token).toBe("env");
-    expect(result.updatedEnvironment?.collectionOnly).toBeUndefined();
-    expect(result.updatedCollectionVariables?.collectionOnly).toBe("yes");
+    expect(getExecutionState(result)?.variables.token).toBe("local");
+    expect(getExecutionState(result)?.environment.token).toBe("env");
+    expect(result.updatedVariables?.token).toBe("*****");
+    expect(result.updatedEnvironment?.token).toBe("***");
+    expect(getExecutionState(result)?.environment.collectionOnly).toBeUndefined();
+    expect(getExecutionState(result)?.collection.collectionOnly).toBe("yes");
   });
   it("keeps binary bytes intact and measures headers separately from body completion", async () => {
     const binary = await HttpExecutor.execute(
@@ -280,7 +282,7 @@ describe("Interpreter and request reliability", () => {
     const redirect = await HttpExecutor.execute(
       request({ url: origin + "/redirect" }),
     );
-    expect(JSON.parse(redirect.body).cookie).toContain("session=rea");
+    expect(JSON.parse(redirect.body).cookie).toContain("session=packetlark");
   });
 });
 describe("Collection automation", () => {
@@ -291,7 +293,7 @@ describe("Collection automation", () => {
           id: "one",
           name: "Set",
           url: origin + "/redirect",
-          testScript: `pm.environment.set('next','ready');pm.test('cookie',()=>pm.expect(pm.response.json().cookie).to.include('session=rea'));`,
+          testScript: `pm.environment.set('next','ready');pm.test('cookie',()=>pm.expect(pm.response.json().cookie).to.include('session=packetlark'));`,
         }),
         request({
           id: "two",

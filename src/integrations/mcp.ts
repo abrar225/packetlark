@@ -1,8 +1,12 @@
+import type { ExecutionOptions } from "../core/engine/HttpExecutor.js";
+import type { WorkspaceExecution } from "../core/engine/WorkspaceExecution.js";
+import { validateJsonBody } from "../core/engine/JsonBodyValidation.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { realpath, readFile, readdir, stat } from "node:fs/promises";
+import { WorkspaceRepository } from "../core/workspace/WorkspaceRepository.js";
 import path from "node:path";
+import { SecretRedactor } from "../core/security/SecretRedactor.js";
 import {
   CollectionRunner,
   reportWithoutBodies,
@@ -15,27 +19,45 @@ const identifier = z
   .max(200);
 export function createMcpServer(workspace: string): McpServer {
   const server = new McpServer(
-    { name: "rea-api-studio", version: "1.1.0" },
+    { name: "packetlark", version: "1.1.0" },
     {
       instructions:
         "Local API development tools. Executing requests/collections can change remote services. Use only within the user-authorized API scope; collection scripts can send additional HTTP requests. No arbitrary file paths are accepted.",
     },
   );
+  let execution:WorkspaceExecution|undefined;
+  let pendingContext:Promise<WorkspaceExecution>|undefined;
+  const context=async()=>{
+    pendingContext??=import("../core/engine/WorkspaceExecution.js").then(({WorkspaceExecution})=>execution=new WorkspaceExecution(path.join(workspace,".packetlark")));
+    return (await pendingContext).options();
+  };
+  const executionOptions:ExecutionOptions={
+    resolveCredential:async(...args)=>(await context()).resolveCredential(...args),
+    resolveOAuth:async(...args)=>(await context()).resolveOAuth(...args),
+    resolveFile:async(...args)=>(await context()).resolveFile(...args),
+    validateJsonBody:(raw,schema,signal)=>validateJsonBody(raw,schema,{signal}),
+  };
+  let cleanup:Promise<void>|undefined;
+  const closeContext=()=>cleanup??=(async()=>{if(pendingContext)await pendingContext;await execution?.close();})();
+  const onclose=server.server.onclose;
+  server.server.onclose=()=>{onclose?.();void closeContext().catch(()=>{});};
+  const close=server.close.bind(server);
+  server.close=async()=>{try{await close();}finally{await closeContext();}};
   const reply = (data: any, isError = false) => ({
     content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
     isError,
   });
+  function snapshot() {
+    const repository = new WorkspaceRepository(path.join(workspace, ".packetlark"), { readOnly: true });
+    try { return repository.snapshot(); } finally { repository.close(); }
+  }
+  async function read(kind: "collections", id: string): Promise<import("../core/models/types.js").ApiCollection>;
+  async function read(kind: "environments", id: string): Promise<import("../core/models/types.js").Environment>;
   async function read(kind: "collections" | "environments", id: string) {
     if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error("Invalid identifier");
-    const root = await realpath(workspace);
-    const file = await realpath(
-      path.join(root, ".rea-api", kind, id + ".json"),
-    );
-    if (!file.startsWith(root + path.sep))
-      throw new Error("Workspace path escape rejected");
-    if ((await stat(file)).size > 2 * 1024 * 1024)
-      throw new Error("Workspace file exceeds 2 MiB");
-    return JSON.parse(await readFile(file, "utf8"));
+    const value = snapshot()[kind].find((value) => value.id === id);
+    if (!value) throw new Error("Workspace resource not found");
+    return value;
   }
   server.registerTool(
     "list_collections",
@@ -47,25 +69,8 @@ export function createMcpServer(workspace: string): McpServer {
     },
     async () => {
       try {
-        const names = await readdir(
-          path.join(workspace, ".rea-api", "collections"),
-        );
-        const files = names.filter((name) => name.endsWith(".json"));
-        const items = [];
-        for (const name of files.slice(0, 1000)) {
-          const id = name.slice(0, -5);
-          try {
-            const col = await read("collections", id);
-            items.push({
-              id,
-              name: col.name,
-              requests: collectionRequests(col).length,
-            });
-          } catch (error) {
-            items.push({ id, error: error.message });
-          }
-        }
-        return reply({ collections: items, truncated: files.length > 1000 });
+        const data = snapshot();
+        return reply({ collections: data.collections.map((col) => ({ id: col.id, name: col.name, requests: collectionRequests(col).length })), truncated: false });
       } catch (error) {
         if (error.code === "ENOENT")
           return reply({
@@ -101,29 +106,14 @@ export function createMcpServer(workspace: string): McpServer {
           ? await read("environments", input.environmentId)
           : undefined;
         const result = await CollectionRunner.run(collection, {
+          executionOptions,
           environment,
           iterations: input.iterations,
           stopOnFailure: input.stopOnFailure,
           maxRequests: 100,
           signal: extra.signal,
         });
-        const secrets = (environment?.values || [])
-          .filter((v) => v.secret || v.type === "secret")
-          .map((v) => String(v.value))
-          .filter(Boolean);
-        const serialized = JSON.stringify(reportWithoutBodies(result));
-        return reply(
-          JSON.parse(
-            secrets.reduce(
-              (text, secret) =>
-                text
-                  .split(JSON.stringify(secret).slice(1, -1))
-                  .join("[redacted]"),
-              serialized,
-            ),
-          ),
-          result.status !== "passed",
-        );
+        return reply(reportWithoutBodies(result), result.status !== "passed");
       } catch (error) {
         return reply({ error: error.message }, true);
       }
@@ -137,9 +127,11 @@ export function createMcpServer(workspace: string): McpServer {
       inputSchema: {
         url: z.string().url().max(8192),
         method: z
-          .enum(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"])
+          .string().regex(/^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,64}$/)
           .default("GET"),
-        headers: z.record(z.string(), z.string().max(8192)).optional(),
+        headers: z.union([z.record(z.string(), z.string().max(8192)), z.array(z.object({key:z.string().max(8192),value:z.string().max(8192),enabled:z.boolean().optional()})).max(1000)]).optional(),
+        bodyMode: z.enum(["raw-text","raw-json"]).default("raw-text"),
+        schema: z.record(z.string(),z.unknown()).optional(),
         body: z
           .string()
           .max(1024 * 1024)
@@ -153,29 +145,31 @@ export function createMcpServer(workspace: string): McpServer {
       },
     },
     async (input, extra) => {
+      const secrets = new SecretRedactor();
       try {
+        if(input.schema && (input.bodyMode!=="raw-json" || input.body===undefined))throw new Error("JSON Schema requires a raw-json body");
         const response = await HttpExecutor.execute(
           {
             method: input.method,
             url: input.url,
-            headers: Object.entries(input.headers || {}).map(
+            headers: Array.isArray(input.headers) ? input.headers : Object.entries(input.headers || {}).map(
               ([key, value]) => ({ key, value, enabled: true }),
             ),
             queryParams: [],
             body:
               input.body === undefined
                 ? { mode: "none" }
-                : { mode: "raw-text", raw: input.body },
+                : { mode: input.bodyMode, raw: input.body, schema:input.schema },
             auth: { type: "none" },
             maxResponseBytes: 1024 * 1024,
             timeoutMs: 30000,
           },
           [],
           [],
-          { signal: extra.signal },
+          { ...executionOptions, signal: extra.signal, secrets },
         );
         return reply(
-          {
+          secrets.redact({
             status: response.status,
             statusText: response.statusText,
             sizeBytes: response.sizeBytes,
@@ -184,11 +178,11 @@ export function createMcpServer(workspace: string): McpServer {
             ...(input.includeBody
               ? { body: response.body, bodyEncoding: response.bodyEncoding }
               : {}),
-          },
+          }),
           !!response.error,
         );
       } catch (error) {
-        return reply({ error: error.message }, true);
+        return reply({ error: secrets.text(error.message) }, true);
       }
     },
   );

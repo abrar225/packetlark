@@ -1,0 +1,60 @@
+{
+  "measured_at": "2026-10-25T04:39:02.390Z",
+  "source_commit": "bf4398de1c38a165b0e6fb0913e89628101eca7f",
+  "tracked_changes_present": false,
+  "runtime": {
+    "node": "v24.14.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "memory_gib": 16
+  },
+  "methodology": {
+    "samples_per_path": 200,
+    "warmup_per_path": 20,
+    "order": "alternating direct/capture/workspace sequence",
+    "transport": "sequential loopback HTTP, 1 KiB JSON response; timers include body consumption",
+    "startup": "one module-warm StudioServer.start; excludes module/process/browser startup",
+    "rss": "sampled process RSS across target, two proxies, studio and benchmark client; not isolated or guaranteed peak"
+  },
+  "timings": {
+    "direct": {
+      "samples": 200,
+      "p50_ms": 0.085,
+      "p95_ms": 0.163
+    },
+    "capture": {
+      "samples": 200,
+      "p50_ms": 0.244,
+      "p95_ms": 0.591
+    },
+    "workspace_list": {
+      "samples": 200,
+      "p50_ms": 0.161,
+      "p95_ms": 0.667
+    }
+  },
+  "module_warm_studio_start_ms": 0.177,
+  "sampled_process_rss_max_mib": 162.81,
+  "retained_capture": {
+    "retainedRecords": 220,
+    "retainedBytes": 342320,
+    "omittedRecords": 0,
+    "activeRequests": 0,
+    "limits": {
+      "maxConnections": 32,
+      "maxRequestBytes": 4194304,
+      "maxResponseBytes": 10485760,
+      "timeoutMs": 30000,
+      "maxConcurrentRequests": 8,
+      "maxHistoryBytes": 33554432,
+      "maxRecordBytes": 1048576
+    },
+    "redactionVersion": 1
+  },
+  "limitations": [
+    "No Postman measurement or speed comparison.",
+    "Not a cold-start, browser responsiveness, concurrency/load, large-payload or long-duration leak test.",
+    "Single-machine observation; rerun before setting release performance gates."
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "phase": "P0",
+  "as_of": "2026-10-25",
+  "implementation_commit": "0a7fc307cded932dc41213df88c7b7f29be05666",
+  "status": "local-core-gates-passed",
+  "scope": "Supported local-core trust foundations; not stable-release or full-platform certification",
+  "evidence": [
+    {
+      "criterion": "Core regression/build",
+      "status": "PASS",
+      "command": "npm run check",
+      "tests": 117,
+      "files": 17
+    },
+    {
+      "criterion": "Public browser ownership",
+      "status": "PASS",
+      "harness_groups": 5,
+      "cases": 16
+    },
+    {
+      "criterion": "Source-pinned sustained capture",
+      "status": "PASS",
+      "artifact": "verification/P0_SOAK.json",
+      "duration_ms": 600186,
+      "requests": 41000,
+      "post_gc_heap_growth_mib": 0.887
+    },
+    {
+      "criterion": "Fresh-process reference baseline",
+      "status": "PASS",
+      "artifact": "verification/P0_COLD_START.json",
+      "ready_p95_ms": 85.62,
+      "backend_rss_p95_mib": 71.41
+    },
+    {
+      "criterion": "Browser reference baseline recorded",
+      "status": "PASS",
+      "artifact": "verification/P0_BROWSER_BASELINE.json",
+      "note": "Large-workspace filter/selection target failed and is assigned to P1. Baseline source limitations are explicit."
+    },
+    {
+      "criterion": "Threat model and risk disposition",
+      "status": "PASS",
+      "artifact": "P0_THREAT_MODEL.md"
+    },
+    {
+      "criterion": "Production package and extension build",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Dependency advisory audit",
+      "status": "PASS",
+      "reported_vulnerabilities": 0
+    }
+  ],
+  "remaining_release_gates": [
+    "P1 workspace leases/recovery/conflicts/full editing and large-list responsiveness",
+    "P2 keychain/OAuth/TLS/files/cookies and explicit secret migration/export UX",
+    "P3 scoped script/agent grants, worker isolation, typed compatibility and reference differential tests",
+    "P5 independent security review, installed editor/cross-OS/accessibility/user trials and representative load"
+  ]
+}

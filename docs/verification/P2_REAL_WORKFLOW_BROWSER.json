@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-10-26T18:15:25.072Z",
+  "verdict": "PASS",
+  "cases": [
+    "real credential dialog stores session secret metadata; real auth control saves only reference and executes",
+    "real cookie create/edit is sent to matching peer; explicit persistence failure retains opt-in choice and reports refusal",
+    "native picker uploads chosen file to real backend, saved binary body uses selection ID, streamed response exposes working artifact download",
+    "real JSON schema editor validates, persists supported schema, sends valid body, and exposes mismatched value error"
+  ],
+  "evidence": {
+    "collectionId": "p2_browser_1793038520815_b61236003bd098",
+    "credentialId": "e168be87-f6ee-4e0d-9d68-4de7d444df94",
+    "selectedFileId": "be284b89-190f-480f-bea9-0ce91576a143",
+    "targetOrigin": "http://127.0.0.1:56463"
+  }
+}

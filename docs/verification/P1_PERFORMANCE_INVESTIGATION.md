@@ -1,0 +1,39 @@
+# P1 frame scheduling investigation — 26 October 2026
+
+Current reference timing gate: **PASS**, assessed in [P1_PERFORMANCE_GATE.json](P1_PERFORMANCE_GATE.json). The historical experiments below remain unchanged. The accepted scope is the documented foreground-prepared reference protocol; continuous foreground ownership and the cause of every historical stall remain unestablished.
+
+The historical focused and unfocused runs retain failures: filter p95 867.2/917 ms, with outliers near one second. Their filter handler duration was about 4 ms and the blank input control p95 was 8.6 ms. Those observations do not establish whether delayed frames came from application layout, Chromium scheduling, the host compositor or another task.
+
+A new, single unchanged-benchmark reproduction attempt against `scripts/p0-browser-fixture.mjs --large` produced 30 startup/filter/selection samples: p95 **239.6 / 10.3 / 9.2 ms**. The workspace contained **10,004 requests**, with 31 rendered request rows. Every raw sample remains in `P1_PERFORMANCE_DIAG_BASELINE.json`. This is a non-reproduction, not a fix or evidence that the previous samples were invalid.
+
+A different diagnostic protocol then tested the first filter after each of 30 navigations. It clicked the actual search field, dispatched its public input event, and measured synchronous work, a zero-delay timer, first and second native frame callbacks, and browser Long Tasks. First frames were **2.4–3.1 ms**, second frames **5.9–10.4 ms**, zero-delay timers **3.2–4.0 ms**, and no overlapping long tasks were reported. All samples remain in `P1_PERFORMANCE_FRAME_DIAGNOSTIC.json`. The observer/timer/second-frame protocol can affect scheduling, so it supplements rather than replaces the existing event-to-first-frame acceptance measurement.
+
+No observed failure currently justifies a change to collection filtering, ResizeObserver handling or application rendering. Historical root cause remains unresolved. In particular, visible/focused state does not prove uninterrupted compositor scheduling, and a fast handler does not substitute for the full interval. A fresh representative 30-sample run after all P1 UI changes is still required. Keep the 100 ms interaction budget and all samples; retain any new failing run.
+
+The benchmark now records every navigation’s viewport/focus/visibility, device pixel ratio, hardware concurrency, tree height and frame timestamp. This retains context missing from the historical runs without removing samples or changing the timing endpoint. `scripts/performance-diagnostics.mjs` exports `diagnoseFrames(page,baseUrl,30)` for targeted investigation if delayed frames recur. The existing `measureBrowser(page,baseUrl,30,{focusBeforeInteractions:true})` remains the gate protocol.
+
+The diagnostic server used a disposable system temporary workspace, never the project or the user’s `.packetlark` files. Current working tree was uncommitted and shared with concurrent P1 implementation. These SHA-256 values were captured immediately after the diagnostic run; they identify the browser files at capture time, not a clean commit:
+
+- `public/assets/studio.js`: `4aef72d462a3b8ccc2811a720a7cd7337db40a6b290c83792bc3c567f4e3ec38`
+- `public/app.js`: `6b771530b476d6c0a8fe5f33c25490e0254df3b4a51ba40d70d692647ccce9ad`
+- `web/collection-tree.js`: `74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768`
+
+Planning policy: `{"planning":"compact","context_depth":"dependency","verification_depth":"impact","delegation":"none","reason_codes":["historical-performance-regression","browser-scheduling-uncertainty"]}`. Decision: add observation before changing rendering because the actual reproduction passed and did not identify a product bottleneck. No application fix is claimed.
+
+## Final P1 assessment
+
+The complete P1 UI reproduced the delay: [P1_FINAL_PERFORMANCE.json](P1_FINAL_PERFORMANCE.json) retains startup/filter/selection p95 **201.2 / 893.3 / 36.0 ms**, with filter synchronous work p95 **2.8 ms**. A source-identical copy is retained as `P1_FINAL_PERFORMANCE_BACKGROUND.json`. Further tracing attempts did not yield a usable CDP trace stream; their timing samples remain diagnostic evidence, not a trace-based causal explanation.
+
+[P1_MATCHED_FRAME_DIAGNOSTIC.json](P1_MATCHED_FRAME_DIAGNOSTIC.json) alternates filter/control order in the same document. Filter/control p95 were **1011.5 / 998.8 ms**. Outlier intervals reported fast zero-delay timers and no overlapping Long Tasks, including delayed control events with no filter handler. This separates the delay from synchronous filtering alone; it does not identify the browser/compositor/OS cause.
+
+Read-only macOS observations then showed ChatGPT/Brave foreground while the browser document could still report visible/focused. Activating the QA app once did not maintain that host condition: [P1_FOREGROUND_PERFORMANCE_1.json](P1_FOREGROUND_PERFORMANCE_1.json) started with Ego foreground and ended with ChatGPT foreground, recording filter p95 **888.2 ms**. That failure remains retained.
+
+The supported reference protocol now prepares the dedicated Ego app before each sample if needed, then records the macOS frontmost application before and after the sample. Host observation/activation runs outside the existing measured interval. The browser still performs 30 fresh navigations with HTTP cache disabled, 30 alternating filter inputs and 30 request selections. Event dispatch to the next native animation-frame callback remains the timing endpoint; the filter/selection p95 budget remains 100 ms. There are no warmups, exclusions, substitutions or removed samples. Host checks add gaps between samples, so this is not a controlled causal A/B comparison with older runs.
+
+[P1_OS_FOREGROUND_PERFORMANCE_1.json](P1_OS_FOREGROUND_PERFORMANCE_1.json) records **206.6 / 3.3 / 6.9 ms** startup/filter/selection p95. All filter samples are at most **3.5 ms** and all selection samples at most **7.4 ms**. All 90 before-sample observations report Ego foreground; 80 of 90 after-sample observations do. Its original `FAIL` includes a stricter whole-run foreground predicate and remains unchanged. [P1_PERFORMANCE_GATE.json](P1_PERFORMANCE_GATE.json) separately assesses the declared timing criterion as PASS, checks all raw sample counts/percentiles and verifies the measured code hashes against current files. It expressly reports that continuous foreground ownership is unestablished.
+
+A later user-coordinated run, [P1_CONTROLLED_FOREGROUND_1.json](P1_CONTROLLED_FOREGROUND_1.json), also retained all passing timings (filter/selection p95 **4.4 / 3.6 ms**), but recorded foreground drift and failed its stricter host predicate. It is corroborating timing evidence, not evidence of continuous foreground control.
+
+Reference surface: macOS host, Chromium **156.0.0.0**, viewport **948 × 871**, device pixel ratio **1**, reported hardware concurrency **10**, **10,004** requests and **31** rendered request rows. Browser/source metadata and SHA-256 identities are in the raw records. This is a synthetic one-machine event-to-frame check, not physical input latency, guaranteed paint completion, combined RSS, a cross-device promise or a competitor comparison. The source is an uncommitted working tree; no remote CI or clean-commit result is implied.
+
+`scripts/check-p1-performance-gate.mjs` contains the exact macOS `observeHost`/activation implementation as `measureMacReference(page,baseUrl,30)` for the Ego Page API. Use it only during an authorized QA interval and reuse the active task space. `node scripts/check-p1-performance-gate.mjs --write --check-current-source` reproduces the acceptance assessment without altering the original experiment. The independent [gate review](P1_GATE_REVIEW.md) supports this scoped interpretation and the required qualifications. Broader scheduling/platform/performance claims remain in the PACKETLARK-081 P5 scope.

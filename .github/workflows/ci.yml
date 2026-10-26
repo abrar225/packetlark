@@ -19,6 +19,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: node scripts/check-branding.mjs
       - run: npm run build:extension
       - run: node scripts/assessment-probes.mjs
       - run: node scripts/package-smoke.mjs

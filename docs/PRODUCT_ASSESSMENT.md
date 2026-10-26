@@ -1,6 +1,6 @@
 > Historical assessment of the initial redesign (24 October 2026). Several defects and missing runner capabilities described below were addressed in release candidate 1.1.0. See [current readiness](PLATFORM_READINESS.md) and [verification](VERIFICATION.md). The old scores are retained as historical reviewer judgments.
 
-# Rea versus Postman: candid product assessment
+# PacketLark versus Postman: candid product assessment
 
 **Reviewed 24 October 2026.** Baseline: `b88f097f5540622a53c54b64e64eb5298a24192a`. Source review covered the HTTP executor, variable resolver, Postman converter, script engine, proxy, schema/OpenAPI/SDK generators, server routes, browser UI, and all original test suites. This revision also includes the documented design and usability fixes.
 
@@ -14,15 +14,15 @@ These are explicit reviewer judgments on a 0–10 scale, not experimentally meas
 
 The broad-platform rubric is weighted toward everyday professional API use:
 
-- HTTP editing, authentication and response tooling, **20%**: Rea **5**, Postman **9**.
-- Scripts, repeatable runs and automation, **15%**: Rea **3**, Postman **9**.
-- Storage, versioning and local workflows, **15%**: Rea **6**, Postman **8**.
-- Capture, specification and generated-code workflows, **15%**: Rea **5**, Postman **8**.
-- Team collaboration, ecosystem and governance, **15%**: Rea **0**, Postman **9**.
-- Reliability, safety and operational maturity, **15%**: Rea **3**, Postman **8**.
-- Usability, onboarding and documentation, **5%**: Rea **4**, Postman **8**.
+- HTTP editing, authentication and response tooling, **20%**: PacketLark **5**, Postman **9**.
+- Scripts, repeatable runs and automation, **15%**: PacketLark **3**, Postman **9**.
+- Storage, versioning and local workflows, **15%**: PacketLark **6**, Postman **8**.
+- Capture, specification and generated-code workflows, **15%**: PacketLark **5**, Postman **8**.
+- Team collaboration, ecosystem and governance, **15%**: PacketLark **0**, Postman **9**.
+- Reliability, safety and operational maturity, **15%**: PacketLark **3**, Postman **8**.
+- Usability, onboarding and documentation, **5%**: PacketLark **4**, Postman **8**.
 
-Weighted result: **Rea 3.75/10 (3.8 rounded), Postman 8.5/10**. This measures breadth and readiness, not effort or visual appeal. Rea is penalized heavily for team/platform capabilities it has not chosen to build; a narrower personal-tool rubric would be more favorable. Postman's security/maturity score is a documentation-based assessment, not a security certification.
+Weighted result: **PacketLark 3.75/10 (3.8 rounded), Postman 8.5/10**. This measures breadth and readiness, not effort or visual appeal. PacketLark is penalized heavily for team/platform capabilities it has not chosen to build; a narrower personal-tool rubric would be more favorable. Postman's security/maturity score is a documentation-based assessment, not a security certification.
 
 For a side project aimed at a developer comfortable with Node and HTTP, I would call it **6.5/10 useful today**: real functionality, a comprehensible codebase, and an interesting capture-to-spec direction, with meaningful rough edges. That separate score is a subjective use-case judgment, not another weighted platform score. I would still keep another API client available for complex work.
 
@@ -66,7 +66,7 @@ For a side project aimed at a developer comfortable with Node and HTTP, I would 
 - **Pre-request and response scripts: present subset.** Synchronous JavaScript, selected `pm.environment`, `pm.variables`, `pm.test`, `pm.expect` and response helpers; logs and test results rendered.
 - **Postman scripting compatibility: partial.** Hand-written Chai-like subset, not Chai or the full Postman runtime. No documented `pm.sendRequest`, package ecosystem, robust async test lifecycle, full scopes, or collection/folder script inheritance. Pre-request script failures are not comprehensively propagated into response-test results.
 - **Collection runner, data-driven CSV/JSON iterations, request chaining control: absent.** Sending individual requests is not a runner. Postman documents collection/CLI/CI workflows [P5].
-- **CLI: launch-only.** The `rea-api` binary starts the server; it is not a headless collection runner or CI test reporter.
+- **CLI: launch-only.** The `packetlark` binary starts the server; it is not a headless collection runner or CI test reporter.
 - **Mock servers, scheduled monitors, performance/load tests and flows: absent.** Postman lists these capabilities, with plan-specific limits [P6].
 - **API contract validation/linting/change governance: absent.** Example-based inference does not validate API conformance.
 
@@ -80,7 +80,7 @@ For a side project aimed at a developer comfortable with Node and HTTP, I would 
 - **Specification editing/validation/round trip: absent.** JSON preview is not a complete schema editor, validator, diff tool or publishing workflow. Postman's repository/Spec Hub covers substantially more [P4].
 - **Generated TypeScript SDK: draft quality.** One selected server, a subset of methods, JSON-centric body/response generation and basic schema conversion. Multi-origin routing, unions, auth, non-JSON responses and broader error semantics require review. No production-readiness claim is warranted.
 - **cURL/Fetch/Python/Go snippets: present but partial.** Generator lives in browser code; URL templates, language escaping and less common body/auth combinations need more tests. “Postman has only basic cURL/Fetch” was an unsupported contrast.
-- **Postman also captures and bootstraps collections from traffic.** The capture idea is useful, but not exclusive [P7, P8]. I did not establish an exact equivalent to every Rea inference heuristic, so I do not claim either product completely subsumes this workflow.
+- **Postman also captures and bootstraps collections from traffic.** The capture idea is useful, but not exclusive [P7, P8]. I did not establish an exact equivalent to every PacketLark inference heuristic, so I do not claim either product completely subsumes this workflow.
 
 ### Collaboration, distribution and business
 
@@ -89,12 +89,12 @@ For a side project aimed at a developer comfortable with Node and HTTP, I would 
 - **Roles, SSO, audit logs, organization administration, governance: absent.** Postman has plan-specific organization capabilities [P6].
 - **Public/private API network, integrations, agent/AI tooling: absent.** No need to build all of this for a side project, but it matters to a replacement comparison [P1, P4, P6].
 - **Packaging and updates: basic.** Node/npm source install and a launch binary, without a tested signed-desktop installer or update channel. Supported in this session on macOS/Node 24; CI is configured for Linux/Node 22 and 24.
-- **Price: MIT source, no Rea subscription implementation.** Postman has a free individual tier, with Solo and Team pricing shown separately; do not imply all Postman use is paid [P6]. Hosting/maintenance time still has a cost for Rea.
+- **Price: MIT source, no PacketLark subscription implementation.** Postman has a free individual tier, with Solo and Team pricing shown separately; do not imply all Postman use is paid [P6]. Hosting/maintenance time still has a cost for PacketLark.
 - **Community/support/release maturity: not established.** This repository does not prove sustained adoption, large-team support or a service commitment. Postman's documentation breadth is observable; no market-share or user-count advantage is invented here.
 
 ## Performance and safety: claims that needed correction
 
-1. **Memory comparison was not apples to apples.** Rea's health endpoint reports the Node process RSS only, excluding the browser. Startup logs in this session showed approximately 56–57 MB before browser activity, already above the original “under 40MB” wording. This is a session observation, not a cross-machine benchmark. Postman process trees were not measured here; no percentage advantage is defensible.
+1. **Memory comparison was not apples to apples.** PacketLark's health endpoint reports the Node process RSS only, excluding the browser. Startup logs in this session showed approximately 56–57 MB before browser activity, already above the original “under 40MB” wording. This is a session observation, not a cross-machine benchmark. Postman process trees were not measured here; no percentage advantage is defensible.
 2. **Startup claims lacked a protocol.** No controlled cold/warm runs, cache conditions, machine specification, browser cost, versioned Postman install, or repeated measurements supported “99% faster” or “under 50ms.” Removed.
 3. **First-byte timing is mislabeled.** In `HttpExecutor`, `firstByteMs` is assigned `totalMs` after the whole body is read. It is not a distinct time-to-first-byte measurement. Size is decoded UTF-8 byte length, not necessarily wire/compressed size.
 4. **“RCE immune” is not justified.** The engine uses `node:vm`; Node explicitly says it is not a security mechanism [N1]. A defensive proxy plus five tests does not establish hostile-script isolation. I have not demonstrated an escape, and I do not claim Postman is vulnerable.

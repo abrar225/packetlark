@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <title>Workbench — Rea API Studio</title>
+    <title>Workbench — PacketLark</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/studio.css" />
     <link rel="stylesheet" href="studio.css" />
@@ -14,10 +14,10 @@
   <body>
     <a class="skip-link" href="#workspace">Skip to workspace</a>
     <header>
-      <a class="brand" href="./" aria-label="Rea home"
-        ><img src="brand/rea-symbol.svg" alt="" width="36" height="36" /><span
+      <a class="brand" href="./" aria-label="PacketLark home"
+        ><img src="brand/packetlark-symbol.svg" alt="" width="36" height="36" /><span
           class="brand-name"
-          >rea<span class="brand-sub"> / studio</span></span
+          >PacketLark<span class="brand-sub"> / studio</span></span
         ></a
       >
       <nav class="view-nav" aria-label="Workspace views">
@@ -72,6 +72,7 @@
           <div class="sidebar-header">
             <span class="sidebar-title">Collections</span>
             <div>
+              <button class="icon-btn" aria-label="Manage collections" title="Manage collections" onclick="workspaceAuthoring.open(activeCollection?.id)">⋯</button>
               <button
                 class="icon-btn"
                 title="New Request"
@@ -123,7 +124,33 @@
             ><strong id="request-name">Select a request</strong
             ><span class="request-kind">HTTP request</span>
           </div>
+          <div class="workspace-sync-bar">
+            <span id="workspace-sync-message" role="status" aria-live="polite"
+              >Local files</span
+            >
+            <button
+              id="btn-check-workspace"
+              class="nav-btn"
+              aria-label="Check workspace files"
+            >
+              Check files
+            </button>
+            <button
+              id="btn-review-workspace"
+              class="nav-btn"
+              aria-label="Review workspace changes"
+              hidden
+            >
+              Review changes
+            </button>
+          </div>
+          <div class="workspace-sync-bar">
+            <span id="draft-recovery-status" role="status" aria-live="polite">Draft recovery off</span>
+            <button id="btn-draft-recovery" class="nav-btn">Draft recovery</button>
+          </div>
           <!-- URL dispatch bar -->
+          <div id="request-tabs" class="request-tabs" role="tablist" aria-label="Open request tabs"></div>
+          <p class="workbench-retention-note">Up to 20 tabs. Response previews: 2 MiB per tab, 16 MiB total; older previews can expire.</p>
           <div class="dispatch-bar">
             <select
               class="method-select"
@@ -159,6 +186,11 @@
                 >•</span
               >
             </button>
+
+            <span id="save-status" role="status" aria-live="polite"></span>
+            <button class="nav-btn" id="btn-undo-draft" onclick="undoActiveDraft()" title="Undo request edit">Undo</button>
+            <button class="nav-btn" id="btn-request-history" onclick="workbenchActivity.open()">History</button>
+            <button class="nav-btn" id="btn-save-example" onclick="workbenchActivity.saveExample()">Save example</button>
 
             <button
               class="nav-btn"
@@ -204,7 +236,10 @@
                 min="1"
                 max="300000"
                 value="30000"
-                onchange="activeRequest.timeoutMs=Number(this.value);markDirty()"
+                onchange="
+                  activeRequest.timeoutMs = Number(this.value);
+                  markDirty();
+                "
               />
               ms</label
             ><label
@@ -212,10 +247,20 @@
                 id="req-redirects"
                 type="checkbox"
                 checked
-                onchange="activeRequest.followRedirects=this.checked;markDirty()"
+                onchange="
+                  activeRequest.followRedirects = this.checked;
+                  markDirty();
+                "
               />
               Follow redirects</label
             ><span id="import-warning" role="status"></span>
+            <button class="nav-btn" id="btn-credentials">Credentials</button>
+            <button class="nav-btn" id="btn-oauth">OAuth</button>
+            <button class="nav-btn" id="btn-cookies">Cookies</button>
+            <button class="nav-btn" id="btn-tls">TLS</button>
+            <label><input type="checkbox" id="req-stream-response" onchange="if(activeRequest){activeRequest.streamResponse=this.checked;markDirty();}"> Stream preview / complete download</label>
+            <label>Request limit (MiB) <input type="number" id="req-max-request" min="0.001" max="50" step="1" value="4" style="width:64px" onchange="if(activeRequest){activeRequest.maxRequestBytes=Math.round(Number(this.value)*1048576);markDirty();}"></label>
+            <label>Response limit (MiB) <input type="number" id="req-max-response" min="0.001" max="50" step="1" value="10" style="width:64px" onchange="if(activeRequest){activeRequest.maxResponseBytes=Math.round(Number(this.value)*1048576);markDirty();}"></label>
           </div>
           <!-- Request Tabs -->
           <div class="tab-nav">
@@ -373,6 +418,9 @@
                   >
                 </div>
 
+                <label><input type="radio" name="body-mode" value="binary" onchange="changeBodyMode('binary')" /> binary file</label>
+                <div id="p2-body-controls"></div>
+
                 <!-- Raw Textarea -->
                 <div id="body-raw-container">
                   <textarea
@@ -434,6 +482,7 @@
                     <option value="bearer">Bearer Token</option>
                     <option value="basic">Basic Auth</option>
                     <option value="apikey">API Key</option>
+                    <option value="oauth2">OAuth 2.0</option>
                   </select>
                 </div>
                 <div id="auth-fields"></div>
@@ -441,6 +490,18 @@
 
               <!-- Scripts Tab -->
               <div id="tab-scripts" style="display: none">
+                <p
+                  style="
+                    font-size: 12px;
+                    color: var(--text-muted);
+                    margin-bottom: 12px;
+                  "
+                >
+                  Send saves environment script changes when its revision still
+                  matches. Collection, global and local changes remain in the
+                  response. Runs keep scope changes within the run. Variable
+                  writes and iteration data currently use strings.
+                </p>
                 <div style="margin-bottom: 16px">
                   <div
                     style="
@@ -522,6 +583,9 @@
                   </button>
                 </div>
               </div>
+
+              <p id="p2-stream-progress" role="status" class="p2-note" hidden></p>
+              <div id="p2-response-inspector"></div>
 
               <!-- Inline Search Bar -->
               <div class="search-bar-container" id="res-search-container">
@@ -629,7 +693,10 @@
         </div>
         <form
           id="runner-form"
-          onsubmit="event.preventDefault();startCollectionRun()"
+          onsubmit="
+            event.preventDefault();
+            startCollectionRun();
+          "
         >
           <label
             >Collection<select
@@ -740,6 +807,21 @@
           </div>
         </div>
 
+        <p
+          id="capture-budget"
+          style="font-size: 12px; color: var(--text-muted); padding: 12px"
+          role="status"
+        ></p>
+        <p
+          style="
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 0 12px 12px;
+          "
+        >
+          Inspection copies redact common credential fields and omit
+          unstructured bodies. Review generated drafts before sharing.
+        </p>
         <table class="traffic-table">
           <thead>
             <tr>
@@ -787,7 +869,7 @@
         ><span class="status-dot"></span
         ><span id="connection-state">Connecting…</span></span
       ><span id="health-info">Local server</span
-      ><a href="./">Rea API Studio <span>1.1</span></a>
+      ><a href="./">PacketLark <span>1.1</span></a>
     </footer>
     <div class="toast" id="toast" role="status"></div>
   </body>

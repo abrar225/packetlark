@@ -5,7 +5,8 @@ export type HttpMethod =
   | "DELETE"
   | "PATCH"
   | "HEAD"
-  | "OPTIONS";
+  | "OPTIONS"
+  | (string & {});
 
 export interface KeyValueParam {
   key: string;
@@ -13,6 +14,8 @@ export interface KeyValueParam {
   enabled?: boolean;
   description?: string;
   secret?: boolean;
+  fileId?: string;
+  fileName?: string;
 }
 
 export type AuthType =
@@ -21,10 +24,12 @@ export type AuthType =
   | "bearer"
   | "basic"
   | "apikey"
+  | "oauth2"
   | "unsupported";
 
 export interface AuthConfig {
   type: AuthType;
+  oauthConnectionId?: string;
   originalType?: string;
   postman?: Record<string, any>;
   bearerToken?: string;
@@ -36,6 +41,7 @@ export interface AuthConfig {
 }
 
 export type BodyMode =
+  | "binary"
   | "none"
   | "raw-json"
   | "raw-text"
@@ -46,6 +52,8 @@ export type BodyMode =
 export interface RequestBody {
   mode: BodyMode;
   raw?: string;
+  fileId?: string;
+  schema?: Record<string, unknown>;
   formData?: KeyValueParam[];
   postman?: Record<string, any>;
 }
@@ -65,7 +73,10 @@ export interface HttpRequest {
   testScripts?: string[];
   timeoutMs?: number;
   followRedirects?: boolean;
+  streamResponse?: boolean;
   maxResponseBytes?: number;
+  maxRequestBytes?: number;
+  tls?: { ca?: string; cert?: string; keyRef?: string; passphraseRef?: string };
   postman?: Record<string, any>;
 }
 
@@ -85,6 +96,16 @@ export interface ApiErrorDetail {
 }
 
 export interface HttpResponse {
+  /** Indicates transport was attempted, not a guarantee about remote side effects. */
+  transportAttempted?: boolean;
+  persistence?: {
+    environment: {
+      status: "saved" | "conflict" | "failed";
+      revision?: string;
+      code?: string;
+      message?: string;
+    };
+  };
   status: number;
   statusText: string;
   headers: Record<string, string>;
@@ -95,6 +116,9 @@ export interface HttpResponse {
   logs?: string[];
   updatedVariables?: Record<string, string>;
   error?: ApiErrorDetail;
+  headerEntries?: Array<[string, string]>;
+  artifactId?: string;
+  previewTruncated?: boolean;
   bodyBase64?: string;
   bodyEncoding?: "utf8" | "base64";
   updatedEnvironment?: Record<string, string>;
@@ -126,6 +150,8 @@ export interface CollectionItem {
 }
 
 export interface ApiCollection {
+  /** Workspace content revision; excluded from canonical JSON files. */
+  revision?: string;
   id: string;
   name: string;
   description?: string;
@@ -140,6 +166,7 @@ export interface ApiCollection {
 }
 
 export interface Environment {
+  revision?: string;
   id: string;
   name: string;
   values: KeyValueParam[];
@@ -152,6 +179,8 @@ export interface SniffedTrafficItem {
   url: string;
   pathname: string;
   queryParams: Record<string, string>;
+  queryParamEntries?: Array<[string, string]>;
+  redaction?: { version: number; applied: boolean; bodyOmitted?: boolean };
   requestHeaders: Record<string, string>;
   requestBody?: any;
   responseStatus: number;

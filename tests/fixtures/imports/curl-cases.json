@@ -1,0 +1,92 @@
+[
+  {
+    "name": "quoted shell syntax stays literal",
+    "command": "curl 'https://fixture.invalid/path?x=$(whoami)' -H 'X-Repeat: one' -H 'X-Repeat: two'",
+    "method": "GET",
+    "url": "https://fixture.invalid/path?x=$(whoami)",
+    "headers": [
+      [
+        "X-Repeat",
+        "one"
+      ],
+      [
+        "X-Repeat",
+        "two"
+      ]
+    ]
+  },
+  {
+    "name": "explicit urlencoded body",
+    "command": "curl https://fixture.invalid -H 'Content-Type: application/x-www-form-urlencoded' --data 'tag=one&tag=two&blank='",
+    "method": "POST",
+    "body": "tag=one&tag=two&blank="
+  },
+  {
+    "name": "empty raw body",
+    "command": "curl https://fixture.invalid --data-raw ''",
+    "method": "POST",
+    "body": ""
+  },
+  {
+    "name": "literal at in data-raw",
+    "command": "curl https://fixture.invalid --data-raw '@fixture'",
+    "method": "POST",
+    "body": "@fixture"
+  },
+  {
+    "name": "json defaults",
+    "command": "curl https://fixture.invalid --json '{\"ok\":true}'",
+    "method": "POST",
+    "body": "{\"ok\":true}"
+  },
+  {
+    "name": "file option rejected",
+    "command": "curl https://fixture.invalid --data-binary @fixture-do-not-read.txt",
+    "error": "file uploads"
+  },
+  {
+    "name": "form option rejected",
+    "command": "curl https://fixture.invalid -F a=b",
+    "error": "Unsupported cURL option -F"
+  },
+  {
+    "name": "proxy rejected",
+    "command": "curl --proxy http://fixture.invalid https://fixture.invalid",
+    "error": "Unsupported cURL option --proxy"
+  },
+  {
+    "name": "compression behavior rejected",
+    "command": "curl --compressed https://fixture.invalid",
+    "error": "Unsupported cURL option --compressed"
+  },
+  {
+    "name": "multiple URLs rejected",
+    "command": "curl https://fixture.invalid/one https://fixture.invalid/two",
+    "error": "Only one cURL URL"
+  },
+  {
+    "name": "mixed json encoding rejected",
+    "command": "curl https://fixture.invalid --json '{}' -d a=b",
+    "error": "Combining --json"
+  },
+  {
+    "name": "unsupported method rejected",
+    "command": "curl https://fixture.invalid -X TRACE",
+    "error": "Unsupported cURL HTTP method"
+  },
+  {
+    "name": "missing argument rejected",
+    "command": "curl https://fixture.invalid -H",
+    "error": "Missing cURL option value"
+  },
+  {
+    "name": "multiple explicit URLs rejected",
+    "command": "curl --url https://fixture.invalid/one --url https://fixture.invalid/two",
+    "error": "Only one cURL URL"
+  },
+  {
+    "name": "header suppression rejected",
+    "command": "curl https://fixture.invalid -H 'Accept:'",
+    "error": "header suppression"
+  }
+]

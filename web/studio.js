@@ -1,4 +1,24 @@
+import { CredentialControls } from './credential-controls.js';
+import { HttpControls } from './http-controls.js';
+window.PacketLarkCredentialControls = CredentialControls;
+window.PacketLarkHttpControls = HttpControls;
 import "./fonts.css";
+import { CollectionTree } from "./collection-tree.js";
+import { WorkspaceSync } from "./workspace-sync.js";
+import { DraftRecovery } from "./draft-recovery.js";
+import { WorkspaceAuthoring } from "./workspace-authoring.js";
+import { WorkbenchState, WorkbenchActivity, sanitizeExample } from "./workbench-activity.js";
+import { validWorkspaceResource } from "../src/core/models/WorkspaceValidation.ts";
+import { resolveCollectionRequest } from "../src/core/models/CollectionContext.ts";
+window.PacketLarkCollectionTree = CollectionTree;
+window.PacketLarkWorkspaceSync = WorkspaceSync;
+window.PacketLarkDraftRecovery = DraftRecovery;
+window.PacketLarkWorkspaceAuthoring = WorkspaceAuthoring;
+window.PacketLarkWorkbenchState = WorkbenchState;
+window.PacketLarkWorkbenchActivity = WorkbenchActivity;
+window.PacketLarkSanitizeExample = sanitizeExample;
+window.PacketLarkValidWorkspaceResource = validWorkspaceResource;
+window.PacketLarkResolveCollectionRequest = resolveCollectionRequest;
 import {
   createIcons,
   Plus,

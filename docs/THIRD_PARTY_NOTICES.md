@@ -1,6 +1,6 @@
 # Third-party notices
 
-Rea source is MIT licensed. Dependencies retain their own terms; free-to-use does not mean every dependency uses the MIT or an OSI-approved license. Generated bundle notices are emitted beside the JavaScript.
+PacketLark source is MIT licensed. Dependencies retain their own terms; free-to-use does not mean every dependency uses the MIT or an OSI-approved license. Generated bundle notices are emitted beside the JavaScript.
 
 ## gsap 3.15.0
 

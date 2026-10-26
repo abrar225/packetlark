@@ -1,0 +1,138 @@
+{
+  "source_commit": "503404f7d0977efb9681af95ef318853411beb2a",
+  "methodology": "Fresh disposable servers started after the source commit. Ego Page API public DOM and HTTP workflows; injected failures/latency confined to HTTP adapter. Not installed editor-host or cross-OS certification.",
+  "results": [
+    {
+      "verdict": "PASS",
+      "cases": [
+        "first native item auto-selects and executes with item identity"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "search matches displayed native label",
+        "search matches unsaved URL",
+        "nested folders collapse and expand with Enter"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "Send waits for pending environment save",
+        "execution uses latest saved environment revision and value"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "new request saves with returned collection revision",
+        "confirmed deletion discards only owned draft without orphan unload guard"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "late save retains selected draft",
+        "draft restored on switch",
+        "edits during save stay dirty",
+        "failed save retains draft",
+        "late response cannot render or clear another execution",
+        "selection clears prior response"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "environment uses update endpoint",
+        "edits serialize with current revision",
+        "latest queued input persists",
+        "failed environment save retains draft"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "stale request deletion preserves request",
+        "stale environment deletion reports conflict and preserves selection"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "clean editor adopts disk edit",
+        "dirty request survives external change",
+        "explicit rebase preserves disk context",
+        "externally deleted collection recovers as a separate saved copy"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "late disk snapshot cannot replace a newer saved request"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "failed environment draft survives disk conflict",
+        "recovered environment copy preserves both versions"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "explicit discard loads disk and removes the owned unload guard"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "rebasing dirty B reloads cached clean A from disk"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "failed busy save exposes conflict after an unchanged-disk refresh"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "copy resolution prevents closing and editing until its bounded request settles"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "review masks API-key fields and marked secret variable values"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "runner admits one pending submission",
+        "runner sends reviewed revision and reports a stale context before transport"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "review never retains another dialog's footer actions"
+      ]
+    },
+    {
+      "verdict": "PASS",
+      "cases": [
+        "bounded DOM for 10k workspace",
+        "scroll reaches later requests",
+        "search finds offscreen request",
+        "draft ownership survives window changes",
+        "Home/End and Enter select exact requests",
+        "scroll-away retains logical keyboard focus and arrow navigation"
+      ]
+    }
+  ],
+  "cases": 41
+}

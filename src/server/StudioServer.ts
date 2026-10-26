@@ -1,14 +1,23 @@
 import http from "node:http";
+import { readIncomingBody } from "../core/engine/BodyBudget.js";
+import { WorkspaceRepository } from "../core/workspace/WorkspaceRepository.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   CollectionRunner,
-  RunResult,
+  RunReport,
+  reportWithoutBodies,
 } from "../core/runner/CollectionRunner.js";
 import { resolveCollectionRequest } from "../core/models/CollectionContext.js";
 import { CookieJar } from "tough-cookie";
-import { HttpExecutor } from "../core/engine/HttpExecutor.js";
+import { HttpExecutor, getExecutionState } from "../core/engine/HttpExecutor.js";
+import { WorkspaceExecution } from "../core/engine/WorkspaceExecution.js";
+import { P2Api } from "./P2Api.js";
+import type { CredentialProvider } from "../core/security/CredentialStore.js";
+import { SecretRedactor } from "../core/security/SecretRedactor.js";
+import { secretReferencePattern } from "../core/security/CredentialStore.js";
+import { sanitizeExample } from "../core/workspace/WorkbenchState.js";
 import { PostmanConverter } from "../core/models/PostmanConverter.js";
 import { TrafficSnifferProxy } from "../core/sniffing/TrafficSnifferProxy.js";
 import { OpenApiGenerator } from "../core/sniffing/OpenApiGenerator.js";
@@ -24,7 +33,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "../../");
 const publicDir = path.resolve(projectRoot, "public");
-const storageDir = path.resolve(projectRoot, ".rea-api");
+const storageDir = path.resolve(projectRoot, ".packetlark");
 
 function findAndUpdateRequest(
   items: CollectionItem[],
@@ -58,402 +67,285 @@ function findAndDeleteRequest(items: CollectionItem[], reqId: string): boolean {
   return false;
 }
 
-export class StudioServer {
+interface RunJob {
+  controller: AbortController;
+  state: "running" | "completed";
+  result?: RunReport;
+  error?: string;
+  progress?: any;
+  retainedBytes?: number;
+}
+const maxRunHistoryBytes = 32 * 1024 * 1024;
+export class StudioServer extends WorkspaceRepository {
   private server: http.Server | null = null;
   private port: number;
-  private cookieJar = new CookieJar();
-  private runs = new Map<
-    string,
-    {
-      controller: AbortController;
-      state: "running" | "completed";
-      result?: RunResult;
-      error?: string;
-      progress?: any;
-    }
-  >();
-  private storageDir: string;
-  private collectionsDir: string;
-  private environmentsDir: string;
+  private p2Context?: WorkspaceExecution;
+  private p2Api?: P2Api;
+  private executions = new Set<AbortController>();
+  private runs = new Map<string, RunJob>();
+  private knownSecrets = new SecretRedactor();
   private sniffer: TrafficSnifferProxy;
-  private collections: Map<string, ApiCollection> = new Map();
-  private environments: Map<string, Environment> = new Map();
+  private lifecycle:
+    "created" | "starting" | "running" | "stopping" | "stopped" = "created";
+  private startPromise: Promise<number>;
+  private listeningPromise: Promise<number>;
+  private stopPromise: Promise<void>;
 
   constructor(
     port: number = 4040,
     snifferPort: number = 8085,
     workspaceDir: string = storageDir,
+    private p2Options: { credentialProvider?: CredentialProvider; allowInsecureOAuthForTests?: boolean } = {},
   ) {
-    this.storageDir = workspaceDir;
-    this.collectionsDir = path.join(workspaceDir, "collections");
-    this.environmentsDir = path.join(workspaceDir, "environments");
+    super(workspaceDir);
     this.port = port;
-    this.sniffer = new TrafficSnifferProxy(snifferPort);
-    this.ensureStorage();
-    this.loadInitialCollections();
-    this.loadInitialEnvironments();
+    this.sniffer = new TrafficSnifferProxy(snifferPort, { knownSecrets: this.knownSecrets });
   }
 
-  private ensureStorage() {
-    if (!fs.existsSync(this.storageDir)) {
-      fs.mkdirSync(this.storageDir, { recursive: true });
+  private p2() {
+    if (!this.p2Api) {
+      const baseUrl = `http://127.0.0.1:${this.port}`;
+      this.p2Context = new WorkspaceExecution(this.storageDir, { knownSecrets: this.knownSecrets, serverOwned: true, callbackUrl: baseUrl + '/api/oauth/callback', credentialProvider: this.p2Options.credentialProvider, allowInsecureLoopbackForTests: this.p2Options.allowInsecureOAuthForTests });
+      this.p2Api = new P2Api(this.p2Context, baseUrl, {
+        assertOwned: () => this.assertWorkspaceDirectories(),
+        snapshot: () => this.snapshot(),
+        commit: (kind, value, revision) => { if (kind === 'collections') this.persistCollection(value.id, value, revision); else this.persistEnvironment(value.id, value, revision); },
+      });
     }
-    if (!fs.existsSync(this.collectionsDir)) {
-      fs.mkdirSync(this.collectionsDir, { recursive: true });
-    }
-    if (!fs.existsSync(this.environmentsDir)) {
-      fs.mkdirSync(this.environmentsDir, { recursive: true });
-    }
+    return this.p2Api;
   }
 
-  private loadInitialCollections() {
-    // 1. Load multi-file collections from .rea-api/collections/*.json
-    try {
-      const files = fs.readdirSync(this.collectionsDir);
-      for (const file of files) {
-        if (file.endsWith(".json")) {
-          try {
-            const raw = fs.readFileSync(
-              path.join(this.collectionsDir, file),
-              "utf8",
-            );
-            const col = JSON.parse(raw);
-            if (col && col.id) {
-              this.collections.set(col.id, col);
-            }
-          } catch {}
-        }
+  private checkExecutionRevisions(body: any) {
+    for (const [label, revision, current] of [
+      [
+        "Collection",
+        body.collectionRevision,
+        this.collections.get(body.collectionId)?.revision,
+      ],
+      [
+        "Environment",
+        body.environmentRevision,
+        this.environments.get(body.environmentId)?.revision,
+      ],
+    ])
+      if (revision && revision !== current)
+        throw Object.assign(
+          new Error(
+            `${label} changed before execution. Review its current settings before sending or running.`,
+          ),
+          { statusCode: 412, code: "ERR_WORKSPACE_CONFLICT" },
+        );
+  }
+
+  private activeWorkCount() {
+    return (
+      this.executions.size +
+      [...this.runs.values()].filter((job) => job.state === "running").length
+    );
+  }
+
+  private runHistoryStats() {
+    let retainedBytes = 0,
+      completedRuns = 0;
+    for (const job of this.runs.values())
+      if (job.state === "completed") {
+        retainedBytes += job.retainedBytes || 0;
+        completedRuns++;
       }
-    } catch {}
-
-    // 2. Fallback to monolithic collections.json for backwards compatibility
-    if (this.collections.size === 0) {
-      const collFile = path.join(this.storageDir, "collections.json");
-      if (fs.existsSync(collFile)) {
-        try {
-          const data = JSON.parse(fs.readFileSync(collFile, "utf8"));
-          if (Array.isArray(data)) {
-            for (const c of data) {
-              this.collections.set(c.id, c);
-              this.persistCollection(c.id);
-            }
-          }
-        } catch {}
-      }
-    }
-
-    // 3. If empty, create starter sample collection
-    if (this.collections.size === 0) {
-      const sampleCol: ApiCollection = {
-        id: "col_sample_1",
-        name: "GitHub Public API Sample",
-        description: "Demonstration collection with variables and assertions.",
-        schemaVersion: "2.1.0",
-        variables: [
-          { key: "baseUrl", value: "https://api.github.com", enabled: true },
-          { key: "repo", value: "abrar225/rea-api-studio", enabled: true },
-        ],
-        items: [
-          {
-            id: "req_1",
-            name: "Get Rea repository",
-            request: {
-              id: "req_1",
-              name: "Get Rea repository",
-              method: "GET",
-              url: "{{baseUrl}}/repos/{{repo}}",
-              headers: [
-                { key: "User-Agent", value: "ReaAPI-Studio", enabled: true },
-              ],
-              queryParams: [],
-              body: { mode: "none" },
-              auth: { type: "none" },
-              testScript: `pm.test("Status code is 200", function () {
-    pm.expect(pm.response.code).to.equal(200);
-    pm.response.to.have.status(200);
-});
-
-pm.test("Has valid repo name", function () {
-    var data = pm.response.json();
-    pm.expect(data.name).to.equal("rea-api-studio");
-});`,
-            },
-          },
-          {
-            id: "req_2",
-            name: "HTTPBin Echo Test",
-            request: {
-              id: "req_2",
-              name: "HTTPBin Echo Test",
-              method: "POST",
-              url: "https://httpbin.org/post",
-              headers: [
-                {
-                  key: "Content-Type",
-                  value: "application/json",
-                  enabled: true,
-                },
-              ],
-              queryParams: [
-                { key: "traceId", value: "{{$guid}}", enabled: true },
-              ],
-              body: {
-                mode: "raw-json",
-                raw: JSON.stringify(
-                  {
-                    timestamp: "{{$timestamp}}",
-                    client: "ReaAPI Studio",
-                    message: "Hello from Rea",
-                  },
-                  null,
-                  2,
-                ),
-              },
-              auth: { type: "none" },
-              testScript: `pm.test("Echo response received", function () {
-    pm.expect(pm.response.code).to.equal(200);
-    var json = pm.response.json();
-    pm.expect(json.json.client).to.equal("ReaAPI Studio");
-});`,
-            },
-          },
-        ],
-      };
-      this.collections.set(sampleCol.id, sampleCol);
-      this.persistCollection(sampleCol.id);
-    }
+    return {
+      retainedBytes,
+      completedRuns,
+      limitBytes: maxRunHistoryBytes,
+      maxRuns: 20,
+    };
   }
 
-  private loadInitialEnvironments() {
-    // 1. Load multi-file environments from .rea-api/environments/*.json
-    try {
-      const files = fs.readdirSync(this.environmentsDir);
-      for (const file of files) {
-        if (file.endsWith(".json")) {
-          try {
-            const raw = fs.readFileSync(
-              path.join(this.environmentsDir, file),
-              "utf8",
-            );
-            const env = JSON.parse(raw);
-            if (env && env.id) {
-              this.environments.set(env.id, env);
-            }
-          } catch {}
-        }
-      }
-    } catch {}
-
-    // 2. Fallback to monolithic environments.json
-    if (this.environments.size === 0) {
-      const envFile = path.join(this.storageDir, "environments.json");
-      if (fs.existsSync(envFile)) {
-        try {
-          const data = JSON.parse(fs.readFileSync(envFile, "utf8"));
-          if (Array.isArray(data)) {
-            for (const env of data) {
-              this.environments.set(env.id, env);
-              this.persistEnvironment(env.id);
-            }
-          }
-        } catch {}
-      }
-    }
-
-    // 3. If empty, create default Development environment
-    if (this.environments.size === 0) {
-      const devEnv: Environment = {
-        id: "env_dev_1",
-        name: "Development",
-        values: [
-          { key: "baseUrl", value: "https://httpbin.org", enabled: true },
-          { key: "apiKey", value: "dev-secret-token-12345", enabled: true },
-        ],
-      };
-      this.environments.set(devEnv.id, devEnv);
-      this.persistEnvironment(devEnv.id);
-    }
-  }
-
-  private atomicWrite(file: string, data: string) {
-    const temporary = file + "." + crypto.randomUUID() + ".tmp";
-    try {
-      fs.writeFileSync(temporary, data, { encoding: "utf8", mode: 0o600 });
-      fs.renameSync(temporary, file);
-    } finally {
-      if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
-    }
-  }
-
-  public persistCollection(id: string) {
-    const col = this.collections.get(id);
-    if (!col) return;
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      this.atomicWrite(
-        path.join(this.collectionsDir, `${safeId}.json`),
-        JSON.stringify(col, null, 2),
+  private completeRun(id: string, job: RunJob) {
+    job.state = "completed";
+    job.retainedBytes =
+      (job.result ? Buffer.byteLength(JSON.stringify(job.result)) : 0) +
+      Buffer.byteLength(
+        JSON.stringify({
+          id,
+          state: job.state,
+          error: job.error,
+          progress: job.progress,
+        }),
       );
-      // Backwards compatibility mirror
-      const collFile = path.join(this.storageDir, "collections.json");
-      fs.writeFileSync(
-        collFile,
-        JSON.stringify(Array.from(this.collections.values()), null, 2),
-        "utf8",
+    while (
+      this.runHistoryStats().retainedBytes > maxRunHistoryBytes ||
+      this.runs.size > 20
+    ) {
+      const oldest = [...this.runs].find(
+        ([, entry]) => entry.state === "completed",
       );
-    } catch (e) {
-      console.error("Failed to persist collection:", e);
-      throw e;
+      if (!oldest) break;
+      this.runs.delete(oldest[0]);
     }
   }
 
-  public persistCollections() {
-    for (const id of this.collections.keys()) {
-      this.persistCollection(id);
-    }
+  public start(): Promise<number> {
+    if (this.lifecycle === "starting" || this.lifecycle === "running")
+      return this.startPromise;
+    if (this.lifecycle !== "created")
+      return Promise.reject(
+        Object.assign(
+          new Error(
+            "This Studio has stopped. Create a new instance to reopen it.",
+          ),
+          { code: "ERR_STUDIO_STOPPED" },
+        ),
+      );
+    this.lifecycle = "starting";
+    this.listeningPromise = this.startListening();
+    this.startPromise = this.listeningPromise
+      .then((port) => {
+        this.assertStarting();
+        this.lifecycle = "running";
+        return port;
+      })
+      .catch(async (error) => {
+        await this.stop();
+        throw error;
+      });
+    return this.startPromise;
   }
 
-  public deleteCollection(id: string) {
-    this.collections.delete(id);
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const colFile = path.join(this.collectionsDir, `${safeId}.json`);
-      if (fs.existsSync(colFile)) fs.unlinkSync(colFile);
-      const allFile = path.join(this.storageDir, "collections.json");
-      fs.writeFileSync(
-        allFile,
-        JSON.stringify(Array.from(this.collections.values()), null, 2),
-        "utf8",
+  private assertStarting() {
+    if (this.lifecycle !== "starting")
+      throw Object.assign(
+        new Error("Studio startup was cancelled by shutdown."),
+        { code: "ERR_STUDIO_STOPPED" },
       );
-    } catch (e) {
-      console.error("Failed to delete collection file:", e);
-    }
+    this.lease?.assertOwned();
   }
 
-  public persistEnvironment(id: string) {
-    const env = this.environments.get(id);
-    if (!env) return;
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      this.atomicWrite(
-        path.join(this.environmentsDir, `${safeId}.json`),
-        JSON.stringify(env, null, 2),
-      );
-      // Backwards compatibility mirror
-      const envFile = path.join(this.storageDir, "environments.json");
-      fs.writeFileSync(
-        envFile,
-        JSON.stringify(Array.from(this.environments.values()), null, 2),
-        "utf8",
-      );
-    } catch (e) {
-      console.error("Failed to persist environment:", e);
-      throw e;
-    }
-  }
-
-  public deleteEnvironment(id: string) {
-    this.environments.delete(id);
-    try {
-      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const envFile = path.join(this.environmentsDir, `${safeId}.json`);
-      if (fs.existsSync(envFile)) fs.unlinkSync(envFile);
-      const allFile = path.join(this.storageDir, "environments.json");
-      fs.writeFileSync(
-        allFile,
-        JSON.stringify(Array.from(this.environments.values()), null, 2),
-        "utf8",
-      );
-    } catch (e) {
-      console.error("Failed to delete environment file:", e);
-    }
-  }
-
-  public async start(): Promise<number> {
-    // Start sniffer proxy in parallel
+  private async startListening(): Promise<number> {
+    this.assertStarting();
     await this.sniffer.start();
+    this.assertStarting();
 
     return new Promise((resolve, reject) => {
-      this.server = http.createServer(async (req, res) => {
-        // Only the local studio may use this API from a browser. Check Host too,
-        // so a foreign hostname resolving to loopback cannot bypass the origin check.
-        const host = req.headers.host || "";
-        const allowedHosts = [
-          `localhost:${this.port}`,
-          `127.0.0.1:${this.port}`,
-        ];
-        const origin = req.headers.origin;
-        if (
-          !allowedHosts.includes(host) ||
-          (origin && !allowedHosts.some((h) => origin === `http://${h}`))
-        ) {
-          res.writeHead(403, { "Content-Type": "application/json" });
-          res.end(
-            JSON.stringify({
-              error: "Only the local studio origin is allowed",
-            }),
-          );
-          return;
-        }
-        res.setHeader("X-Content-Type-Options", "nosniff");
-        res.setHeader("Referrer-Policy", "no-referrer");
-        if (origin) {
-          res.setHeader("Access-Control-Allow-Origin", origin);
-          res.setHeader("Vary", "Origin");
-        }
-        if (req.method === "OPTIONS") {
-          res.setHeader(
-            "Access-Control-Allow-Methods",
-            "GET, POST, PUT, DELETE, OPTIONS",
-          );
-          res.setHeader(
-            "Access-Control-Allow-Headers",
-            "Content-Type, Authorization, X-Requested-With",
-          );
-          res.writeHead(204);
-          res.end();
-          return;
-        }
-        const urlObj = new URL(req.url || "/", `http://localhost:${this.port}`);
-        const pathname = urlObj.pathname;
-
-        // REST API routes with top-level error isolation
-        if (pathname.startsWith("/api/")) {
-          try {
-            await this.handleApi(req, res, pathname, urlObj);
-          } catch (err: any) {
-            res.writeHead(err.statusCode || 500, {
-              "Content-Type": "application/json",
-            });
+      this.server = http.createServer(
+        {
+          headersTimeout: 10000,
+          requestTimeout: 10000,
+          connectionsCheckingInterval: 1000,
+        },
+        async (req, res) => {
+          req.on("error", () => {});
+          res.on("error", () => {});
+          // Only the local studio may use this API from a browser. Check Host too,
+          // so a foreign hostname resolving to loopback cannot bypass the origin check.
+          const host = req.headers.host || "";
+          const allowedHosts = [
+            `localhost:${this.port}`,
+            `127.0.0.1:${this.port}`,
+          ];
+          const origin = req.headers.origin;
+          // Provider redirects are top-level GET navigations. Only this fixed
+          // callback bypasses the fetch-site restriction; OAuthService still
+          // verifies its owned callback URL and consumes an unguessable state.
+          const oauthNavigation = req.method === 'GET' &&
+            new URL(req.url || '/', `http://${allowedHosts[1]}`).pathname === '/api/oauth/callback' &&
+            req.headers['sec-fetch-mode'] === 'navigate' && req.headers['sec-fetch-dest'] === 'document' && !origin;
+          if (
+            !allowedHosts.includes(host) ||
+            (req.headers["sec-fetch-site"] && !oauthNavigation &&
+              !["same-origin", "none"].includes(
+                String(req.headers["sec-fetch-site"]),
+              )) ||
+            (origin && !allowedHosts.some((h) => origin === `http://${h}`))
+          ) {
+            res.writeHead(403, { "Content-Type": "application/json" });
             res.end(
               JSON.stringify({
-                error: {
-                  category: "Internal Server Error",
-                  message:
-                    err.message || "An unhandled server exception occurred",
-                  guidance:
-                    "Please inspect the request payload or server diagnostics.",
-                  code: err.code || "INTERNAL_ERROR",
-                },
+                error: "Only the local studio origin is allowed",
               }),
             );
+            return;
           }
-          return;
-        }
+          res.setHeader("X-Content-Type-Options", "nosniff");
+          res.setHeader("Referrer-Policy", "no-referrer");
+          if (origin) {
+            res.setHeader("Access-Control-Allow-Origin", origin);
+            res.setHeader("Vary", "Origin");
+          }
+          if (req.method === "OPTIONS") {
+            res.setHeader(
+              "Access-Control-Allow-Methods",
+              "GET, POST, PUT, DELETE, OPTIONS",
+            );
+            res.setHeader(
+              "Access-Control-Allow-Headers",
+              "Content-Type, Authorization, X-Requested-With",
+            );
+            res.writeHead(204);
+            res.end();
+            return;
+          }
+          const urlObj = new URL(
+            req.url || "/",
+            `http://localhost:${this.port}`,
+          );
+          const pathname = urlObj.pathname;
 
-        // Static files from public/
-        this.serveStatic(req, res, pathname);
-      });
+          // REST API routes with top-level error isolation
+          if (pathname.startsWith("/api/")) {
+            try {
+              await this.handleApi(req, res, pathname, urlObj);
+            } catch (err: any) {
+              if (res.destroyed || res.headersSent) {
+                if (!res.destroyed) res.destroy();
+                return;
+              }
+              res.shouldKeepAlive = false;
+              res.setHeader("Connection", "close");
+              res.once("finish", () => {
+                if (!req.complete) req.destroy();
+              });
+              res.writeHead(err.statusCode || 500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  error: {
+                    category: "Internal Server Error",
+                    message:
+                      err.message || "An unhandled server exception occurred",
+                    guidance:
+                      "Please inspect the request payload or server diagnostics.",
+                    code: err.code || "INTERNAL_ERROR",
+                  },
+                }),
+              );
+            }
+            return;
+          }
 
+          // Static files from public/
+          this.serveStatic(req, res, pathname);
+        },
+      );
+
+      this.server.maxConnections = 64;
       this.server.listen(this.port, "127.0.0.1", () => {
         this.port = (this.server.address() as { port: number }).port;
         resolve(this.port);
       });
 
       this.server.on("error", (err: any) => {
-        if (err.code === "EADDRINUSE") {
+        if (this.lifecycle !== "starting") {
+          reject(err);
+          return;
+        }
+        if (err.code === "EADDRINUSE" && this.port < 65535) {
           this.port += 1;
-          this.server?.listen(this.port, "127.0.0.1");
+          try {
+            this.server?.listen(this.port, "127.0.0.1");
+          } catch (error) {
+            reject(error);
+          }
         } else {
           reject(err);
         }
@@ -467,23 +359,29 @@ pm.test("Has valid repo name", function () {
     pathname: string,
     urlObj: URL,
   ) {
+    const workspacePath =
+      /^\/api\/(workspace|collections|environments)(\/|$)/.test(pathname) ||
+      pathname === "/api/execute" ||
+      pathname === "/api/import/postman" ||
+      (pathname === "/api/runs" && req.method === "POST");
+    if (workspacePath) this.assertWorkspaceDirectories();
+    const clientRevision =
+      typeof req.headers["if-match"] === "string"
+        ? req.headers["if-match"].replace(/^"|"$/g, "")
+        : undefined;
     const sendJson = (data: any, statusCode = 200) => {
       res.writeHead(statusCode, { "Content-Type": "application/json" });
       res.end(JSON.stringify(data));
     };
 
     const readBody = async (): Promise<any> => {
-      const chunks: Buffer[] = [];
-      let bytes = 0;
-      for await (const chunk of req) {
-        bytes += chunk.length;
-        if (bytes > 2 * 1024 * 1024)
-          throw Object.assign(new Error("Request payload exceeds 2 MiB"), {
-            statusCode: 413,
-          });
-        chunks.push(chunk);
-      }
-      const str = Buffer.concat(chunks).toString("utf8");
+      const bytes = await readIncomingBody(
+        req,
+        2 * 1024 * 1024,
+        AbortSignal.timeout(10000),
+      );
+      if (workspacePath) this.assertWorkspaceDirectories();
+      const str = bytes.toString("utf8");
       if (!str.trim()) return {};
       try {
         return JSON.parse(str);
@@ -494,13 +392,38 @@ pm.test("Has valid repo name", function () {
       }
     };
 
+    if (/^\/api\/(credentials|oauth|files|responses|cookies|validate\/json)(\/|$)/.test(pathname) && await this.p2().handle(req, res, urlObj, readBody)) return;
+
+    if (pathname === "/api/workspace/move" && req.method === "POST") {
+      sendJson(this.moveItem(await readBody()));
+      return;
+    }
+
+    if (pathname === "/api/workspace/identity" && req.method === "GET") {
+      res.setHeader("Cache-Control", "no-store");
+      sendJson({ id: this.revision(JSON.stringify([this.storageDir, this.directoryIdentities.get(this.storageDir)])) });
+      return;
+    }
+
+    if (pathname === "/api/workspace" && req.method === "GET") {
+      const snapshot = this.refreshWorkspaceSnapshot();
+      const tag = `"${snapshot.revision}"`;
+      res.setHeader("ETag", tag);
+      res.setHeader("Cache-Control", "no-store");
+      if (req.headers["if-none-match"] === tag) {
+        res.writeHead(304);
+        res.end();
+      } else sendJson(snapshot);
+      return;
+    }
+
     // 1. Health check & memory footprint
     if (pathname === "/api/health") {
       const mem = process.memoryUsage();
       sendJson({
         status: "healthy",
         uptimeSec: Math.floor(process.uptime()),
-        product: "rea-api-studio",
+        product: "packetlark",
         version: "1.1.0",
         memoryRssMb: (mem.rss / 1024 / 1024).toFixed(2),
         memoryHeapUsedMb: (mem.heapUsed / 1024 / 1024).toFixed(2),
@@ -508,22 +431,38 @@ pm.test("Has valid repo name", function () {
         snifferPort: this.sniffer.getPort(),
         collectionsCount: this.collections.size,
         environmentsCount: this.environments.size,
+        runHistory: this.runHistoryStats(),
+        activeWork: this.activeWorkCount(),
+        maxActiveWork: 2,
       });
       return;
     }
 
     // 2. Dispatch Request Execution with environment sync
-    if (pathname === "/api/execute" && req.method === "POST") {
+    if (["/api/execute", "/api/execute/stream"].includes(pathname) && req.method === "POST") {
+      const streaming = pathname.endsWith('/stream');
       const body = await readBody();
+      this.refreshWorkspaceSnapshot();
+      this.checkExecutionRevisions(body);
       let httpRequest = body.request;
       let collectionVars = body.collectionVariables || [];
       const envId = body.environmentId;
       let envVars = body.environmentVariables || [];
+      const environmentSnapshot =
+        envId && this.environments.has(envId)
+          ? structuredClone(this.environments.get(envId))
+          : undefined;
 
       if (!httpRequest || !httpRequest.url) {
         sendJson({ error: "Invalid request: url is required" }, 400);
         return;
       }
+
+      if (environmentSnapshot)
+        this.checkRevision(
+          this.resourceFile("environments", envId),
+          environmentSnapshot.revision,
+        );
 
       if (envId && this.environments.has(envId)) {
         const env = this.environments.get(envId)!;
@@ -535,6 +474,11 @@ pm.test("Has valid repo name", function () {
         }
       }
 
+      const initialEnvironment = Object.fromEntries(
+        envVars
+          .filter((value) => value.enabled !== false)
+          .map((value) => [value.key, String(value.value)]),
+      );
       if (body.collectionId) {
         const collection = this.collections.get(body.collectionId);
         if (!collection) {
@@ -545,39 +489,89 @@ pm.test("Has valid repo name", function () {
         httpRequest = resolved.request;
         collectionVars = resolved.variables;
       }
+      if (this.activeWorkCount() >= 2) {
+        sendJson(
+          {
+            error: {
+              code: "ERR_CONCURRENCY",
+              message:
+                "Two executions or runs are active. Cancel or wait for one.",
+            },
+          },
+          503,
+        );
+        return;
+      }
       const controller = new AbortController();
       const onClose = () => {
         if (!res.writableEnded) controller.abort();
       };
       res.on("close", onClose);
+      this.executions.add(controller);
       let response;
+      let executionOptions;
+      const emit = async (event: any) => {
+        if (controller.signal.aborted || res.destroyed) throw new Error('Execution stream closed');
+        if (!res.headersSent) res.writeHead(200, { 'Content-Type': 'application/x-ndjson', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+        if (!res.write(JSON.stringify(event) + '\n')) {
+          await new Promise<void>((resolve, reject) => {
+            const done = () => { res.off('drain', drained); controller.signal.removeEventListener('abort', aborted); };
+            const drained = () => { done(); resolve(); }, aborted = () => { done(); reject(new Error('Execution stream cancelled')); };
+            res.once('drain', drained); controller.signal.addEventListener('abort', aborted, { once: true });
+            if (controller.signal.aborted) aborted();
+          });
+        }
+      };
       try {
+        executionOptions = await this.p2().executionOptions(streaming);
+        let lastProgress = 0;
         response = await HttpExecutor.execute(
           httpRequest,
           collectionVars,
           envVars,
-          { cookieJar: this.cookieJar, signal: controller.signal },
+          { ...executionOptions, signal: controller.signal,
+            ...(streaming ? {
+              onResponseHeaders: (headers) => emit({ type: 'headers', ...headers }),
+              onProgress: async (progress) => { if (Date.now() - lastProgress >= 100 || (progress.total !== undefined && progress.bytes === progress.total)) { lastProgress = Date.now(); await emit({ type: 'progress', ...progress }); } },
+            } : {}),
+          },
         );
-      } finally {
-        res.off("close", onClose);
+        try { await this.p2().saveCookies(); } catch { response.cookieWarning = 'Response completed, but cookies could not be saved securely. Session cookies remain available; review persistence before relying on restart recovery.'; }
+        response.example = sanitizeExample(httpRequest, response, [...envVars, ...collectionVars], executionOptions.secrets);
+      } catch (error) {
+        res.off('close', onClose); this.executions.delete(controller); throw error;
       }
-      if (res.destroyed) return;
+      if (res.destroyed) { this.executions.delete(controller); res.off('close', onClose); return; }
+
+      let environmentChanges = getExecutionState(response)?.environment;
+      if (environmentChanges && executionOptions.secrets && Object.entries(environmentChanges).some(([key, value]) => executionOptions.secrets.text(key) !== key || (initialEnvironment[key] !== value && !secretReferencePattern.test(String(value)) && executionOptions.secrets.text(String(value)) !== String(value)))) {
+        environmentChanges = undefined;
+        response.persistence = { environment: { status: 'failed', code: 'ERR_SECRET_PERSISTENCE', message: 'Secret-bearing script changes were not written to workspace files. Store a credential reference explicitly.' } };
+      }
 
       // Auto-sync script mutations back to active environment file on disk
       if (
         envId &&
-        this.environments.has(envId) &&
-        response.updatedEnvironment
+        environmentSnapshot &&
+        environmentChanges &&
+        [
+          ...new Set([
+            ...Object.keys(initialEnvironment),
+            ...Object.keys(environmentChanges),
+          ]),
+        ].some(
+          (key) => initialEnvironment[key] !== environmentChanges[key],
+        )
       ) {
-        const env = this.environments.get(envId)!;
+        const env = structuredClone(environmentSnapshot);
         const original = new Map(env.values.map((value) => [value.key, value]));
         env.values = [
           ...env.values.filter(
             (v) =>
               v.enabled === false &&
-              !Object.hasOwn(response.updatedEnvironment, v.key),
+              !Object.hasOwn(environmentChanges, v.key),
           ),
-          ...Object.entries(response.updatedEnvironment).map(
+          ...Object.entries(environmentChanges).map(
             ([key, value]) => ({
               ...original.get(key),
               key,
@@ -586,30 +580,62 @@ pm.test("Has valid repo name", function () {
             }),
           ),
         ];
-        this.persistEnvironment(env.id);
+        try {
+          this.persistEnvironment(env.id, env, environmentSnapshot.revision);
+          response.persistence = {
+            environment: { status: "saved", revision: env.revision },
+          };
+        } catch (error: any) {
+          response.persistence = {
+            environment: {
+              status:
+                error.code === "ERR_WORKSPACE_CONFLICT" ? "conflict" : "failed",
+              code: error.code || "ERR_ENVIRONMENT_SAVE",
+              message:
+                error.code === "ERR_WORKSPACE_CONFLICT"
+                  ? error.message
+                  : "Request completed, but environment changes could not be saved. Review them before retrying.",
+            },
+          };
+        }
       }
 
-      sendJson(response);
+      for (const field of ['updatedVariables', 'updatedEnvironment', 'updatedLocalVariables', 'updatedCollectionVariables', 'updatedGlobals']) if (response[field] && executionOptions.secrets)
+        response[field] = Object.fromEntries(Object.entries(response[field]).map(([key, value]) => [key, secretReferencePattern.test(String(value)) ? value : executionOptions.secrets.text(String(value))]));
+      try { if (streaming) {
+        if (Buffer.byteLength(JSON.stringify(response)) > 1800 * 1024) {
+          response.example = undefined;
+          for (const field of ['logs', 'testResults', 'updatedVariables', 'updatedEnvironment', 'updatedLocalVariables', 'updatedCollectionVariables', 'updatedGlobals']) response[field] = undefined;
+          response.diagnosticWarning = 'Diagnostic retention limit reached. Full response bytes remain available through Download.';
+        }
+        await emit({ type: 'complete', response }); res.end();
+      } else sendJson(response); }
+      finally { res.off('close', onClose); this.executions.delete(controller); }
       return;
     }
 
     if (pathname === "/api/runs" && req.method === "POST") {
-      if (
-        [...this.runs.values()].filter((run) => run.state === "running")
-          .length >= 2
-      ) {
+      const body = await readBody();
+      this.refreshWorkspaceSnapshot();
+      this.checkExecutionRevisions(body);
+      if (this.activeWorkCount() >= 2) {
         sendJson(
-          { error: "Two runs are already active. Cancel or wait for one." },
+          {
+            error:
+              "Two executions or runs are already active. Cancel or wait for one.",
+          },
           429,
         );
         return;
       }
-      const body = await readBody();
       const collection = this.collections.get(body.collectionId);
       if (!collection) {
         sendJson({ error: "Collection not found" }, 404);
         return;
       }
+      const runExecutionOptions = await this.p2().executionOptions();
+      if (this.lifecycle !== "running") throw new Error("Studio is stopping");
+      if (this.activeWorkCount() >= 2) { sendJson({ error: 'Two executions or runs are already active' }, 429); return; }
       const controller = new AbortController(),
         id = crypto.randomUUID();
       while (this.runs.size >= 20) {
@@ -619,15 +645,10 @@ pm.test("Has valid repo name", function () {
         if (!completed) break;
         this.runs.delete(completed[0]);
       }
-      const job: {
-        controller: AbortController;
-        state: "running" | "completed";
-        result?: RunResult;
-        error?: string;
-        progress?: any;
-      } = { controller, state: "running" };
+      const job: RunJob = { controller, state: "running" };
       this.runs.set(id, job);
       CollectionRunner.run(collection, {
+        executionOptions: runExecutionOptions,
         environment: body.environmentId
           ? this.environments.get(body.environmentId)
           : undefined,
@@ -638,15 +659,18 @@ pm.test("Has valid repo name", function () {
         stopOnFailure: body.stopOnFailure,
         timeoutMs: body.timeoutMs,
         signal: controller.signal,
-        onProgress: (progress) => (job.progress = progress),
+        onProgress: (progress) =>
+          (job.progress = { ...progress, name: progress.name.slice(0, 512) }),
       })
-        .then((result) => {
-          job.result = result;
-          job.state = "completed";
+        .then(async (result) => {
+          job.result = reportWithoutBodies(result);
+          try { await this.p2().saveCookies(); }
+          catch { (job.result as any).cookieWarning = 'Run completed, but cookies could not be saved securely. Session cookies remain available.'; }
+          this.completeRun(id, job);
         })
         .catch((error) => {
-          job.error = error.message;
-          job.state = "completed";
+          job.error = String(error.message).slice(0, 512);
+          this.completeRun(id, job);
         });
       sendJson({ id, state: job.state }, 202);
       return;
@@ -688,8 +712,7 @@ pm.test("Has valid repo name", function () {
         if (!newEnv.name) newEnv.name = "New Environment";
         if (!Array.isArray(newEnv.values)) newEnv.values = [];
 
-        this.environments.set(newEnv.id, newEnv);
-        this.persistEnvironment(newEnv.id);
+        this.persistEnvironment(newEnv.id, newEnv, null);
         sendJson(newEnv);
         return;
       }
@@ -719,8 +742,11 @@ pm.test("Has valid repo name", function () {
           ...body,
           id: envId,
         };
-        this.environments.set(envId, updatedEnv);
-        this.persistEnvironment(envId);
+        this.persistEnvironment(
+          envId,
+          updatedEnv,
+          clientRevision || existing.revision,
+        );
         sendJson(updatedEnv);
         return;
       }
@@ -728,14 +754,17 @@ pm.test("Has valid repo name", function () {
         req.method === "DELETE" &&
         pathname === `/api/environments/${envId}`
       ) {
-        this.deleteEnvironment(envId);
+        this.deleteEnvironment(
+          envId,
+          clientRevision || this.environments.get(envId)?.revision,
+        );
         sendJson({ ok: true, deleted: envId });
         return;
       }
       if (req.method === "POST" && pathname.endsWith("/sync")) {
         const { variables } = await readBody();
         if (variables && this.environments.has(envId)) {
-          const env = this.environments.get(envId)!;
+          const env = structuredClone(this.environments.get(envId)!);
           for (const [k, v] of Object.entries(
             variables as Record<string, string>,
           )) {
@@ -743,7 +772,7 @@ pm.test("Has valid repo name", function () {
             if (existing) existing.value = v;
             else env.values.push({ key: k, value: v, enabled: true });
           }
-          this.persistEnvironment(envId);
+          this.persistEnvironment(envId, env, clientRevision || env.revision);
           sendJson(env);
           return;
         }
@@ -764,8 +793,7 @@ pm.test("Has valid repo name", function () {
         if (!Array.isArray(newCol.items)) newCol.items = [];
         if (!Array.isArray(newCol.variables)) newCol.variables = [];
 
-        this.collections.set(newCol.id, newCol);
-        this.persistCollection(newCol.id);
+        this.persistCollection(newCol.id, newCol, null);
         sendJson(newCol);
         return;
       }
@@ -796,8 +824,11 @@ pm.test("Has valid repo name", function () {
           ...body,
           id: colId,
         };
-        this.collections.set(colId, updatedCol);
-        this.persistCollection(colId);
+        this.persistCollection(
+          colId,
+          updatedCol,
+          clientRevision || collection.revision,
+        );
         sendJson(updatedCol);
         return;
       }
@@ -810,13 +841,17 @@ pm.test("Has valid repo name", function () {
           sendJson({ error: "Collection not found" }, 404);
           return;
         }
-        const postmanJson = PostmanConverter.toPostman(collection);
+        const includeSecrets = urlObj.searchParams.get('includeSecrets') === 'true';
+        const postmanJson = PostmanConverter.toPostman(this.p2().exportResource(collection, includeSecrets, urlObj.searchParams.get('consent') === 'plaintext'));
         sendJson(postmanJson);
         return;
       }
 
       if (req.method === "DELETE" && pathname === `/api/collections/${colId}`) {
-        this.deleteCollection(colId);
+        this.deleteCollection(
+          colId,
+          clientRevision || this.collections.get(colId)?.revision,
+        );
         sendJson({ ok: true, deleted: colId });
         return;
       }
@@ -834,17 +869,22 @@ pm.test("Has valid repo name", function () {
         const reqToSave: HttpRequest = body.request || body;
         if (!reqToSave.id) reqToSave.id = crypto.randomUUID();
 
-        const updated = findAndUpdateRequest(collection.items, reqToSave);
+        const next = structuredClone(collection);
+        const updated = findAndUpdateRequest(next.items, reqToSave);
         if (!updated) {
-          collection.items.push({
+          next.items.push({
             id: reqToSave.id,
             name: reqToSave.name || "New Request",
             isFolder: false,
             request: reqToSave,
           });
         }
-        this.persistCollection(colId);
-        sendJson({ ok: true, request: reqToSave, collection });
+        this.persistCollection(
+          colId,
+          next,
+          clientRevision || collection.revision,
+        );
+        sendJson({ ok: true, request: reqToSave, collection: next });
         return;
       }
 
@@ -855,9 +895,14 @@ pm.test("Has valid repo name", function () {
       if (delReqMatch && req.method === "DELETE") {
         const reqId = delReqMatch[2];
         if (collection) {
-          findAndDeleteRequest(collection.items, reqId);
-          this.persistCollection(colId);
-          sendJson({ ok: true, deleted: reqId });
+          const next = structuredClone(collection);
+          findAndDeleteRequest(next.items, reqId);
+          this.persistCollection(
+            colId,
+            next,
+            clientRevision || collection.revision,
+          );
+          sendJson({ ok: true, deleted: reqId, collection: next });
           return;
         }
       }
@@ -872,8 +917,7 @@ pm.test("Has valid repo name", function () {
       } catch (error) {
         throw Object.assign(error, { statusCode: 400 });
       }
-      this.collections.set(collection.id, collection);
-      this.persistCollection(collection.id);
+      this.persistCollection(collection.id, collection, null);
       sendJson(collection);
       return;
     }
@@ -896,7 +940,8 @@ pm.test("Has valid repo name", function () {
       sendJson({
         active: this.sniffer.isRunning(),
         port: this.sniffer.getPort(),
-        capturedCount: this.sniffer.getCapturedItems().length,
+        capturedCount: this.sniffer.getCaptureStats().retainedRecords,
+        capture: this.sniffer.getCaptureStats(),
       });
       return;
     }
@@ -1011,12 +1056,25 @@ pm.test("Has valid repo name", function () {
     });
   }
 
-  public async stop(): Promise<void> {
+  public stop(): Promise<void> {
+    if (this.stopPromise) return this.stopPromise;
+    this.lifecycle = "stopping";
     for (const run of this.runs.values()) run.controller.abort();
-    await this.sniffer.stop();
-    if (!this.server) return;
-    return new Promise((resolve) => {
-      this.server?.close(() => resolve());
-    });
+    for (const execution of this.executions) execution.abort();
+    this.stopPromise = (async () => {
+      // Wait for the raw listener attempt, never the startup wrapper that awaits stop.
+      await this.listeningPromise?.catch(() => {});
+      await this.sniffer.stop();
+      if (this.server)
+        await new Promise<void>((resolve) => {
+          this.server?.close(() => resolve());
+          this.server?.closeAllConnections();
+        });
+      await this.p2Api?.idle();
+      await this.p2Context?.close();
+      this.lease?.release();
+      this.lifecycle = "stopped";
+    })();
+    return this.stopPromise;
   }
 }

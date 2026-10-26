@@ -1,6 +1,6 @@
-# Rea API Studio: signal into structure
+# PacketLark: signal into structure
 
-Research and implementation: 24 October 2026. This document distinguishes observed reference patterns from Rea's original design choices. The reference sites were inspected in a live browser at approximately 948 × 871 CSS pixels; screenshots are research evidence, not redistributed assets. Desktop and mobile Rea layouts were checked separately.
+Research and implementation: 24 October 2026. This document distinguishes observed reference patterns from PacketLark's original design choices. The reference sites were inspected in a live browser at approximately 948 × 871 CSS pixels; screenshots are research evidence, not redistributed assets. Desktop and mobile PacketLark layouts were checked separately.
 
 ## Reference research
 
@@ -8,17 +8,17 @@ Research and implementation: 24 October 2026. This document distinguishes observ
 
 Observed: a full-screen entry with optional audio, an immersive lavender WebGL landscape, a large central particle glyph, oversized editorial typography anchored near the lower left, and a compact pill-shaped navigation overlay. Live computed styles identified **Emotion Serif** and **IBM Plex Mono**. The serif headlines and terse technical text produce strong contrast. Browser captures showed the entry gate and loaded hero; source inspection identified a Nuxt bundle. We did not establish the exact animation implementation from a screenshot or prove its full motion library inventory.
 
-Transfer to Rea: one memorable central glyph, a controlled opening sequence, generous negative space, and one quiet navigation level. Rea uses a lightweight original SVG illustration instead of a landscape. There is no audio or loading gate before using the product.
+Transfer to PacketLark: one memorable central glyph, a controlled opening sequence, generous negative space, and one quiet navigation level. PacketLark uses a lightweight original SVG illustration instead of a landscape. There is no audio or loading gate before using the product.
 
 ### Chande Bootcamp — https://www.chandebootcamp.com/
 
 Observed: large compressed display typography, modular image/text regions, a persistent navigation strip, cream paper surfaces, deep green, and a bright green accent. Live browser styles identified **Phudu** and **Geist Mono**, with a body background of `rgb(244, 243, 235)` / `#f4f3eb`. Firecrawl's branding extraction additionally reported `#68f12b`, `#236c3c`, and `#182220` (the last also appeared in page metadata). These extracted accent roles are approximate classifier output, not a complete set of authoritative CSS variables. The loaded browser capture confirmed the coarse modular composition and compressed headline treatment.
 
-Transfer to Rea: deliberate changes in section density, a strong typographic silhouette, and surfaces that distinguish product explanation from product demonstration. We did not copy the site's portraits, logo, 3D work, textures, or exact grid.
+Transfer to PacketLark: deliberate changes in section density, a strong typographic silhouette, and surfaces that distinguish product explanation from product demonstration. We did not copy the site's portraits, logo, 3D work, textures, or exact grid.
 
 Neither site's award status was independently verified. They are the user's supplied visual references. Mobile navigation, hover details, and the complete animation sequence of these reference sites were not comprehensively reverse engineered.
 
-## Rea's proposed and implemented design system
+## PacketLark's proposed and implemented design system
 
 Palette roles:
 
@@ -41,9 +41,9 @@ These fonts are installed through Fontsource and bundled locally. UI labels use 
 
 ## Original identity
 
-`public/brand/rea-symbol.svg` is an original request/response-path R. A returning upper path forms the bowl; an incoming lower stem provides the forward structure; the diagonal becomes an outgoing leg. A small directional chevron connects the mark to API traffic. The single-color silhouette works without gradients. The homepage hero is a larger dimensional interpretation; the UI favicon and small mark use flat vector paths.
+`public/brand/packetlark-symbol.svg` is the original PacketLark mark: a lark in flight, facing in the direction of a dispatched request. Two angular feather planes give it a clear silhouette. A diamond cutout represents a packet, with a small negative-space eye. The mark uses the existing Signal lavender without gradients, and the homepage hero repeats the same geometry. The favicon uses the same mark; an Ink variant serves light surfaces. `packetlark-wordmark.svg` provides a horizontal lockup. Keep the mark's aspect ratio and at least one packet-width of clear space. The full brand is always spelled **PacketLark**, with an uppercase P and L; the package, repository, CLI command and workspace directory use `packetlark`.
 
-The concept is derived from the service, not a generic hexagon/AI prism. No external image or existing logo is embedded. Original construction does not constitute a trademark clearance or a guarantee of uniqueness across all existing marks.
+The identity is original vector construction. No external image or existing logo is embedded. Original construction does not constitute trademark clearance or a guarantee of uniqueness across all existing marks.
 
 ## Layout
 
@@ -51,7 +51,7 @@ Homepage: left-aligned editorial statement paired with the large signal glyph; o
 
 Workbench: stable header, collection sidebar, breadcrumb, dispatch bar, request configuration, response inspection, local connection footer. At wider widths request and response sit side by side; below 1100px they stack. Below 760px collections become a toggleable overlay and dispatch controls wrap. Editors and responses retain native scrolling. The traffic screen has an explicit description of what is captured and its HTTPS CONNECT limit.
 
-A screenshot is an observation of that viewport, not a guarantee across every browser and device. Rea is visually checked at 1440px, the browser's initial 948px viewport, and 390px, with an additional reduced-motion state.
+A screenshot is an observation of that viewport, not a guarantee across every browser and device. PacketLark is visually checked at 1440px, the browser's initial 948px viewport, and 390px, with an additional reduced-motion state.
 
 ## Motion contract
 
@@ -69,7 +69,7 @@ Reference APIs: https://gsap.com/docs/v3/GSAP/gsap.matchMedia/ ; https://animejs
 
 Keyboard focus is visible. The homepage uses semantic landmarks and native details. Dialogs have names, focus containment, Escape dismissal, and return focus. Icon-only buttons receive accessible names. The studio has a skip link, collection search, Cmd/Ctrl+Enter to send, Cmd/Ctrl+S to save, Cmd/Ctrl+F for response search, and `/` to focus collection search. This is an accessibility improvement, not a complete WCAG audit.
 
-The GitHub Pages deployment contains only the homepage and bundled assets; it neither runs the local backend nor accepts credentials. The sample response is explicitly labeled. Installation links use a project-relative path and work below `/rea-api-studio/`.
+The GitHub Pages deployment contains only the homepage and bundled assets; it neither runs the local backend nor accepts credentials. The sample response is explicitly labeled. Installation links use a project-relative path and work below `/packetlark/`.
 
 ## Acceptance and future refinements
 

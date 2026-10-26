@@ -375,13 +375,14 @@ main {
 }
 .dispatch-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 6px 26px 24px;
   align-items: center;
 }
 .url-input {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 260px;
+  min-width: 220px;
   border: 1px solid var(--border);
   border-radius: 5px;
   background: var(--bg-input);
@@ -829,7 +830,8 @@ mark {
     overflow: auto;
   }
   .request-pane {
-    flex: 0 0 42%;
+    flex: 0 0 auto;
+    overflow: visible;
     min-height: 180px;
     border-right: 0;
     border-bottom: 1px solid var(--border);
@@ -1188,3 +1190,104 @@ mark {
     font-size: 11px;
   }
 }
+
+/* Fixed-height native-scroll window: work scales with the visible rows. */
+.collection-tree .virtual-row {
+  height: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+.collection-tree .virtual-row > .req-main-info {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+.virtual-request-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.virtual-row .tree-folder-title {
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.collection-tree:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.workspace-sync-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.workspace-sync-bar > span {
+  flex: 1;
+}
+.workspace-sync-bar [hidden] {
+  display: none;
+}
+.workspace-sync-bar .nav-btn {
+  padding: 5px 8px;
+  font-size: 11px;
+}
+.workspace-previews {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.workspace-previews pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow: auto;
+  font: 11px var(--font-mono);
+}
+.workspace-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.modal-footer:empty { display: none; }
+@media (max-width: 700px) {
+  .workspace-previews {
+    grid-template-columns: 1fr;
+  }
+}
+.request-tabs { display:flex; gap:4px; flex-shrink:0; overflow-x:auto; padding:5px 12px; border-bottom:1px solid var(--border); }
+.request-tabs > div { display:flex; flex-shrink:0; align-items:center; max-width:230px; }
+.request-tabs button { background:transparent; border:0; color:var(--text-muted); padding:6px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.request-tabs button[aria-selected="true"] { color:var(--text); border-bottom:2px solid var(--primary); }
+.workbench-retention-note { margin: 0; padding: 3px 20px; font-size: 11px; color: var(--text-muted); }
+
+/* P2 controls share the studio typography, colors, and keyboard treatment. */
+.p2-controls { display: grid; gap: 10px; min-width: 0; }
+.p2-controls .nav-btn { justify-self: start; }
+.p2-field { display: grid; gap: 5px; font-size: 12px; min-width: 0; }
+.p2-field .url-input { width: 100%; box-sizing: border-box; }
+.p2-field input[type="checkbox"] { width: auto; justify-self: start; }
+.p2-note, .p2-status { color: var(--text-muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.p2-status { min-height: 1.5em; }
+.p2-dialog { margin: auto; color: var(--text); background: var(--bg-panel, #16181f); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: min(620px, calc(100vw - 48px)); max-height: 85vh; overflow: auto; }
+.p2-dialog::backdrop { background: #0009; backdrop-filter: blur(5px); }
+.p2-dialog h2 { font-size: 18px; margin: 0 0 20px; }
+.p2-dialog code { overflow-wrap: anywhere; font-size: 11px; }
+.p2-dialog button:focus-visible, .p2-dialog input:focus-visible, .p2-dialog select:focus-visible, .p2-controls a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.p2-dialog button:disabled { opacity: .55; cursor: wait; }
+.p2-card { display: grid; gap: 8px; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+.p2-controls pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 12px var(--font-mono); }
+.p2-controls textarea { min-height: 120px; width: 100%; box-sizing: border-box; }
+.p2-controls summary { cursor: pointer; font-size: 12px; padding: 8px 0; }
+
+/* PacketLark wordmark keeps navigation usable in the compact workbench. */
+.brand-name { font-size: 22px; white-space: nowrap; }
+@media (max-width: 1100px) { .brand-sub { display: none; } header { gap: 20px; } }
+@media (max-width: 480px) { .brand-name { font-size: 19px; } .brand { gap: 6px; } .brand img { width: 30px; height: 30px; } }

@@ -1,9 +1,9 @@
 {
-  "name": "rea-api-studio",
-  "displayName": "Rea API Studio",
-  "description": "Open a local Rea workbench and run API collections inside VS Code.",
+  "name": "packetlark",
+  "displayName": "PacketLark",
+  "description": "Open a local PacketLark workbench and run API collections inside VS Code.",
   "version": "1.1.0",
-  "publisher": "rea-api-studio",
+  "publisher": "packetlark",
   "license": "MIT",
   "engines": {
     "vscode": "^1.105.0"
@@ -13,7 +13,7 @@
   ],
   "main": "./dist/extension.cjs",
   "activationEvents": [
-    "onCommand:rea.openStudio"
+    "onCommand:packetlark.openStudio"
   ],
   "capabilities": {
     "untrustedWorkspaces": {
@@ -24,24 +24,24 @@
   "contributes": {
     "commands": [
       {
-        "command": "rea.openStudio",
-        "title": "Rea: Open API Studio"
+        "command": "packetlark.openStudio",
+        "title": "PacketLark: Open API Studio"
       },
       {
-        "command": "rea.stopStudio",
-        "title": "Rea: Stop API Studio"
+        "command": "packetlark.stopStudio",
+        "title": "PacketLark: Stop API Studio"
       }
     ],
     "configuration": {
-      "title": "Rea API Studio",
+      "title": "PacketLark",
       "properties": {
-        "rea.runtimePath": {
+        "packetlark.runtimePath": {
           "type": "string",
           "default": "",
           "scope": "machine",
-          "description": "Absolute path to a built Rea API Studio checkout (npm ci && npm run build)."
+          "description": "Absolute path to a built PacketLark checkout (npm ci && npm run build)."
         },
-        "rea.nodePath": {
+        "packetlark.nodePath": {
           "type": "string",
           "default": "node",
           "scope": "machine",
@@ -52,7 +52,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/abrar225/rea-api-studio.git",
+    "url": "https://github.com/abrar225/packetlark.git",
     "directory": "extensions/vscode"
-  }
+  },
+  "icon": "icon.png"
 }

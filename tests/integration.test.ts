@@ -10,7 +10,7 @@ describe('StudioServer & Live Sniffer Integration', () => {
   beforeAll(async()=>{target=await startHttpFixture();});
   afterAll(async()=>{await target.stop();});
   let server: StudioServer;
-  const testWorkspace = mkdtempSync(join(tmpdir(), 'rea-test-'));
+  const testWorkspace = mkdtempSync(join(tmpdir(), 'packetlark-test-'));
   const serverPort = 4199;
   const snifferPort = 8199;
 
@@ -69,7 +69,7 @@ describe('StudioServer & Live Sniffer Integration', () => {
     const sniffedRes = await fetch(`http://localhost:${snifferPort}/${target.url}/json`, {
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'ReaIntegrationTest'
+        'User-Agent': 'PacketLarkIntegrationTest'
       }
     });
 

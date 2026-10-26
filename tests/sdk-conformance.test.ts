@@ -131,7 +131,7 @@ describe("Observed contracts and executable SDKs", () => {
       },
     };
     const code = SdkGenerator.generateTypeScript(spec);
-    const dir = mkdtempSync(path.join(tmpdir(), "rea-sdk-"));
+    const dir = mkdtempSync(path.join(tmpdir(), "packetlark-sdk-"));
     try {
       writeFileSync(path.join(dir, "sdk.ts"), code);
       execFileSync(process.execPath, [

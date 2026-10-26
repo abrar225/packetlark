@@ -1,0 +1,95 @@
+{
+  "as_of": "2026-10-26",
+  "scope": "P1 local acceptance passed; all 15 tracked tasks accepted. P2 remains queued.",
+  "source_state": "Uncommitted local workspace. Commands and browser checks use disposable workspace roots.",
+  "checks": [
+    {
+      "command": "npm run check",
+      "verdict": "PASS",
+      "tests": 219,
+      "files": 23
+    },
+    {
+      "command": "npm run build:extension",
+      "verdict": "PASS"
+    },
+    {
+      "command": "node scripts/package-smoke.mjs",
+      "verdict": "PASS",
+      "detail": "Fresh production-only tarball install executes the CLI and WASM scripts without source/dev dependencies"
+    },
+    {
+      "command": "node scripts/check-import-corpus.mjs",
+      "verdict": "PASS"
+    },
+    {
+      "command": "node scripts/assessment-probes.mjs",
+      "verdict": "PASS"
+    },
+    {
+      "command": "node scripts/check-p1-performance-gate.mjs --check-current-source",
+      "verdict": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "verdict": "PASS"
+    }
+  ],
+  "browser": [
+    {
+      "file": "P1_FINAL_REGRESSION_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 35
+    },
+    {
+      "file": "P1_FINAL_MANIFEST_REGRESSION_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 35
+    },
+    {
+      "file": "P1_FINAL_RECOVERY_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 16
+    },
+    {
+      "file": "P1_WORKBENCH_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 22
+    },
+    {
+      "file": "P1_FINAL_LARGE_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 6
+    },
+    {
+      "file": "P1_DRAG_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 5
+    },
+    {
+      "file": "P1_AUTOMATIC_WATCH_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 2
+    },
+    {
+      "file": "P1_BUSY_WATCH_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 2
+    },
+    {
+      "file": "P1_FINAL_CLI_RESTART_BROWSER.json",
+      "verdict": "PASS",
+      "cases": 2
+    }
+  ],
+  "performance": {
+    "verdict": "PASS",
+    "assessment": "P1_PERFORMANCE_GATE.json",
+    "raw_reference": "P1_OS_FOREGROUND_PERFORMANCE_1.json",
+    "filter_p95_ms": 3.3,
+    "selection_p95_ms": 6.9,
+    "budget_ms": 100,
+    "qualification": "Foreground prepared before each sample; continuous foreground not established. Original stricter FAIL and all historical samples retained."
+  },
+  "acceptance_record": "docs/verification/P1_ACCEPTANCE.json"
+}

@@ -1,0 +1,11 @@
+{
+  "measured_at": "2026-10-26T08:04:46.383Z",
+  "verdict": "PASS",
+  "pid_before": 48854,
+  "pid_after": 49187,
+  "canonical_sha256": "00f8954561d357ac327b5e188ded3ff13658b1c8e802f6ec35ac37a9a43874a9",
+  "cases": [
+    "acknowledged recovery survives a real Studio CLI process replacement without canonical writes or execution",
+    "first edit after restoration supports undo while retaining recovered request identity"
+  ]
+}

@@ -26,6 +26,7 @@ export function collectionRequests(
       }
       if (!item.request) continue;
       const request = structuredClone(item.request);
+      request.id ??= item.id;
       let auth: AuthConfig = { type: "none" };
       for (const parent of parents)
         if (parent.auth && parent.auth.type !== "inherit") auth = parent.auth;
@@ -39,7 +40,7 @@ export function collectionRequests(
       const variables = new Map<string, KeyValueParam>();
       for (const parent of parents)
         for (const variable of parent.variables || [])
-          variables.set(variable.key, variable);
+          if (variable.enabled !== false) variables.set(variable.key, variable);
       found.push({
         request,
         variables: [...variables.values()],
