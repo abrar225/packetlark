@@ -6,10 +6,10 @@ async function testDomain(domain, extraPaths = []) {
   const paths = ['', ...extraPaths];
   for (const p of paths) {
     const fullUrl = `https://${domain}${p}`;
-    console.log(`\n[ReaAPI Studio Request] GET ${fullUrl}`);
+    console.log(`\n[PacketLark Request] GET ${fullUrl}`);
 
     try {
-      // 1. Direct Dispatch via ReaAPI Studio Executor
+      // 1. Direct Dispatch via PacketLark Executor
       const execRes = await fetch('http://localhost:4040/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -18,7 +18,7 @@ async function testDomain(domain, extraPaths = []) {
             method: 'GET',
             url: fullUrl,
             headers: [
-              { key: 'User-Agent', value: 'ReaAPI-Studio/1.0 (Windows x64)', enabled: true },
+              { key: 'User-Agent', value: 'PacketLark/1.0 (Windows x64)', enabled: true },
               { key: 'Accept', value: '*/*', enabled: true }
             ],
             queryParams: [],
@@ -43,10 +43,10 @@ async function testDomain(domain, extraPaths = []) {
         console.log(`  -> Redirect Location: ${execData.headers.location}`);
       }
 
-      // 2. Intercept via ReaAPI Sniffer Proxy to capture into OpenAPI & SDK pipeline
+      // 2. Intercept via PacketLarkAPI Sniffer Proxy to capture into OpenAPI & SDK pipeline
       const sniffRes = await fetch(`http://localhost:8085/${fullUrl}`, {
         headers: {
-          'User-Agent': 'ReaAPI-Studio-Sniffer/1.0',
+          'User-Agent': 'PacketLark-Sniffer/1.0',
           'Accept': '*/*'
         }
       });
