@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-10-26T18:15:58.017Z",
+  "verdict": "PASS",
+  "cases": [
+    "parent auth uses sensitive input; sensitive variables require confirmed reveal; plaintext save cancellation retains source",
+    "parent store-and-replace requires entered origin and commits its session reference without plaintext",
+    "unsupported inherited authorization remains opaque and unchanged until an explicit mode change",
+    "OAuth metadata picker attaches to detached folder auth and Apply persists that same object"
+  ]
+}

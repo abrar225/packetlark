@@ -1,0 +1,1052 @@
+{
+  "measured_at": "2026-10-26T08:27:25.162Z",
+  "methodology": "Separate diagnostic: 30 navigations, then 30 alternating order matched filter/control event-to-rAF pairs in the same page. Zero-delay timer, synchronous work and Long Tasks observed. All samples retained; does not replace original gate.",
+  "rows": [
+    {
+      "i": 0,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 1271,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 894.5,
+            "ts": 2164.8
+          },
+          "timer": 0.40000000037252903,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 2165.5,
+          "work": 6.099999999627471,
+          "frame": {
+            "ms": 1028.7999999988824,
+            "ts": 3174.7
+          },
+          "timer": 16.09999999962747,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 1,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 3195.699999999255,
+          "work": 1.599999999627471,
+          "frame": {
+            "ms": 20.09999999962747,
+            "ts": 3214.7
+          },
+          "timer": 1.800000000745058,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 3215.9000000003725,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 29.199999999254942,
+            "ts": 3244.7
+          },
+          "timer": 4,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 2,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 3246.9000000003725,
+          "work": 0,
+          "frame": {
+            "ms": 998.7999999988824,
+            "ts": 4244.7
+          },
+          "timer": 0.19999999925494194,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 4245.699999999255,
+          "work": 6.700000001117587,
+          "frame": {
+            "ms": 1010.5999999996275,
+            "ts": 5254.8
+          },
+          "timer": 14.5,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 3,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 5260,
+          "work": 3.299999998882413,
+          "frame": {
+            "ms": 10.5,
+            "ts": 5264.7
+          },
+          "timer": 3.599999999627471,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 5270.5,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 4.699999999254942,
+            "ts": 5274.7
+          },
+          "timer": 4.099999999627471,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 4,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 5277.5999999996275,
+          "work": 0,
+          "frame": {
+            "ms": 28.09999999962747,
+            "ts": 5304.8
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 5305.699999999255,
+          "work": 6.599999999627471,
+          "frame": {
+            "ms": 1000.4000000003725,
+            "ts": 6304.7
+          },
+          "timer": 16.700000001117587,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 5,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 6308.4000000003725,
+          "work": 2.899999998509884,
+          "frame": {
+            "ms": 31.199999999254942,
+            "ts": 6334.7
+          },
+          "timer": 3.099999999627471,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 6339.699999999255,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 5.5,
+            "ts": 6344.7
+          },
+          "timer": 3.5,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 6,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 6347.5999999996275,
+          "work": 0,
+          "frame": {
+            "ms": 18.59999999962747,
+            "ts": 6364.7
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 6366.299999998882,
+          "work": 4.900000000372529,
+          "frame": {
+            "ms": 999.8000000007451,
+            "ts": 7364.8
+          },
+          "timer": 12.100000001490116,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 7,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 7372.699999999255,
+          "work": 2.900000000372529,
+          "frame": {
+            "ms": 16.90000000037253,
+            "ts": 7384.7
+          },
+          "timer": 3.099999999627471,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 7389.5999999996275,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 5.5,
+            "ts": 7394.7
+          },
+          "timer": 2.800000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 8,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 7396.699999999255,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 19,
+            "ts": 7414.7
+          },
+          "timer": 0.2000000011175871,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 7415.699999999255,
+          "work": 4.200000001117587,
+          "frame": {
+            "ms": 1000.0999999996275,
+            "ts": 8414.8
+          },
+          "timer": 13.300000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 9,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 8424.599999999627,
+          "work": 3.5,
+          "frame": {
+            "ms": 11.699999999254942,
+            "ts": 8424.8
+          },
+          "timer": 3.900000000372529,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 8436.299999998882,
+          "work": 0.10000000149011612,
+          "frame": {
+            "ms": 9,
+            "ts": 8444.7
+          },
+          "timer": 3.400000000372529,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 10,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 8447.299999998882,
+          "work": 0,
+          "frame": {
+            "ms": 18.300000000745058,
+            "ts": 8464.7
+          },
+          "timer": 0.2000000011175871,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 8465.599999999627,
+          "work": 6.699999999254942,
+          "frame": {
+            "ms": 1009.5,
+            "ts": 9474.5
+          },
+          "timer": 15.800000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 11,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 9477.799999998882,
+          "work": 2.800000000745058,
+          "frame": {
+            "ms": 28,
+            "ts": 9504.7
+          },
+          "timer": 3,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 9505.900000000373,
+          "work": 0,
+          "frame": {
+            "ms": 28.299999998882413,
+            "ts": 9533.7
+          },
+          "timer": 4,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 12,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 9537.099999999627,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 7.900000000372529,
+            "ts": 9544.1
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 9545,
+          "work": 6.900000000372529,
+          "frame": {
+            "ms": 1001,
+            "ts": 10544.8
+          },
+          "timer": 15.299999998882413,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 13,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 10548.900000000373,
+          "work": 3.199999999254942,
+          "frame": {
+            "ms": 22.299999998882413,
+            "ts": 10564.7
+          },
+          "timer": 3.399999998509884,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 10571.299999998882,
+          "work": 0,
+          "frame": {
+            "ms": 14,
+            "ts": 10584.8
+          },
+          "timer": 3.300000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 14,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 10587.900000000373,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 7.5,
+            "ts": 10594.7
+          },
+          "timer": 0.2999999988824129,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 10595.5,
+          "work": 6.5,
+          "frame": {
+            "ms": 1000.0999999996275,
+            "ts": 11594.7
+          },
+          "timer": 16.5,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 15,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 11598.5,
+          "work": 3.400000000372529,
+          "frame": {
+            "ms": 21,
+            "ts": 11614.8
+          },
+          "timer": 3.699999999254942,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 11619.5,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 5.299999998882413,
+            "ts": 11624.3
+          },
+          "timer": 3.5,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 16,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 11627.299999998882,
+          "work": 0.10000000149011612,
+          "frame": {
+            "ms": 18.200000001117587,
+            "ts": 11644.7
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 11645.599999999627,
+          "work": 6.900000000372529,
+          "frame": {
+            "ms": 1000.8000000007451,
+            "ts": 12644.8
+          },
+          "timer": 13.699999999254942,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 17,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 12649.099999999627,
+          "work": 3,
+          "frame": {
+            "ms": 22.5,
+            "ts": 12664.7
+          },
+          "timer": 3.199999999254942,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 12671.699999999255,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 23.40000000037253,
+            "ts": 12694.8
+          },
+          "timer": 3.800000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 18,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 12698.5,
+          "work": 0,
+          "frame": {
+            "ms": 7,
+            "ts": 12704.7
+          },
+          "timer": 0.19999999925494194,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 12705.5,
+          "work": 6.400000000372529,
+          "frame": {
+            "ms": 1009.7999999988824,
+            "ts": 13714.7
+          },
+          "timer": 17,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 19,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 13719.699999999255,
+          "work": 4.099999999627471,
+          "frame": {
+            "ms": 10.5,
+            "ts": 13724.8
+          },
+          "timer": 4.400000000372529,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 13730.299999998882,
+          "work": 0.10000000149011612,
+          "frame": {
+            "ms": 15.100000001490116,
+            "ts": 13744.7
+          },
+          "timer": 2.800000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 20,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 13752.299999998882,
+          "work": 0.10000000149011612,
+          "frame": {
+            "ms": 3.700000001117587,
+            "ts": 13754.7
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 13756.099999999627,
+          "work": 4.5,
+          "frame": {
+            "ms": 1009.5999999996275,
+            "ts": 14764.7
+          },
+          "timer": 11.699999999254942,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 21,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 14768.400000000373,
+          "work": 3.199999999254942,
+          "frame": {
+            "ms": 21.399999998509884,
+            "ts": 14784.7
+          },
+          "timer": 3.5,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 14789.799999998882,
+          "work": 0.10000000149011612,
+          "frame": {
+            "ms": 5.400000000372529,
+            "ts": 14794.7
+          },
+          "timer": 3.300000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 22,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 14797.199999999255,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 18.300000000745058,
+            "ts": 14814.7
+          },
+          "timer": 0.2000000011175871,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 14815.5,
+          "work": 6,
+          "frame": {
+            "ms": 1011.5,
+            "ts": 15824.7
+          },
+          "timer": 13.900000000372529,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 23,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 15832.699999999255,
+          "work": 5.900000000372529,
+          "frame": {
+            "ms": 77.20000000111759,
+            "ts": 15891.364
+          },
+          "timer": 6.300000000745058,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 15909.900000000373,
+          "work": 0.19999999925494194,
+          "frame": {
+            "ms": 966.0999999996275,
+            "ts": 16874.7
+          },
+          "timer": 3.599999999627471,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 24,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 16879.699999999255,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 16,
+            "ts": 16894.7
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 16895.699999999255,
+          "work": 6.700000001117587,
+          "frame": {
+            "ms": 19.59999999962747,
+            "ts": 16914.7
+          },
+          "timer": 15.300000000745058,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 25,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 16918.5,
+          "work": 5,
+          "frame": {
+            "ms": 24,
+            "ts": 16934.7
+          },
+          "timer": 5.400000000372529,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 16942.599999999627,
+          "work": 0.09999999962747097,
+          "frame": {
+            "ms": 993,
+            "ts": 17934.8
+          },
+          "timer": 4,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 26,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 17938.599999999627,
+          "work": 0.19999999925494194,
+          "frame": {
+            "ms": 17.300000000745058,
+            "ts": 17954.7
+          },
+          "timer": 0.30000000074505806,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 17955.900000000373,
+          "work": 6.299999998882413,
+          "frame": {
+            "ms": 39.29999999888241,
+            "ts": 17994.8
+          },
+          "timer": 14.5,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 27,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 17997.699999999255,
+          "work": 3.400000000372529,
+          "frame": {
+            "ms": 33.59999999962747,
+            "ts": 18024.8
+          },
+          "timer": 3.700000001117587,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 18031.400000000373,
+          "work": 0,
+          "frame": {
+            "ms": 1004.2999999988824,
+            "ts": 19034.7
+          },
+          "timer": 3.099999999627471,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 28,
+      "order": [
+        "control",
+        "filter"
+      ],
+      "result": [
+        {
+          "name": "control",
+          "start": 19038.299999998882,
+          "work": 0,
+          "frame": {
+            "ms": 7.300000000745058,
+            "ts": 19044.4
+          },
+          "timer": 0.2000000011175871,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "filter",
+          "start": 19045.599999999627,
+          "work": 6.300000000745058,
+          "frame": {
+            "ms": 39.80000000074506,
+            "ts": 19084.7
+          },
+          "timer": 14.900000000372529,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "i": 29,
+      "order": [
+        "filter",
+        "control"
+      ],
+      "result": [
+        {
+          "name": "filter",
+          "start": 19088.199999999255,
+          "work": 5.099999999627471,
+          "frame": {
+            "ms": 37.90000000037253,
+            "ts": 19114.8
+          },
+          "timer": 5.400000000372529,
+          "visibility": "visible",
+          "focus": true
+        },
+        {
+          "name": "control",
+          "start": 19126.199999999255,
+          "work": 0,
+          "frame": {
+            "ms": 989.5999999996275,
+            "ts": 20114.8
+          },
+          "timer": 6.900000000372529,
+          "visibility": "visible",
+          "focus": true
+        }
+      ],
+      "longTasks": []
+    }
+  ],
+  "summary": {
+    "filter_p95": 1011.5,
+    "control_p95": 998.7999999988824,
+    "filter_outliers": [
+      1028.7999999988824,
+      1010.5999999996275,
+      1000.4000000003725,
+      999.8000000007451,
+      1000.0999999996275,
+      1009.5,
+      1001,
+      1000.0999999996275,
+      1000.8000000007451,
+      1009.7999999988824,
+      1009.5999999996275,
+      1011.5
+    ],
+    "control_outliers": [
+      894.5,
+      998.7999999988824,
+      966.0999999996275,
+      993,
+      1004.2999999988824,
+      989.5999999996275
+    ]
+  }
+}

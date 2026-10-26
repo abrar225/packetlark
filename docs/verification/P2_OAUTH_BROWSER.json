@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-10-26T18:15:28.825Z",
+  "verdict": "PASS",
+  "cases": [
+    "real OAuth dialog PKCE state/nonce and owned callback URL",
+    "provider navigation completes callback and rejects replay",
+    "stored connection metadata omits tokens; selected connection sends bearer to approved peer",
+    "explicit provider revoke clears connection"
+  ],
+  "provider": "disposable local fake provider; insecure HTTP is enabled only by fixture constructor"
+}

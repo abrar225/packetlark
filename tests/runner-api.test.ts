@@ -3,15 +3,25 @@ import { StudioServer } from "../src/server/StudioServer.js";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 describe("runner workbench API", () => {
   const workspace = mkdtempSync(join(tmpdir(), "rea-run-api-"));
   const studio = new StudioServer(0, 0, workspace);
+  const peer = createServer((_request, response) => {
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ ok: true }));
+  });
   let origin = "";
+  let targetOrigin = "";
   beforeAll(async () => {
+    await new Promise<void>((resolve) => peer.listen(0, "127.0.0.1", resolve));
+    targetOrigin = `http://127.0.0.1:${(peer.address() as AddressInfo).port}`;
     origin = `http://127.0.0.1:${await studio.start()}`;
   });
   afterAll(async () => {
     await studio.stop();
+    await new Promise<void>((resolve, reject) => peer.close((error) => error ? reject(error) : resolve()));
     rmSync(workspace, { recursive: true, force: true });
   });
   const post = (endpoint: string, body: any) =>
@@ -22,7 +32,7 @@ describe("runner workbench API", () => {
     });
   const source = (script: string) => ({
     info: { name: "API checks" },
-    variable: [{ key: "base", value: origin }],
+    variable: [{ key: "base", value: targetOrigin }],
     event: [
       {
         listen: "test",

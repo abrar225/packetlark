@@ -1,0 +1,25 @@
+{
+  "measured_at": "2026-10-26T08:20:20.251Z",
+  "source_hashes": {
+    "public/app.js": "f6a4ed0c29abe1385dc1ddb515da10e8b3177bacccd0df302de4a1a5a9705cd1",
+    "public/studio.html": "8710c7d32afb371b468634253530afed2d7219ea6ce9fcc30a830df98bddc407",
+    "public/studio.css": "84702c53f58a133bbecd6a1835bd09f3c176ef487ce4720523d9529c2b2ab959",
+    "public/assets/studio.js": "ea6e2dac6a12e0fe2cbeedde5d52bc339f2e1050670657fe662093b9762e7b84",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "web/workspace-authoring.js": "f8508dead6eadc16ebae602826e9ea5588f9a283f23121605e62a571c9a02e81",
+    "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d",
+    "web/workbench-activity.js": "f7cbb75d56924f25b91b87bdab9e7840419398216fa156fed6ffaee4fdfb7192",
+    "scripts/benchmark-browser.mjs": "2fb7d7d32d4cb870266aed8de0bb7c44f24828b0cbedb4b20bbcfafa8750b5d7",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/server/StudioServer.ts": "dd0414c645faeeef8b5b2e1b2f4f225aaace76ac3ff991a9a7f670c5bf2239e1"
+  },
+  "verdict": "PASS",
+  "cases": [
+    "bounded DOM for 10k workspace",
+    "scroll reaches later requests",
+    "search finds offscreen request",
+    "draft ownership survives window changes",
+    "Home/End and Enter select exact requests",
+    "scroll-away retains logical keyboard focus and arrow navigation"
+  ]
+}

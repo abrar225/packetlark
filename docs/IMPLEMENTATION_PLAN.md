@@ -1,6 +1,8 @@
 # Rea implementation program: local reliability to broader platform capability
 
-Status: **approved; scoped P0 local-core gates passed, P1 in progress**. The trust-foundation implementation and baseline evidence are recorded in [P0_GATE.json](P0_GATE.json). See [P0 progress and remaining gates](P0_PROGRESS.md); this roadmap is not a statement of completed parity. The first P1 renderer increment and remaining workspace work are recorded in [P1_PROGRESS.md](P1_PROGRESS.md).
+Status: **approved; scoped P0, P1 and supported local P2 acceptance gates passed, P3 queued**. The trust-foundation implementation and baseline evidence are recorded in [P0_GATE.json](P0_GATE.json). See [P0 progress and remaining gates](P0_PROGRESS.md); this roadmap is not a statement of completed parity. P1 delivery, acceptance evidence and cross-phase limitations are recorded in [P1_PROGRESS.md](P1_PROGRESS.md). P2 evidence and platform boundaries are recorded in [P2_PROGRESS.md](P2_PROGRESS.md).
+
+Execution tracking: [P1–P10 task checklist](TASK_TRACKER.md) and its [machine-readable source](roadmap/task-tracker.json) retain task acceptance criteria, dependencies, evidence and all 92 requirement dispositions. Finish P1 before P2; a phase is complete only after its acceptance gate passes. Run `npm run roadmap:check` to check coverage and generated-summary consistency.
 
 Date: 25 October 2026. Baseline: `c25e02ca2415dd7b2e2826c96ea4ff0df34de311` (Rea 1.1 preview). Capacity: one maintainer assisted by coding agents. Scope: all ten comparison areas, delivered in stages. This document describes intended work, not completed capabilities or a new product rating.
 

@@ -27,6 +27,7 @@ The website published on [GitHub Pages](https://abrar225.github.io/rea-api-studi
 - Local collections, nested imported folders, environments, and variables.
 - QuickJS-isolated pre-request JavaScript, Chai assertions, inherited scripts, async tests and a supported subset of `pm.*`.
 - Redirect-aware cookie sessions, cancellation, response limits and original binary downloads.
+- Origin-bound credential references, macOS Keychain or explicit session storage, OAuth PKCE/refresh/revoke, selected-file uploads, custom CA/mTLS, and bounded JSON Schema validation. See [P2 scope and platform limits](docs/P2_PROGRESS.md).
 - Collection runner with JSON/CSV data, iterations, request chaining and CLI JSON/JUnit summaries.
 - Stdio MCP tools and a packageable VS Code desktop preview; see [integrations](docs/INTEGRATIONS.md).
 - Postman v2.1 collection import/export and basic cURL import.

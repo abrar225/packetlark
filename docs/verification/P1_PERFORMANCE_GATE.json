@@ -1,0 +1,49 @@
+{
+  "assessed_at": "2026-10-26T09:55:49.675Z",
+  "source": "docs/verification/P1_OS_FOREGROUND_PERFORMANCE_1.json",
+  "verdict": "PASS",
+  "criterion": "30 retained event-to-next-frame filter/selection samples, p95 <= 100 ms, on the documented macOS foreground-prepared reference setup",
+  "metrics": {
+    "startup": {
+      "samples": 30,
+      "p95_ms": 206.6,
+      "maximum_ms": 250.8
+    },
+    "filter": {
+      "samples": 30,
+      "p95_ms": 3.3,
+      "maximum_ms": 3.5
+    },
+    "selection": {
+      "samples": 30,
+      "p95_ms": 6.9,
+      "maximum_ms": 7.4
+    }
+  },
+  "original_experiment_verdict": "FAIL",
+  "original_experiment_note": "The original FAIL also required every after-sample OS observation to remain foreground. That stronger predicate is reported separately and its original record is retained unchanged.",
+  "foreground_before": {
+    "checked": 90,
+    "passed": 90
+  },
+  "foreground_after": {
+    "checked": 90,
+    "passed": 80
+  },
+  "continuous_foreground": "Not established; after-sample drift is retained and disclosed",
+  "historical_cause": "Unresolved. Same-page control delays and foreground-prepared passing samples support a scheduling/setup contribution; they do not prove the cause of every historical failure or establish an application performance fix.",
+  "current_source_checked": true,
+  "source_hashes": {
+    "public/app.js": "f6a4ed0c29abe1385dc1ddb515da10e8b3177bacccd0df302de4a1a5a9705cd1",
+    "public/studio.html": "8710c7d32afb371b468634253530afed2d7219ea6ce9fcc30a830df98bddc407",
+    "public/studio.css": "66f47d589ec2946e72e52726545f20259c5209e0c15ebc94b474e215a3365dc5",
+    "public/assets/studio.js": "ea6e2dac6a12e0fe2cbeedde5d52bc339f2e1050670657fe662093b9762e7b84",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "web/workspace-authoring.js": "f8508dead6eadc16ebae602826e9ea5588f9a283f23121605e62a571c9a02e81",
+    "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d",
+    "web/workbench-activity.js": "f7cbb75d56924f25b91b87bdab9e7840419398216fa156fed6ffaee4fdfb7192",
+    "scripts/benchmark-browser.mjs": "2ad620989f52da809d10425c7a46e9fec5f724cca204f26c84a00607b624ca17",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/server/StudioServer.ts": "dd0414c645faeeef8b5b2e1b2f4f225aaace76ac3ff991a9a7f670c5bf2239e1"
+  }
+}

@@ -3,7 +3,7 @@ import http from "node:http";
 import { once } from "node:events";
 import { PostmanConverter } from "../src/core/models/PostmanConverter.js";
 import { collectionRequests } from "../src/core/models/CollectionContext.js";
-import { HttpExecutor } from "../src/core/engine/HttpExecutor.js";
+import { HttpExecutor, getExecutionState } from "../src/core/engine/HttpExecutor.js";
 import {
   CollectionRunner,
   junitReport,
@@ -247,10 +247,12 @@ describe("Interpreter and request reliability", () => {
       [{ key: "token", value: "env" }],
       { iterationData: { priority: "data" } },
     );
-    expect(result.updatedVariables?.token).toBe("local");
-    expect(result.updatedEnvironment?.token).toBe("env");
-    expect(result.updatedEnvironment?.collectionOnly).toBeUndefined();
-    expect(result.updatedCollectionVariables?.collectionOnly).toBe("yes");
+    expect(getExecutionState(result)?.variables.token).toBe("local");
+    expect(getExecutionState(result)?.environment.token).toBe("env");
+    expect(result.updatedVariables?.token).toBe("*****");
+    expect(result.updatedEnvironment?.token).toBe("***");
+    expect(getExecutionState(result)?.environment.collectionOnly).toBeUndefined();
+    expect(getExecutionState(result)?.collection.collectionOnly).toBe("yes");
   });
   it("keeps binary bytes intact and measures headers separately from body completion", async () => {
     const binary = await HttpExecutor.execute(

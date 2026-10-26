@@ -1,0 +1,15 @@
+{
+  "measured_at": "2026-10-26T09:47:38.036Z",
+  "records": [
+    {
+      "run": 1,
+      "verdict": "FAIL",
+      "hostStart": "ego lite",
+      "hostEnd": "ChatGPT",
+      "startup": 215.2,
+      "filter": 888.2,
+      "selection": 9.5
+    }
+  ],
+  "verdict": "FAIL"
+}

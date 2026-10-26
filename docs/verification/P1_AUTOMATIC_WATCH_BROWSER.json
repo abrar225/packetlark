@@ -1,0 +1,8 @@
+{
+  "measured_at": "2026-10-26T08:14:04.446Z",
+  "verdict": "PASS",
+  "cases": [
+    "automatic conditional polling observes the latest external revision without a manual refresh",
+    "automatic change detection retains dirty input and presents explicit conflict review"
+  ]
+}

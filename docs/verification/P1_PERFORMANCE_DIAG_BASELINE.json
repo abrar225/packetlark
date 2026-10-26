@@ -1,0 +1,291 @@
+{
+  "measured_at": "2026-10-26T05:15:41.158Z",
+  "methodology": "Foreground QA tab; 30 navigations with browser HTTP cache disabled; studio-ready mark after environments, collections and health load. Filter and selection timings are DOM-event dispatch to next animation frame, not physical input latency or guaranteed paint completion. Existing browser process/OS caches are warm; no competitor comparison.",
+  "surface": {
+    "ready_ms": 138.5,
+    "rendered_requests": 31,
+    "viewport": [
+      948,
+      871
+    ],
+    "visibility": "visible",
+    "focused": true,
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "workspace_requests": 10004
+  },
+  "interactionSurface": {
+    "visibility": "visible",
+    "focused": true
+  },
+  "focus_before_interactions": true,
+  "startup": {
+    "samples": 30,
+    "p50_ms": 172.1,
+    "p95_ms": 239.6,
+    "raw_ms": [
+      239.6,
+      240.3,
+      196.4,
+      201.6,
+      209.9,
+      239,
+      199.4,
+      185.8,
+      159.3,
+      192.6,
+      191.8,
+      162.8,
+      166.2,
+      165.9,
+      155.8,
+      172.7,
+      179.4,
+      190.7,
+      206.1,
+      232.7,
+      172.1,
+      171.2,
+      165.2,
+      145.4,
+      151.1,
+      151.1,
+      144.4,
+      145.5,
+      153.1,
+      138.5
+    ]
+  },
+  "filter": {
+    "samples": 30,
+    "p50_ms": 9.1,
+    "p95_ms": 10.3,
+    "raw_ms": [
+      3.4,
+      11.4,
+      7.8,
+      9.5,
+      8.2,
+      9.3,
+      9.1,
+      9.8,
+      8.3,
+      10.3,
+      7.9,
+      10.2,
+      7.7,
+      10.1,
+      8,
+      10.2,
+      8.2,
+      9.9,
+      8.3,
+      9.8,
+      8,
+      10.3,
+      8,
+      10.1,
+      8.1,
+      9.6,
+      8.1,
+      9.9,
+      8.2,
+      10.1
+    ]
+  },
+  "filter_synchronous_work": {
+    "samples": 30,
+    "p50_ms": 1.4,
+    "p95_ms": 1.8,
+    "raw_ms": [
+      2,
+      1.8,
+      1.4,
+      1.5,
+      1.4,
+      1.3,
+      1.5,
+      1.3,
+      1.3,
+      1.4,
+      1.3,
+      1.4,
+      1.5,
+      1.5,
+      1.4,
+      1.4,
+      1.5,
+      1.4,
+      1.6,
+      1.4,
+      1.4,
+      1.8,
+      1.4,
+      1.5,
+      1.5,
+      1.6,
+      1.3,
+      1.4,
+      1.3,
+      1.6
+    ]
+  },
+  "filter_frame_state": [
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    },
+    {
+      "visibility": "visible",
+      "focused": true
+    }
+  ],
+  "selection": {
+    "samples": 30,
+    "p50_ms": 8.9,
+    "p95_ms": 9.2,
+    "raw_ms": [
+      6,
+      9,
+      9.1,
+      9.2,
+      8.4,
+      9.4,
+      8.6,
+      9,
+      8.6,
+      9.2,
+      9,
+      9.1,
+      8.5,
+      8.8,
+      9.2,
+      9,
+      7,
+      9.1,
+      9,
+      6.1,
+      7.6,
+      9.1,
+      9.2,
+      8.1,
+      8.2,
+      8.8,
+      9,
+      8.1,
+      8.2,
+      8.9
+    ]
+  }
+}

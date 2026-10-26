@@ -1,0 +1,802 @@
+{
+  "measured_at": "2026-10-26T09:47:37.882Z",
+  "methodology": "Foreground QA tab; 30 navigations with browser HTTP cache disabled; studio-ready mark after environments, collections and health load. Filter and selection timings are DOM-event dispatch to next animation frame, not physical input latency or guaranteed paint completion. Existing browser process/OS caches are warm; no competitor comparison. No warmup or samples are removed.",
+  "surface": {
+    "ready_ms": 152.60000000149012,
+    "rendered_requests": 31,
+    "viewport": [
+      960,
+      849
+    ],
+    "visibility": "visible",
+    "focused": false,
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "device_pixel_ratio": 1,
+    "hardware_concurrency": 10,
+    "tree_height": 547,
+    "workspace_requests": 10004
+  },
+  "startup_surfaces": [
+    {
+      "ready_ms": 391.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 215.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 211.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 187.90000000223517,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 181.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 178.89999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 155.89999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 120.09999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 125.80000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 137,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 151.60000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 126.70000000298023,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 155.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 178.10000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 132.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 146.79999999701977,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 136.39999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 155,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 171.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 148.80000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 116.5,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 131.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 159.39999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 158,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 160.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 159.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 113.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 142.09999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 130.40000000223517,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547
+    },
+    {
+      "ready_ms": 152.60000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        960,
+        849
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 547,
+      "workspace_requests": 10004
+    }
+  ],
+  "interactionSurface": {
+    "visibility": "visible",
+    "focused": true
+  },
+  "focus_before_interactions": true,
+  "startup": {
+    "samples": 30,
+    "p50_ms": 152.6,
+    "p95_ms": 215.2,
+    "raw_ms": [
+      391.3,
+      215.2,
+      211.2,
+      187.9,
+      181.3,
+      178.9,
+      155.9,
+      120.1,
+      125.8,
+      137,
+      151.6,
+      126.7,
+      155.2,
+      178.1,
+      132.3,
+      146.8,
+      136.4,
+      155,
+      171.2,
+      148.8,
+      116.5,
+      131.2,
+      159.4,
+      158,
+      160.3,
+      159.7,
+      113.7,
+      142.1,
+      130.4,
+      152.6
+    ]
+  },
+  "filter": {
+    "samples": 30,
+    "p50_ms": 9,
+    "p95_ms": 888.2,
+    "raw_ms": [
+      888.2,
+      9.5,
+      20.4,
+      15.2,
+      7.9,
+      11.7,
+      17.3,
+      17,
+      18.5,
+      7.4,
+      9,
+      6.7,
+      10.9,
+      16,
+      1001.1,
+      9.7,
+      8.2,
+      6.7,
+      6.3,
+      6.1,
+      10.8,
+      7.8,
+      9.3,
+      6.9,
+      8.7,
+      6.3,
+      11,
+      6.9,
+      8.2,
+      5.9
+    ]
+  },
+  "filter_synchronous_work": {
+    "samples": 30,
+    "p50_ms": 2,
+    "p95_ms": 3.7,
+    "raw_ms": [
+      3.8,
+      2.3,
+      2.2,
+      2.3,
+      2.5,
+      2.5,
+      2.3,
+      2.2,
+      2.2,
+      2.3,
+      1.8,
+      1.9,
+      2.1,
+      2,
+      3.7,
+      2.6,
+      1.9,
+      2,
+      2,
+      1.8,
+      1.7,
+      2,
+      1.9,
+      2,
+      1.9,
+      2,
+      1.7,
+      1.8,
+      1.8,
+      1.6
+    ]
+  },
+  "filter_frame_state": [
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 1304.4000000022352,
+      "frame_timestamp_ms": 2189.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2195.10000000149,
+      "frame_timestamp_ms": 2199.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2206.199999999255,
+      "frame_timestamp_ms": 2219.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2228.199999999255,
+      "frame_timestamp_ms": 2238.9
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2245.199999999255,
+      "frame_timestamp_ms": 2248.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2254.60000000149,
+      "frame_timestamp_ms": 2259.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2268.5,
+      "frame_timestamp_ms": 2279.9
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2287.900000002235,
+      "frame_timestamp_ms": 2298.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2306.60000000149,
+      "frame_timestamp_ms": 2319.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2326.5,
+      "frame_timestamp_ms": 2329.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2335.400000002235,
+      "frame_timestamp_ms": 2339.3
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2345.800000000745,
+      "frame_timestamp_ms": 2349.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2354,
+      "frame_timestamp_ms": 2359.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2366.60000000149,
+      "frame_timestamp_ms": 2369.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2385.5,
+      "frame_timestamp_ms": 3379.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3389,
+      "frame_timestamp_ms": 3389.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3400.699999999255,
+      "frame_timestamp_ms": 3399.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3410.60000000149,
+      "frame_timestamp_ms": 3409.3
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3419,
+      "frame_timestamp_ms": 3419.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3426.800000000745,
+      "frame_timestamp_ms": 3428.9
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3434.400000002235,
+      "frame_timestamp_ms": 3439.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3446.699999999255,
+      "frame_timestamp_ms": 3448.9
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3456,
+      "frame_timestamp_ms": 3459.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3467.199999999255,
+      "frame_timestamp_ms": 3469.9
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3475.900000002235,
+      "frame_timestamp_ms": 3479.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3486.400000002235,
+      "frame_timestamp_ms": 3489.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3494.300000000745,
+      "frame_timestamp_ms": 3499.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3507.199999999255,
+      "frame_timestamp_ms": 3509.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3515.800000000745,
+      "frame_timestamp_ms": 3519.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3525.60000000149,
+      "frame_timestamp_ms": 3529.8
+    }
+  ],
+  "selection": {
+    "samples": 30,
+    "p50_ms": 8.4,
+    "p95_ms": 9.5,
+    "raw_ms": [
+      5.3,
+      8.3,
+      8.4,
+      8.4,
+      7.9,
+      8.9,
+      7.6,
+      9.5,
+      8.5,
+      8.6,
+      8.3,
+      8.4,
+      8.2,
+      8.7,
+      8.1,
+      8.4,
+      8.5,
+      8.6,
+      8.4,
+      8.4,
+      8.3,
+      9.1,
+      8.7,
+      7.3,
+      9.6,
+      8.5,
+      8.8,
+      8.6,
+      8.3,
+      8.2
+    ]
+  },
+  "host": {
+    "platform": "macOS",
+    "before_activation": "ChatGPT",
+    "foreground_start": "ego lite",
+    "foreground_end": "ChatGPT"
+  },
+  "source_state": "Uncommitted local source, fresh built server in disposable 10,004-request workspace. Browser app explicitly activated at OS level before unchanged timing protocol. No samples or warmups removed.",
+  "source_hashes": {
+    "public/app.js": "f6a4ed0c29abe1385dc1ddb515da10e8b3177bacccd0df302de4a1a5a9705cd1",
+    "public/studio.html": "8710c7d32afb371b468634253530afed2d7219ea6ce9fcc30a830df98bddc407",
+    "public/studio.css": "66f47d589ec2946e72e52726545f20259c5209e0c15ebc94b474e215a3365dc5",
+    "public/assets/studio.js": "ea6e2dac6a12e0fe2cbeedde5d52bc339f2e1050670657fe662093b9762e7b84",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "web/workspace-authoring.js": "f8508dead6eadc16ebae602826e9ea5588f9a283f23121605e62a571c9a02e81",
+    "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d",
+    "web/workbench-activity.js": "f7cbb75d56924f25b91b87bdab9e7840419398216fa156fed6ffaee4fdfb7192",
+    "scripts/benchmark-browser.mjs": "2fb7d7d32d4cb870266aed8de0bb7c44f24828b0cbedb4b20bbcfafa8750b5d7",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/server/StudioServer.ts": "dd0414c645faeeef8b5b2e1b2f4f225aaace76ac3ff991a9a7f670c5bf2239e1"
+  },
+  "budgets": {
+    "filter_p95_ms": 100,
+    "selection_p95_ms": 100
+  },
+  "verdict": "FAIL"
+}

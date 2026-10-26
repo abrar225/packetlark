@@ -57,7 +57,7 @@ export class WorkspaceSync {
                   local.drafts.some(
                     (draft) =>
                       draft.collectionId === id &&
-                      (draft.dirty || draft.saving),
+                      (draft.dirty || draft.saving || draft.controller),
                   )
               : (id) => local.dirtyEnvironments.has(id);
           const busy = (id) =>

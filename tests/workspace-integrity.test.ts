@@ -42,6 +42,18 @@ async function workspace(
 }
 
 describe("workspace API and restart integrity", () => {
+  it("keeps browser recovery identity stable across restart and distinct across workspace roots", () =>
+    workspace(async (root, api, restart) => {
+      const identity = await (await api("workspace/identity")).json();
+      expect(identity).toEqual({ id: expect.stringMatching(/^[a-f0-9]{64}$/) });
+      expect(JSON.stringify(identity)).not.toContain(root);
+      await restart();
+      expect(await (await api("workspace/identity")).json()).toEqual(identity);
+      await workspace(async (_, other) => {
+        expect(await (await other("workspace/identity")).json()).not.toEqual(identity);
+      });
+    }));
+
   it("counts the combined collection and environment document limit before committing", () =>
     workspace(async (root, api) => {
       for (let i = 0; i < 997; i++)
@@ -588,7 +600,7 @@ describe("workspace API and restart integrity", () => {
             queryParams: [],
             body: { mode: "none" },
             auth: { type: "none" },
-            testScript: 'pm.environment.set("apiKey", "old-execution-token")',
+            testScript: 'pm.environment.set("counter", "old-execution-value")',
           },
         });
         await started;
@@ -596,7 +608,7 @@ describe("workspace API and restart integrity", () => {
           `environments/${env.id}`,
           "PUT",
           {
-            values: [{ key: "apiKey", value: "new-user-token", enabled: true }],
+            values: [{ key: "counter", value: "new-user-value", enabled: true }],
           },
           { "If-Match": `"${env.revision}"` },
         );
@@ -609,7 +621,7 @@ describe("workspace API and restart integrity", () => {
         );
         expect(
           (await (await api(`environments/${env.id}`)).json()).values[0].value,
-        ).toBe("new-user-token");
+        ).toBe("new-user-value");
       } finally {
         target.closeAllConnections();
         await new Promise<void>((resolve) => target.close(() => resolve()));

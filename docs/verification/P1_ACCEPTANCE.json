@@ -1,0 +1,206 @@
+{
+  "accepted_at": "2026-10-26T10:03:19.696Z",
+  "phase": "P1",
+  "verdict": "PASS",
+  "scope": "Local P1 workspace foundation acceptance; 15 tracked tasks. P2 remains queued.",
+  "base_commit": "c65dfcc4ff606af7c1a15039a43128e572e4a8b0",
+  "source_state": "Uncommitted working tree; no remote CI, deployment, stable-release or full-product-parity claim.",
+  "checks": [
+    {
+      "command": "npm run check",
+      "verdict": "PASS",
+      "tests": 219,
+      "files": 23
+    },
+    {
+      "command": "npm run build:extension",
+      "verdict": "PASS"
+    },
+    {
+      "command": "node scripts/package-smoke.mjs",
+      "verdict": "PASS",
+      "detail": "Fresh production-only tarball install executes the CLI and WASM scripts without source/dev dependencies"
+    },
+    {
+      "command": "node scripts/check-import-corpus.mjs",
+      "verdict": "PASS"
+    },
+    {
+      "command": "node scripts/assessment-probes.mjs",
+      "verdict": "PASS"
+    },
+    {
+      "command": "node scripts/check-p1-performance-gate.mjs --check-current-source",
+      "verdict": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "verdict": "PASS"
+    }
+  ],
+  "browser": {
+    "case_executions": 125,
+    "note": "Local Ego Page API executions; includes repeated regressions on both legacy and manifest storage. Final dispatch wrapping fix was visually checked at 948px: URL width 348.9px; final timing records cover the current built assets.",
+    "artifacts": [
+      {
+        "file": "P1_FINAL_REGRESSION_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 35
+      },
+      {
+        "file": "P1_FINAL_MANIFEST_REGRESSION_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 35
+      },
+      {
+        "file": "P1_FINAL_RECOVERY_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 16
+      },
+      {
+        "file": "P1_WORKBENCH_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 22
+      },
+      {
+        "file": "P1_FINAL_LARGE_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 6
+      },
+      {
+        "file": "P1_DRAG_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 5
+      },
+      {
+        "file": "P1_AUTOMATIC_WATCH_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 2
+      },
+      {
+        "file": "P1_BUSY_WATCH_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 2
+      },
+      {
+        "file": "P1_FINAL_CLI_RESTART_BROWSER.json",
+        "verdict": "PASS",
+        "cases": 2
+      }
+    ]
+  },
+  "performance": {
+    "assessment": "docs/verification/P1_PERFORMANCE_GATE.json",
+    "raw": "docs/verification/P1_OS_FOREGROUND_PERFORMANCE_1.json",
+    "filter_p95_ms": 3.3,
+    "selection_p95_ms": 6.9,
+    "budget_ms": 100,
+    "qualification": "Foreground prepared before each sample; continuous foreground is not established. The original stricter whole-run FAIL and all historical failures remain unchanged. Historical root cause is unresolved; no application performance fix or superiority claim is inferred."
+  },
+  "review": "docs/verification/P1_GATE_REVIEW.md",
+  "tasks": [
+    "P1-001",
+    "P1-002",
+    "P1-003",
+    "P1-004",
+    "P1-005",
+    "P1-006",
+    "P1-007",
+    "P1-008",
+    "P1-009",
+    "P1-010",
+    "P1-011",
+    "P1-012",
+    "P1-013",
+    "P1-014",
+    "P1-015"
+  ],
+  "p1_requirement_scopes": [
+    "REA-010",
+    "REA-023",
+    "REA-024",
+    "REA-025",
+    "REA-026",
+    "REA-027",
+    "REA-028",
+    "REA-030",
+    "REA-031",
+    "REA-072",
+    "REA-081",
+    "REA-085",
+    "REA-087",
+    "REA-088"
+  ],
+  "source_hashes": {
+    "package.json": "a52b3adbcd5fdbe9132b069ba09cba5e95517fe40da85ad6175a339a366ba15f",
+    "public/app.js": "f6a4ed0c29abe1385dc1ddb515da10e8b3177bacccd0df302de4a1a5a9705cd1",
+    "public/assets/studio.js": "ea6e2dac6a12e0fe2cbeedde5d52bc339f2e1050670657fe662093b9762e7b84",
+    "public/studio.css": "66f47d589ec2946e72e52726545f20259c5209e0c15ebc94b474e215a3365dc5",
+    "public/studio.html": "8710c7d32afb371b468634253530afed2d7219ea6ce9fcc30a830df98bddc407",
+    "scripts/benchmark-browser.mjs": "2ad620989f52da809d10425c7a46e9fec5f724cca204f26c84a00607b624ca17",
+    "scripts/check-import-corpus.mjs": "54d780d90e5435f8c30ccde8eb874c2d6fe9de32799b5a1d61cdf4de4f417b62",
+    "scripts/check-p1-authoring.mjs": "dc5dfcdbaf4f4ad02bb15ca403fd1497afcf6b38c506ef8e03831161f4c7a3c9",
+    "scripts/check-p1-draft-recovery.mjs": "1872ec0f21d17342ba6d32aabe969e22f38c077f69052c137506bfdc7241f1ef",
+    "scripts/check-p1-performance-gate.mjs": "7ab5c63feae1764134f55414765327cec6fc3b81e0a61efb0d94182700bc3e44",
+    "scripts/check-p1-reconciliation.mjs": "ecb3b5a9e16e481302ee66c03b86091f7a481c273c5757839ae51358acf96502",
+    "scripts/check-p1-workbench.mjs": "862ddfe78e9aae2c7e2e492ca53d2b63fbbfa932bc08e55ca2e12e03ce7aae09",
+    "scripts/check-p1-workspace-regression.mjs": "6624853b938c8d56ce6876709e746904ed6c8498efe059e26ca43a6e9ccd5a97",
+    "scripts/p0-browser-fixture.mjs": "1869f1b4a82991531d996b91de502dc3b8a45a1bec50c649f68d1231e46e63cc",
+    "scripts/p1-draft-restart-fixture.mjs": "5302f0a6b25855f1325bec1696d369e23f1e5ab3ea3b253857dd68bd9df50fe7",
+    "scripts/performance-diagnostics.mjs": "b0fb1799fc675bd485305639257bd8f41ada1347ef13556bba063acfd859c084",
+    "scripts/roadmap-tracker.mjs": "2b7614d8c6830760288e100bff2890bf50cf3e0ee559213201af4c94350f4731",
+    "src/cli.ts": "cfd2da25bbc4fae38aaf788508e6e86f5bc5833353548564f27bf1da5dc5ef1f",
+    "src/core/models/CollectionContext.ts": "da8d834edad78fd34f9eb6e00d25039f6d4a4181f0de8d3eff6b7a57b12fa2c0",
+    "src/core/models/ImportDiagnostics.ts": "282f0f7c49fc7b86a373d12a64e9ceb5f3988eaf3bd6b5caad4af694158a35d8",
+    "src/core/models/PostmanConverter.ts": "c07fa3eb306442fc67c0e2d14da069c45b842955a736b35adad34d097127ad7f",
+    "src/core/security/SecretRedactor.ts": "6b0731ec09bd411b0f89b7681145e2d5c0440a8600662a2139e6eaa2d1687bc7",
+    "src/core/workspace/CollectionCommands.ts": "c93984ba528ed8fbaaff842f3626ec43a9f6164a4b53ed782db0e85f9de2e9cc",
+    "src/core/workspace/WorkbenchState.ts": "19310422b30abefc66704dd38e69a98a285fb4b3e1af1ff58bb96da589ca7c6e",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/integrations/mcp.ts": "49a03a361a3c76bde084904834a8ed3f058b23d64b069ce3e5ab801af6b3a93d",
+    "src/server/StudioServer.ts": "dd0414c645faeeef8b5b2e1b2f4f225aaace76ac3ff991a9a7f670c5bf2239e1",
+    "tests/authoring.test.ts": "88b58e714c69de085fc2ceff896cd3970b3c168ad0d8ffc47f868b5fda7ed84f",
+    "tests/fixtures/imports/curl-cases.json": "bb66a7cb09b9aa180f2359d03e35d167ef71bb027d4c7de616c97d44e9f57da0",
+    "tests/fixtures/imports/nested-v21.json": "3087bd735479da72c39e9ad2ea84db9892c8c0e747359c8b259d17b554f090da",
+    "tests/fixtures/imports/unsupported-v21.json": "9ba6e132135bec77e1d28658d5e4e12388a800c662c7308bc4047bd99651e8b6",
+    "tests/import-corpus.test.ts": "da81a231f6824e31ac4cce253e4b34e3c1b3de45f27e097799533048abe2edbb",
+    "tests/repository-storage.test.ts": "a5096770226a1d676ac1dcf29ec4b5e791d7eab7ac8295a7f2bac6d7387297b2",
+    "tests/roadmap-tracker.test.ts": "bcd6ebd3ee090cf6b0675bc664915171da81ae0c1c544bc6efd46812384b8d1a",
+    "tests/workbench-state.test.ts": "6f96cb30bff18d4e7c796a0b09561c03a7b316034107b8e23b7873dc920007fc",
+    "tests/workspace-integrity.test.ts": "5a80637056bf9d999e1a46e0cfebc0f74ca3b80509e3dffae3e3ad331bba9443",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "web/draft-recovery.js": "abd3df505194d71d8923a5589de02ece936324eab81c1ebeed596e7a7a8f9b3b",
+    "web/studio.js": "9e5f3d05acb793b1dea235fa9a22df24ec4d675a61795735ebcddf0399cd31c8",
+    "web/workbench-activity.js": "f7cbb75d56924f25b91b87bdab9e7840419398216fa156fed6ffaee4fdfb7192",
+    "web/workspace-authoring.js": "f8508dead6eadc16ebae602826e9ea5588f9a283f23121605e62a571c9a02e81",
+    "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d"
+  },
+  "live_workspace_migrated": false,
+  "remaining_cross_phase_work": [
+    "P2 authentication and secure credential references/export policy",
+    "P4 reusable example/fixture editing beyond P1 reviewed examples",
+    "P5 supported-platform recovery/race/power-loss validation and broad performance/RSS/release claims",
+    "P7 native v3 YAML and separately scoped import/protocol work"
+  ],
+  "next_phase": {
+    "id": "P2",
+    "status": "queued",
+    "tasks": [
+      {
+        "id": "P2-001",
+        "title": "Secure credential lifecycle",
+        "status": "todo"
+      },
+      {
+        "id": "P2-002",
+        "title": "HTTP completion and transport settings",
+        "status": "todo"
+      },
+      {
+        "id": "P2-003",
+        "title": "P2 acceptance gate",
+        "status": "todo"
+      }
+    ]
+  }
+}

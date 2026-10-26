@@ -8,7 +8,7 @@ const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-p0-browser-"));
 const target = http.createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
   setTimeout(
-    () => res.end(JSON.stringify({ owner: req.url })),
+    () => res.end(JSON.stringify({ owner: req.url, headers: req.headers })),
     req.url.startsWith("/slow") ? 800 : 0,
   );
 });
@@ -48,6 +48,7 @@ await fetch(`http://127.0.0.1:${port}/api/collections`, {
     ],
   }),
 });
+if (process.argv.includes("--manifest")) studio.migrate(studio.migrationPlan().checksum);
 if (process.argv.includes("--large")) {
   for (let group = 0; group < 20; group++) {
     const collection = {

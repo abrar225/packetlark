@@ -1,4 +1,4 @@
-import { isSensitiveField } from "../security/SecretRedactor.js";
+import { isSensitiveField, SecretRedactor } from "../security/SecretRedactor.js";
 import type { SniffedTrafficItem } from "../models/types.js";
 const marker = "[REDACTED]";
 const safeHeaders = new Set([
@@ -21,9 +21,11 @@ const sensitive = (key: string, extra: Set<string>) =>
 export function sanitizeCapture(
   input: SniffedTrafficItem,
   extraFields: string[] = [],
+  knownSecrets?: SecretRedactor,
 ): SniffedTrafficItem {
   const extra = new Set(extraFields.map((key) => key.toLowerCase()));
   const secrets = new Set<string>();
+  const redactor = new SecretRedactor();
   let visited = 0;
   const remember = (value: unknown) => {
     if (value === null || value === undefined || typeof value === "object")
@@ -33,6 +35,7 @@ export function sanitizeCapture(
     if (text.length > 8192 || (!secrets.has(text) && secrets.size >= 128))
       throw new Error("Capture redaction budget exceeded");
     secrets.add(text);
+    redactor.add(text);
     if (/^Bearer /i.test(text)) remember(text.slice(7));
   };
   const collect = (value: unknown, depth = 0, secret = false) => {
@@ -62,6 +65,9 @@ export function sanitizeCapture(
     for (const [key, value] of Object.entries(headers || {})) {
       if (sensitive(key, extra) || !safeHeaders.has(key.toLowerCase()))
         remember(value);
+      // Learn decoded Basic components and cookie/Bearer fragments as well as
+      // the complete field, so an echoed password is never retained.
+      redactor.observeHeader(key, value);
       if (/cookie/i.test(key))
         for (const match of value.matchAll(
           /(?:^|[;,]\s*)[^=;,\s]+\s*=\s*("[^"]*"|[^;,]*)/g,
@@ -107,22 +113,14 @@ export function sanitizeCapture(
   collect(responseBody);
   visited = 0;
   const redactText = (text: string) => {
-    let result = text;
-    for (const secret of secrets) {
-      if (result === secret) return marker;
-      if (secret.length >= 4) {
-        result = result.split(secret).join(marker);
-        const encoded = encodeURIComponent(secret);
-        if (encoded !== secret) result = result.split(encoded).join(marker);
-      }
-    }
+    const result = knownSecrets?.text(redactor.text(text)) ?? redactor.text(text);
     return result.length > 8192 ? result.slice(0, 8192) + "[omitted]" : result;
   };
   const cleanValue = (value: any, depth = 0): any => {
     if (++visited > 10000 || depth > 24) return "[Omitted: structure limit]";
     if (typeof value === "string") return redactText(value);
     if (typeof value === "number" || typeof value === "boolean")
-      return secrets.has(String(value)) ? marker : value;
+      return redactText(String(value)) !== String(value) ? marker : value;
     if (value === null) return value;
     if (Array.isArray(value))
       return value.slice(0, 1000).map((child) => cleanValue(child, depth + 1));
@@ -146,8 +144,8 @@ export function sanitizeCapture(
     value.hash = "";
     value.search = new URLSearchParams(
       [...value.searchParams].map(([key, entry]) => [
-        key,
-        sensitive(key, extra) ? marker : entry,
+        redactText(key),
+        sensitive(key, extra) ? marker : redactText(entry),
       ]),
     ).toString();
     return redactText(value.href);
@@ -155,7 +153,7 @@ export function sanitizeCapture(
   const cleanHeaders = (headers: Record<string, string>) =>
     Object.fromEntries(
       Object.entries(headers || {}).map(([key, value]) => [
-        key,
+        redactText(key),
         sensitive(key, extra) || !safeHeaders.has(key.toLowerCase())
           ? marker
           : key.toLowerCase() === "location"
@@ -178,9 +176,9 @@ export function sanitizeCapture(
   }
   const entries = [...parsed.searchParams.entries()];
   return {
-    id: input.id,
+    id: redactText(input.id),
     timestamp: input.timestamp,
-    method: input.method,
+    method: redactText(input.method) as SniffedTrafficItem["method"],
     url: parsed.href,
     pathname: parsed.pathname,
     queryParams: Object.fromEntries(entries),

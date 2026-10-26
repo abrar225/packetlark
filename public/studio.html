@@ -72,6 +72,7 @@
           <div class="sidebar-header">
             <span class="sidebar-title">Collections</span>
             <div>
+              <button class="icon-btn" aria-label="Manage collections" title="Manage collections" onclick="workspaceAuthoring.open(activeCollection?.id)">⋯</button>
               <button
                 class="icon-btn"
                 title="New Request"
@@ -143,7 +144,13 @@
               Review changes
             </button>
           </div>
+          <div class="workspace-sync-bar">
+            <span id="draft-recovery-status" role="status" aria-live="polite">Draft recovery off</span>
+            <button id="btn-draft-recovery" class="nav-btn">Draft recovery</button>
+          </div>
           <!-- URL dispatch bar -->
+          <div id="request-tabs" class="request-tabs" role="tablist" aria-label="Open request tabs"></div>
+          <p class="workbench-retention-note">Up to 20 tabs. Response previews: 2 MiB per tab, 16 MiB total; older previews can expire.</p>
           <div class="dispatch-bar">
             <select
               class="method-select"
@@ -181,6 +188,9 @@
             </button>
 
             <span id="save-status" role="status" aria-live="polite"></span>
+            <button class="nav-btn" id="btn-undo-draft" onclick="undoActiveDraft()" title="Undo request edit">Undo</button>
+            <button class="nav-btn" id="btn-request-history" onclick="workbenchActivity.open()">History</button>
+            <button class="nav-btn" id="btn-save-example" onclick="workbenchActivity.saveExample()">Save example</button>
 
             <button
               class="nav-btn"
@@ -244,6 +254,13 @@
               />
               Follow redirects</label
             ><span id="import-warning" role="status"></span>
+            <button class="nav-btn" id="btn-credentials">Credentials</button>
+            <button class="nav-btn" id="btn-oauth">OAuth</button>
+            <button class="nav-btn" id="btn-cookies">Cookies</button>
+            <button class="nav-btn" id="btn-tls">TLS</button>
+            <label><input type="checkbox" id="req-stream-response" onchange="if(activeRequest){activeRequest.streamResponse=this.checked;markDirty();}"> Stream preview / complete download</label>
+            <label>Request limit (MiB) <input type="number" id="req-max-request" min="0.001" max="50" step="1" value="4" style="width:64px" onchange="if(activeRequest){activeRequest.maxRequestBytes=Math.round(Number(this.value)*1048576);markDirty();}"></label>
+            <label>Response limit (MiB) <input type="number" id="req-max-response" min="0.001" max="50" step="1" value="10" style="width:64px" onchange="if(activeRequest){activeRequest.maxResponseBytes=Math.round(Number(this.value)*1048576);markDirty();}"></label>
           </div>
           <!-- Request Tabs -->
           <div class="tab-nav">
@@ -401,6 +418,9 @@
                   >
                 </div>
 
+                <label><input type="radio" name="body-mode" value="binary" onchange="changeBodyMode('binary')" /> binary file</label>
+                <div id="p2-body-controls"></div>
+
                 <!-- Raw Textarea -->
                 <div id="body-raw-container">
                   <textarea
@@ -462,6 +482,7 @@
                     <option value="bearer">Bearer Token</option>
                     <option value="basic">Basic Auth</option>
                     <option value="apikey">API Key</option>
+                    <option value="oauth2">OAuth 2.0</option>
                   </select>
                 </div>
                 <div id="auth-fields"></div>
@@ -562,6 +583,9 @@
                   </button>
                 </div>
               </div>
+
+              <p id="p2-stream-progress" role="status" class="p2-note" hidden></p>
+              <div id="p2-response-inspector"></div>
 
               <!-- Inline Search Bar -->
               <div class="search-bar-container" id="res-search-container">

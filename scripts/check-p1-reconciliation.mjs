@@ -743,8 +743,10 @@ export async function verifyReviewFooterIsolation(page, baseUrl) {
       cases: ["review never retains another dialog's footer actions"],
     };
   } finally {
+    // Footer isolation is the assertion here. Resolve this cleanup confirmation
+    // synchronously so an async disk refresh cannot open it after acceptDialog.
+    await page.evaluate(() => { window.confirm = () => true; });
     await page.click('[aria-label="Load disk and discard local drafts"]');
-    await page.acceptDialog();
     await page.waitForFunction(
       () => document.getElementById("modal-backdrop").style.display === "none",
     );

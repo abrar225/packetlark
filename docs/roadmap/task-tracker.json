@@ -1,0 +1,4607 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-26",
+  "source_plan": "docs/IMPLEMENTATION_PLAN.md",
+  "source_requirements": "docs/roadmap/requirements.json",
+  "current_phase": null,
+  "execution_policy": "P1 and the supported local P2 subset accepted; P3 is next and has not started. Preserve P5 platform/release certification and P9/P10 threat-model/scope/funding gates. No automatic publish/merge or stable-release claim.",
+  "status_definitions": {
+    "todo": "Not accepted; may have baseline code.",
+    "in_progress": "Active implementation or acceptance work.",
+    "done": "Task-scoped acceptance evidence recorded; does not imply complete comparison parity.",
+    "blocked": "Cannot progress; blocker and next action required.",
+    "gated": "Requires the roadmap scope/funding/external prerequisite before execution."
+  },
+  "p0_reference": {
+    "status": "scoped-local-core-gates-passed",
+    "evidence": [
+      "docs/P0_GATE.json",
+      "docs/P0_PROGRESS.md"
+    ],
+    "note": "P0 broad comparison requirements continue in the next_review_phase ledger."
+  },
+  "phases": [
+    {
+      "id": "P1",
+      "title": "Workspace foundation",
+      "depends_on": [
+        "P0"
+      ],
+      "status": "done"
+    },
+    {
+      "id": "P2",
+      "title": "Daily HTTP, authentication and secrets",
+      "depends_on": [
+        "P1"
+      ],
+      "status": "done"
+    },
+    {
+      "id": "P3",
+      "title": "Compatible scripts and CI",
+      "depends_on": [
+        "P1",
+        "P2"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "P4",
+      "title": "Evidence-driven discovery",
+      "depends_on": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "P5",
+      "title": "Stable local release",
+      "depends_on": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "P6",
+      "title": "GraphQL and realtime",
+      "depends_on": [
+        "P5"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "P7",
+      "title": "Additional protocols and integrations",
+      "depends_on": [
+        "P5"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "P8",
+      "title": "Broader API lifecycle",
+      "depends_on": [
+        "P4",
+        "P5"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "P9",
+      "title": "Optional self-hosted teams",
+      "depends_on": [
+        "P5"
+      ],
+      "status": "gated"
+    },
+    {
+      "id": "P10",
+      "title": "Advanced platform",
+      "depends_on": [
+        "P9"
+      ],
+      "status": "gated"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "P1-001",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Bounded collection rendering and stable request identities",
+      "status": "done",
+      "requirement_ids": [
+        "REA-023",
+        "REA-025"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "10,004-request fixture supports full search and keyboard navigation with bounded viewport rows",
+        "Filter and selection meet recorded reference budgets"
+      ],
+      "evidence": [
+        "docs/P1_PROGRESS.md",
+        "docs/verification/P1_BROWSER.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-002",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Workspace path and canonical-read integrity",
+      "status": "done",
+      "requirement_ids": [
+        "REA-030",
+        "REA-072"
+      ],
+      "depends_on": [
+        "P1-001"
+      ],
+      "acceptance": [
+        "Reject symlink/redirection and changed directory identities without rewriting files",
+        "Bound descriptor reads and preserve oversized or malformed resources"
+      ],
+      "evidence": [
+        "docs/P1_PROGRESS.md",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-003",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Single-writer lease and explicit exited-owner recovery",
+      "status": "done",
+      "requirement_ids": [
+        "REA-072"
+      ],
+      "depends_on": [
+        "P1-002"
+      ],
+      "acceptance": [
+        "Competing cooperating writers are refused before initialization",
+        "Reviewed-token recovery preserves workspace data; live/unknown owners are refused"
+      ],
+      "evidence": [
+        "docs/WORKSPACE_OWNERSHIP.md",
+        "docs/verification/P1_OWNERSHIP_COLD_START.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-004",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "External-file reconciliation and conflict context review",
+      "status": "done",
+      "requirement_ids": [
+        "REA-026",
+        "REA-030",
+        "REA-088"
+      ],
+      "depends_on": [
+        "P1-003"
+      ],
+      "acceptance": [
+        "Clean resources reconcile; dirty/busy drafts survive external edits/deletions",
+        "Explicit choices recheck disk revision; stale Send/Run is rejected before transport"
+      ],
+      "evidence": [
+        "docs/WORKSPACE_RECONCILIATION.md",
+        "docs/verification/P1_RECONCILIATION_BROWSER.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-005",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Versioned workspace repository and storage ADR",
+      "status": "done",
+      "requirement_ids": [
+        "REA-023",
+        "REA-030"
+      ],
+      "depends_on": [
+        "P1-004"
+      ],
+      "acceptance": [
+        "One repository owns canonical collection/environment/request commits across callers",
+        "ADR defines versioned manifest, per-request files, commit point, revisions and recovery",
+        "Per-request edits produce isolated reviewable file diffs and preserve opaque imported fields"
+      ],
+      "evidence": [
+        "docs/P1_REPOSITORY_DESIGN.md",
+        "docs/adr/001-workspace-manifest.md",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-006",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Migration dry-run, backup and validated restore",
+      "status": "done",
+      "requirement_ids": [
+        "REA-028",
+        "REA-072",
+        "REA-087"
+      ],
+      "depends_on": [
+        "P1-005"
+      ],
+      "acceptance": [
+        "Preflight validates schemas/IDs/paths/checksums and reports changes without writes",
+        "Migration retains a backup and resumes or rolls back interrupted commits",
+        "Restore verifies checksums/schema and refuses stale or unreviewed destructive changes",
+        "Fault-injected restart and round-trip fixtures show no silent loss; tests use disposable roots"
+      ],
+      "evidence": [
+        "docs/P1_REPOSITORY_DESIGN.md",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-007",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Complete collection and folder authoring",
+      "status": "done",
+      "requirement_ids": [
+        "REA-010",
+        "REA-023",
+        "REA-024"
+      ],
+      "depends_on": [
+        "P1-004"
+      ],
+      "acceptance": [
+        "Create/rename/duplicate/delete collections and nested folders with stable IDs",
+        "Move/reorder requests and folders with cycle/depth/identity validation",
+        "Collection/folder inherited auth, variables and scripts are editable and affect actual execution",
+        "Revision conflicts and failed writes retain drafts; keyboard users can invoke every action"
+      ],
+      "evidence": [
+        "docs/WORKSPACE_AUTHORING.md",
+        "docs/verification/P1_WORKBENCH_BROWSER.json",
+        "docs/verification/P1_DRAG_BROWSER.json",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-008",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Complete request authoring and identity-safe edits",
+      "status": "done",
+      "requirement_ids": [
+        "REA-023",
+        "REA-024",
+        "REA-026"
+      ],
+      "depends_on": [
+        "P1-007"
+      ],
+      "acceptance": [
+        "Create/rename/duplicate/delete/move/reorder requests inside folders",
+        "Duplication creates fresh identities while preserving editable content and opaque metadata",
+        "Pending operations cannot discard newer or unrelated drafts"
+      ],
+      "evidence": [
+        "docs/WORKSPACE_AUTHORING.md",
+        "docs/verification/P1_WORKBENCH_BROWSER.json",
+        "docs/verification/P1_DRAG_BROWSER.json",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-009",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Multiple request tabs and response ownership",
+      "status": "done",
+      "requirement_ids": [
+        "REA-025",
+        "REA-026"
+      ],
+      "depends_on": [
+        "P1-004"
+      ],
+      "acceptance": [
+        "Open/switch/close independent request tabs; dirty close requires an explicit choice",
+        "Late save/execution results update only their owning tab",
+        "Execution cancellation and bounded tab/response retention are visible and tested"
+      ],
+      "evidence": [
+        "docs/WORKBENCH_STATE.md",
+        "docs/verification/P1_WORKBENCH_BROWSER.json",
+        "docs/verification/P1_BUSY_WATCH_BROWSER.json",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-010",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Bounded request history, examples and undo",
+      "status": "done",
+      "requirement_ids": [
+        "REA-025",
+        "REA-085",
+        "REA-087"
+      ],
+      "depends_on": [
+        "P1-009"
+      ],
+      "acceptance": [
+        "History has declared count/byte retention and no automatic replay",
+        "Users can inspect/reopen requests and save examples with explicit secret exclusion",
+        "Undo/recovery choices preserve identities and never overwrite a newer revision"
+      ],
+      "evidence": [
+        "docs/WORKBENCH_STATE.md",
+        "docs/verification/P1_WORKBENCH_BROWSER.json",
+        "docs/verification/P1_FINAL_CLI_RESTART_BROWSER.json",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-011",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Durable draft and restart recovery",
+      "status": "done",
+      "requirement_ids": [
+        "REA-026",
+        "REA-072"
+      ],
+      "depends_on": [
+        "P1-004"
+      ],
+      "acceptance": [
+        "Committed recoveries survive reload/restart independently of canonical saves",
+        "Recovery retains the original revision/context and requires review when disk changed or vanished",
+        "Concurrent tabs do not overwrite one another; failed/quota writes are visible",
+        "Retention, local storage/privacy behavior and explicit discard are documented and testable"
+      ],
+      "evidence": [
+        "docs/WORKSPACE_DRAFT_RECOVERY.md",
+        "docs/verification/P1_DRAFT_RECOVERY_BROWSER.json",
+        "docs/P1_PROGRESS.md",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-012",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Import corpus and semantic migration reports",
+      "status": "done",
+      "requirement_ids": [
+        "REA-028",
+        "REA-031"
+      ],
+      "depends_on": [
+        "P1-006"
+      ],
+      "acceptance": [
+        "Sanitized Postman v2.1/cURL fixtures cover nested inheritance, repeated/disabled values and unsupported fields",
+        "Import/export/restart preserves opaque metadata and reports semantic differences",
+        "Unsupported schemas/modes fail explicitly; v3 YAML remains P7"
+      ],
+      "evidence": [
+        "docs/IMPORT_COMPATIBILITY.md",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-013",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Environment editing and scope diagnostics",
+      "status": "done",
+      "requirement_ids": [
+        "REA-027"
+      ],
+      "depends_on": [
+        "P1-004"
+      ],
+      "acceptance": [
+        "Environment CRUD/revision behavior and inherited scope explanations are tested",
+        "Plaintext/reference limitations are explicit; keychain implementation stays in P2",
+        "Failed/conflicting environment saves cannot silently change execution context"
+      ],
+      "evidence": [
+        "docs/WORKBENCH_STATE.md",
+        "docs/verification/P1_WORKBENCH_BROWSER.json",
+        "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P1-014",
+      "phase": "P1",
+      "kind": "phase_gate",
+      "title": "P1 acceptance and phase handoff",
+      "status": "done",
+      "requirement_ids": [
+        "REA-023",
+        "REA-024",
+        "REA-025",
+        "REA-026",
+        "REA-027",
+        "REA-028",
+        "REA-030",
+        "REA-031",
+        "REA-087",
+        "REA-088"
+      ],
+      "depends_on": [
+        "P1-001",
+        "P1-002",
+        "P1-003",
+        "P1-004",
+        "P1-005",
+        "P1-006",
+        "P1-007",
+        "P1-008",
+        "P1-009",
+        "P1-010",
+        "P1-011",
+        "P1-012",
+        "P1-013",
+        "P1-015"
+      ],
+      "acceptance": [
+        "All P1 deliverables have post-change automated and public browser evidence",
+        "Package/extension builds and regression suite pass; large-list budget is remeasured after UI changes",
+        "P1 progress and requirement dispositions name remaining cross-phase work without overstating parity"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-001",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "Secure credential lifecycle",
+      "status": "done",
+      "requirement_ids": [
+        "REA-001",
+        "REA-002",
+        "REA-003",
+        "REA-004",
+        "REA-005",
+        "REA-006",
+        "REA-007",
+        "REA-009",
+        "REA-010",
+        "REA-011",
+        "REA-015",
+        "REA-027",
+        "REA-030",
+        "REA-068",
+        "REA-070",
+        "REA-086"
+      ],
+      "depends_on": [
+        "P2-004",
+        "P2-005",
+        "P2-006",
+        "P2-007",
+        "P2-012"
+      ],
+      "acceptance": [
+        "Keychain providers fail closed/session-only; migration/export consent and recovery are explicit",
+        "OAuth provider fixtures cover PKCE/state/callback/denial/refresh rotation and concurrent refresh"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-002",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "HTTP completion and transport settings",
+      "status": "done",
+      "requirement_ids": [
+        "REA-001",
+        "REA-002",
+        "REA-003",
+        "REA-004",
+        "REA-005",
+        "REA-006",
+        "REA-007",
+        "REA-009",
+        "REA-011",
+        "REA-015",
+        "REA-068",
+        "REA-070",
+        "REA-086"
+      ],
+      "depends_on": [
+        "P2-008",
+        "P2-009",
+        "P2-010",
+        "P2-011",
+        "P2-012"
+      ],
+      "acceptance": [
+        "Exact repeated fields, file selection, cancellation, redirects, cookies, binary download and streaming budgets are verified",
+        "mTLS/custom CA fixtures preserve default TLS verification"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-003",
+      "phase": "P2",
+      "kind": "phase_gate",
+      "title": "P2 acceptance gate",
+      "status": "done",
+      "requirement_ids": [],
+      "depends_on": [
+        "P2-001",
+        "P2-002",
+        "P2-004",
+        "P2-005",
+        "P2-006",
+        "P2-007",
+        "P2-008",
+        "P2-009",
+        "P2-010",
+        "P2-011",
+        "P2-012"
+      ],
+      "acceptance": [
+        "Supported auth/secret/HTTP subset documented with real provider and wire fixtures; no seeded credentials leak"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P3-001",
+      "phase": "P3",
+      "kind": "deliverable",
+      "title": "Versioned script and Send/Run policy",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-032",
+        "REA-033",
+        "REA-034",
+        "REA-035",
+        "REA-036",
+        "REA-039",
+        "REA-040",
+        "REA-041",
+        "REA-042",
+        "REA-044"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Pinned reference differential cases compare event order, typed precedence/mutation, wire bytes and errors"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P3-002",
+      "phase": "P3",
+      "kind": "deliverable",
+      "title": "Worker and destination-policy enforcement",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-032",
+        "REA-033",
+        "REA-034",
+        "REA-035",
+        "REA-036",
+        "REA-039",
+        "REA-040",
+        "REA-041",
+        "REA-042",
+        "REA-044"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Bounded worker queue/bridge and adversarial script cancellation release resources",
+        "Workspace grants apply to direct, redirected and script-originated network calls"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P3-003",
+      "phase": "P3",
+      "kind": "deliverable",
+      "title": "Durable CI jobs and reports",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-032",
+        "REA-033",
+        "REA-034",
+        "REA-035",
+        "REA-036",
+        "REA-039",
+        "REA-040",
+        "REA-041",
+        "REA-042",
+        "REA-044"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Durable results are bounded/redacted and never silently rerun destructive work after restart",
+        "Actual CLI/MCP clients verify cancellation, denial, stable exit codes and reports"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P3-004",
+      "phase": "P3",
+      "kind": "phase_gate",
+      "title": "P3 acceptance gate",
+      "status": "todo",
+      "requirement_ids": [],
+      "depends_on": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "acceptance": [
+        "Declared compatibility subset passes pinned differential suite and public negative paths"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P4-001",
+      "phase": "P4",
+      "kind": "deliverable",
+      "title": "Capture sessions and reviewed evidence",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-048",
+        "REA-050",
+        "REA-051",
+        "REA-052",
+        "REA-053",
+        "REA-054",
+        "REA-055",
+        "REA-056",
+        "REA-057",
+        "REA-058",
+        "REA-060",
+        "REA-084"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Filters/retention/selection preserve immutable sanitized observations and provenance"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P4-002",
+      "phase": "P4",
+      "kind": "deliverable",
+      "title": "Reviewed contract and regression pipeline",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-048",
+        "REA-050",
+        "REA-051",
+        "REA-052",
+        "REA-053",
+        "REA-054",
+        "REA-055",
+        "REA-056",
+        "REA-057",
+        "REA-058",
+        "REA-060",
+        "REA-084",
+        "REA-085"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Independent OpenAPI validation; observed/inferred/confirmed distinctions remain visible",
+        "Approved fixture replay catches seeded contract drift and client failures"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P4-003",
+      "phase": "P4",
+      "kind": "deliverable",
+      "title": "Executable generated clients and snippets",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-048",
+        "REA-050",
+        "REA-051",
+        "REA-052",
+        "REA-053",
+        "REA-054",
+        "REA-055",
+        "REA-056",
+        "REA-057",
+        "REA-058",
+        "REA-060",
+        "REA-084"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Generated outputs compile and execute auth/path/body/error/binary/cancel fixture cases"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P4-004",
+      "phase": "P4",
+      "kind": "phase_gate",
+      "title": "P4 acceptance gate",
+      "status": "todo",
+      "requirement_ids": [],
+      "depends_on": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "acceptance": [
+        "Capture \u2192 review \u2192 contract \u2192 fixture \u2192 generated client succeeds without seeded-secret disclosure"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P5-001",
+      "phase": "P5",
+      "kind": "deliverable",
+      "title": "Install, onboarding and supported platform matrix",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-071",
+        "REA-072",
+        "REA-073",
+        "REA-074",
+        "REA-075",
+        "REA-077",
+        "REA-079",
+        "REA-080",
+        "REA-081",
+        "REA-082",
+        "REA-083",
+        "REA-092",
+        "REA-068"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Clean supported OS installs exercise restart/upgrade/rollback with actionable doctor diagnostics",
+        "Actual installed VS Code extension host and real MCP clients verify supported operations",
+        "Native vault/platform matrix is explicit: implement private Windows metadata ACLs before enabling persistent credentials and verify Linux Secret Service; retain explicit session-only refusal paths"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P5-002",
+      "phase": "P5",
+      "kind": "deliverable",
+      "title": "Independent security and accessibility review",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-071",
+        "REA-072",
+        "REA-073",
+        "REA-074",
+        "REA-075",
+        "REA-077",
+        "REA-079",
+        "REA-080",
+        "REA-081",
+        "REA-082",
+        "REA-083",
+        "REA-092"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Independent review scope/findings/disposition recorded; no release-blocking security/data-loss findings",
+        "Keyboard/accessibility/mobile/browser checks have recorded outcomes and manual review"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P5-003",
+      "phase": "P5",
+      "kind": "deliverable",
+      "title": "Representative performance and target-user validation",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-071",
+        "REA-073",
+        "REA-074",
+        "REA-075",
+        "REA-077",
+        "REA-079",
+        "REA-080",
+        "REA-081",
+        "REA-082",
+        "REA-083",
+        "REA-092"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Record process-tree RSS, startup/interaction/resource/load methodology and limits",
+        "At least ten independent target developers attempt the supported task chain; investigate every loss event",
+        "Repeat use over multiple weeks and proposed 90% task target are evaluated"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P5-004",
+      "phase": "P5",
+      "kind": "phase_gate",
+      "title": "Stable local release decision",
+      "status": "todo",
+      "requirement_ids": [],
+      "depends_on": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "acceptance": [
+        "P0\u2013P4 gates and P5 evidence pass; support/compatibility/license/upgrade policies are published",
+        "External reviews, credentials and trials are real prerequisites, never self-awarded"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P6-001",
+      "phase": "P6",
+      "kind": "deliverable",
+      "title": "Shared protocol/event contracts",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-008",
+        "REA-016",
+        "REA-018"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "At least two real adapters establish connect/send/subscribe/cancel and bounded events without HTTP-only assumptions"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P6-002",
+      "phase": "P6",
+      "kind": "deliverable",
+      "title": "Protocol peer and reconnect acceptance",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-008",
+        "REA-016",
+        "REA-018"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "GraphQL, WebSocket/Socket.IO and SSE real peers cover auth, framing, cancellation, backpressure and reconnect duplication"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P6-003",
+      "phase": "P6",
+      "kind": "phase_gate",
+      "title": "P6 release gate",
+      "status": "todo",
+      "requirement_ids": [],
+      "depends_on": [
+        "P6-001",
+        "P6-002"
+      ],
+      "acceptance": [
+        "Per-surface capability tables and unsupported protocol features match integration evidence"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P7-001",
+      "phase": "P7",
+      "kind": "deliverable",
+      "title": "Demand-ranked protocol and auth releases",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-012",
+        "REA-013",
+        "REA-014",
+        "REA-017",
+        "REA-019",
+        "REA-021",
+        "REA-022",
+        "REA-029",
+        "REA-049",
+        "REA-076"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "gRPC/reflection/streams, MQTT/QoS, MCP inspector and signing each have separately reviewed scopes",
+        "Maintained libraries are pinned with license/advisory/packaging/cancellation checks"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P7-002",
+      "phase": "P7",
+      "kind": "deliverable",
+      "title": "Consented browser/native capture",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-012",
+        "REA-013",
+        "REA-014",
+        "REA-017",
+        "REA-019",
+        "REA-021",
+        "REA-022",
+        "REA-029",
+        "REA-049",
+        "REA-076"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Domain grants, recording indication and stop/revoke behavior verified; no background capture/upload",
+        "TLS interception requires its own trust design and explicit manual certificate installation"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P7-003",
+      "phase": "P7",
+      "kind": "deliverable",
+      "title": "Interoperability evaluation",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-012",
+        "REA-013",
+        "REA-014",
+        "REA-017",
+        "REA-019",
+        "REA-021",
+        "REA-022",
+        "REA-029",
+        "REA-049",
+        "REA-076"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Native v3 YAML is evaluated as a separate parser/serializer; internal schema remains explicit"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P7-004",
+      "phase": "P7",
+      "kind": "phase_gate",
+      "title": "P7 release gates",
+      "status": "todo",
+      "requirement_ids": [],
+      "depends_on": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "acceptance": [
+        "Each independent capability has real peer/signing-vector/format fixtures and documented limitations"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P8-001",
+      "phase": "P8",
+      "kind": "deliverable",
+      "title": "Local lifecycle tools",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-020",
+        "REA-037",
+        "REA-038",
+        "REA-043",
+        "REA-045",
+        "REA-046",
+        "REA-047",
+        "REA-059",
+        "REA-061",
+        "REA-091"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Mocks isolate state/files/network; docs/examples exclude secrets; SDK publishing follows runtime correctness"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P8-002",
+      "phase": "P8",
+      "kind": "deliverable",
+      "title": "Durable scheduling and load integration",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-020",
+        "REA-037",
+        "REA-038",
+        "REA-043",
+        "REA-045",
+        "REA-046",
+        "REA-047",
+        "REA-059",
+        "REA-061",
+        "REA-091"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Timezone/missed-run/duplicate/alert-spam tests; external load adapter identifies generator limits",
+        "Retries and mixed-protocol runs use the shared job/event engine"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P8-003",
+      "phase": "P8",
+      "kind": "deliverable",
+      "title": "Optional scripted UI extensions",
+      "status": "todo",
+      "requirement_ids": [
+        "REA-020",
+        "REA-037",
+        "REA-038",
+        "REA-043",
+        "REA-045",
+        "REA-046",
+        "REA-047",
+        "REA-059",
+        "REA-061",
+        "REA-091"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Approved package libraries, sandboxed visualizers and visual workflows cannot bypass execution policy"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P8-004",
+      "phase": "P8",
+      "kind": "phase_gate",
+      "title": "P8 release gates",
+      "status": "todo",
+      "requirement_ids": [],
+      "depends_on": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "acceptance": [
+        "Independent demand-ranked increments have public functional, isolation and resource evidence"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P9-001",
+      "phase": "P9",
+      "kind": "deliverable",
+      "title": "Self-hosted platform scope and threat model",
+      "status": "gated",
+      "requirement_ids": [
+        "REA-062",
+        "REA-063",
+        "REA-064",
+        "REA-067"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Define operators, authentication boundary, tenant model, retention and operational budget before shared deployment"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P9-002",
+      "phase": "P9",
+      "kind": "deliverable",
+      "title": "Durable collaborative platform",
+      "status": "gated",
+      "requirement_ids": [
+        "REA-062",
+        "REA-063",
+        "REA-064",
+        "REA-067"
+      ],
+      "depends_on": [
+        "P9-001"
+      ],
+      "acceptance": [
+        "Every resource/job checks server-side authorization; users/orgs/invitations/revocation/RBAC/tenant isolation tested",
+        "Sync/fork/review conflicts preserve concurrent work; durable jobs never silently replay side effects"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P9-003",
+      "phase": "P9",
+      "kind": "deliverable",
+      "title": "Self-hosted operations and recovery",
+      "status": "gated",
+      "requirement_ids": [
+        "REA-062",
+        "REA-063",
+        "REA-064",
+        "REA-067"
+      ],
+      "depends_on": [
+        "P9-001"
+      ],
+      "acceptance": [
+        "Backup/restore, TLS, queues, incident/upgrade/runbook and cost/abuse controls verified"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P9-004",
+      "phase": "P9",
+      "kind": "phase_gate",
+      "title": "P9 release gates",
+      "status": "gated",
+      "requirement_ids": [],
+      "depends_on": [
+        "P9-001",
+        "P9-002",
+        "P9-003"
+      ],
+      "acceptance": [
+        "Real multi-user isolation/revocation/recovery tests and operational evidence pass"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P10-001",
+      "phase": "P10",
+      "kind": "prerequisite_gate",
+      "title": "Funded enterprise scope decision",
+      "status": "gated",
+      "requirement_ids": [],
+      "depends_on": [],
+      "acceptance": [
+        "Explicit demand, scope, security owners and funding precede execution"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P10-002",
+      "phase": "P10",
+      "kind": "deliverable",
+      "title": "Identity, governance and vault integration",
+      "status": "gated",
+      "requirement_ids": [
+        "REA-065",
+        "REA-066",
+        "REA-069",
+        "REA-078",
+        "REA-089",
+        "REA-090"
+      ],
+      "depends_on": [
+        "P10-001"
+      ],
+      "acceptance": [
+        "Real SSO/OIDC/SAML/SCIM provider fixtures validate lifecycle and revocation",
+        "Audit integrity/retention, external vaults and encryption administration have reviewed threat models"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P10-003",
+      "phase": "P10",
+      "kind": "deliverable",
+      "title": "Private runners and opt-in AI/context",
+      "status": "gated",
+      "requirement_ids": [
+        "REA-065",
+        "REA-066",
+        "REA-069",
+        "REA-078",
+        "REA-089",
+        "REA-090"
+      ],
+      "depends_on": [
+        "P10-001"
+      ],
+      "acceptance": [
+        "Runner isolation and egress grants enforced; model costs/privacy and explicit opt-in documented"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P10-004",
+      "phase": "P10",
+      "kind": "phase_gate",
+      "title": "P10 release gates",
+      "status": "gated",
+      "requirement_ids": [],
+      "depends_on": [
+        "P10-001",
+        "P10-002",
+        "P10-003"
+      ],
+      "acceptance": [
+        "Enterprise capabilities meet scoped conformance/operations evidence; no unearned certification claim"
+      ],
+      "evidence": [],
+      "blocker": null
+    },
+    {
+      "id": "P1-015",
+      "phase": "P1",
+      "kind": "deliverable",
+      "title": "Resolve large-workspace event-to-frame outliers",
+      "status": "done",
+      "requirement_ids": [
+        "REA-025",
+        "REA-081"
+      ],
+      "depends_on": [
+        "P1-001"
+      ],
+      "acceptance": [
+        "Investigate retained p95 failures with synchronous-work and frame-scheduling measurements; do not discard slow samples or attribute a cause from focus alone",
+        "Meet the existing 100 ms filter/selection event-to-frame budget on the documented supported reference setup",
+        "Record source hashes, browser/control methodology and raw samples before closing the performance gate"
+      ],
+      "evidence": [
+        "docs/verification/P1_PERFORMANCE_GATE.json",
+        "docs/verification/P1_OS_FOREGROUND_PERFORMANCE_1.json",
+        "docs/verification/P1_PERFORMANCE_INVESTIGATION.md",
+        "docs/verification/P1_GATE_REVIEW.md",
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-004",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "OS credential providers and session-only lifecycle",
+      "status": "done",
+      "requirement_ids": [
+        "REA-068",
+        "REA-070"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Secret values use the selected OS secure provider or explicit session-only storage; no plaintext fallback or process-argument exposure",
+        "Provider refusal, restart/missing session state, typed purpose and per-origin isolation are exercised"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-005",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "Secret references, consent migration and safe exports",
+      "status": "done",
+      "requirement_ids": [
+        "REA-009",
+        "REA-010",
+        "REA-027",
+        "REA-030",
+        "REA-068",
+        "REA-070"
+      ],
+      "depends_on": [
+        "P2-004"
+      ],
+      "acceptance": [
+        "References resolve only for approved actual destinations after scripts/variables; resolved credential values are never automatically saved as plaintext",
+        "Reviewed migration rechecks revisions and preserves recoverable source on failures",
+        "Exports/backups/reports omit resolved values and require explicit consent for inline plaintext credentials"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-006",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "OAuth acquisition and owned callbacks",
+      "status": "done",
+      "requirement_ids": [
+        "REA-011"
+      ],
+      "depends_on": [
+        "P2-004"
+      ],
+      "acceptance": [
+        "Authorization code with PKCE/state/nonce and client credentials use maintained standards implementation",
+        "Real fake-provider fixtures cover success, denial, wrong state/callback, replay, timeout and secure-store refusal"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-007",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "OAuth expiry, refresh rotation and clear/revoke",
+      "status": "done",
+      "requirement_ids": [
+        "REA-011"
+      ],
+      "depends_on": [
+        "P2-006"
+      ],
+      "acceptance": [
+        "Expired/rotated tokens refresh once under concurrent calls and update an atomic secure bundle",
+        "Refresh failure retains recoverable account state; clearing local state and remote revocation are explicit and tested"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-008",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "Selected multipart and binary streaming uploads",
+      "status": "done",
+      "requirement_ids": [
+        "REA-003",
+        "REA-006"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Only explicitly chosen bytes are uploaded with bounded private session file capabilities",
+        "Real wire byte equality, multipart field order, import-path refusal and cancellation/limit cleanup are tested"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-009",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "HTTP wire fidelity, cookies and diagnostics",
+      "status": "done",
+      "requirement_ids": [
+        "REA-001",
+        "REA-002",
+        "REA-006",
+        "REA-007",
+        "REA-086"
+      ],
+      "depends_on": [],
+      "acceptance": [
+        "Repeated fields/method/encoding/redirect/deadline cases are verified against real peers",
+        "Cookie editing, clear, domain/path/secure behavior and explicit secure persistence are tested",
+        "Diagnostics explain observed failures without unsupported timing or secret leakage"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-010",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "Verified TLS, custom CA and mutual TLS",
+      "status": "done",
+      "requirement_ids": [
+        "REA-015",
+        "REA-086"
+      ],
+      "depends_on": [
+        "P2-004"
+      ],
+      "acceptance": [
+        "Default certificate and hostname verification stays enabled; unknown/bypass settings fail explicitly",
+        "mTLS fails without the selected key/certificate and succeeds with them; custom CA and cross-origin credential boundaries are exercised"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-011",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "Bounded streamed responses and exact downloads",
+      "status": "done",
+      "requirement_ids": [
+        "REA-004",
+        "REA-005",
+        "REA-006"
+      ],
+      "depends_on": [
+        "P2-008",
+        "P2-009"
+      ],
+      "acceptance": [
+        "Progress/preview/download preserve owner identity with explicit preview/artifact limits and backpressure",
+        "Larger binary/media types, compressed expansion, abort/disconnect and retention cleanup are verified"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    },
+    {
+      "id": "P2-012",
+      "phase": "P2",
+      "kind": "deliverable",
+      "title": "Schema-aware authoring and credential/HTTP workflows",
+      "status": "done",
+      "requirement_ids": [
+        "REA-002",
+        "REA-004",
+        "REA-009",
+        "REA-010",
+        "REA-027",
+        "REA-070"
+      ],
+      "depends_on": [
+        "P2-004",
+        "P2-005",
+        "P2-006",
+        "P2-008",
+        "P2-009",
+        "P2-010",
+        "P2-011"
+      ],
+      "acceptance": [
+        "JSON syntax and supported schemas validate with bounded off-main-thread execution and no remote schema fetch",
+        "Public browser credential/OAuth/file/TLS/cookie/streaming controls use explicit consent and retain failed inputs",
+        "Sensitive inputs, reviewed examples and inspector/export flows exclude seeded secret values"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json",
+        "docs/P2_PROGRESS.md"
+      ],
+      "blocker": null
+    }
+  ],
+  "requirements": {
+    "REA-001": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Methods, URL, query and headers",
+      "required_work": "Validate encoding and uncommon header/method cases.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-009"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Validate encoding and uncommon header/method cases.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-009"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-002": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "JSON, text and URL-encoded bodies",
+      "required_work": "Add schema-aware editing and better validation.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-009",
+        "P2-012"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Add schema-aware editing and better validation.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-009",
+            "P2-012"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-003": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Multipart and binary uploads",
+      "required_work": "Add safe local file selection and streaming upload.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-008"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Add safe local file selection and streaming upload.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-008"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-004": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Response inspection",
+      "required_work": "Add richer inspectors and saved examples.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-011",
+        "P2-012"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Add richer inspectors and saved examples.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-011",
+            "P2-012"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-005": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Binary response download",
+      "required_work": "Exercise larger files and broaden media-type handling.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-011"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Exercise larger files and broaden media-type handling.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-011"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-006": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Timeout, cancellation and redirects",
+      "required_work": "Differential redirect/encoding/cancellation fixtures.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-008",
+        "P2-009",
+        "P2-011"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Differential redirect/encoding/cancellation fixtures.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-008",
+            "P2-009",
+            "P2-011"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-007": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Cookies",
+      "required_work": "Cookie editor, clear controls and optional persistence.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-009"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Cookie editor, clear controls and optional persistence.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-009"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-008": {
+      "candidate_phase": "P6",
+      "next_review_phase": "P6",
+      "workstream": "WS1",
+      "feature": "Streaming / SSE UI",
+      "required_work": "Implement only after bounded streaming architecture.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P6-001",
+        "P6-002"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P6",
+          "status": "pending",
+          "scope": "Implement only after bounded streaming architecture.",
+          "task_ids": [
+            "P6-001",
+            "P6-002"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-009": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS2",
+      "feature": "Basic, Bearer and API key",
+      "required_work": "Improve sensitive-input UI and diagnostics.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-005",
+        "P2-012"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Improve sensitive-input UI and diagnostics.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-005",
+            "P2-012"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-010": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS2",
+      "feature": "Inherited authentication",
+      "required_work": "Finish authoring inherited settings directly in the UI.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-007",
+        "P2-001",
+        "P2-005",
+        "P2-012"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json",
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Collection/folder inherited authentication, variables and scripts are editable and exercised through real transport; P2 owns the remaining authentication/credential scope.",
+          "task_ids": [
+            "P1-007"
+          ],
+          "evidence": [
+            "docs/WORKSPACE_AUTHORING.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_DRAG_BROWSER.json",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/verification/P1_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Finish authoring inherited settings directly in the UI.",
+          "task_ids": [
+            "P2-001",
+            "P2-005",
+            "P2-012"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-011": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS2",
+      "feature": "OAuth 2.0 / PKCE / refresh",
+      "required_work": "High priority: OAuth with secure token lifecycle.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-006",
+        "P2-007"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "High priority: OAuth with secure token lifecycle.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-006",
+            "P2-007"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-012": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS2",
+      "feature": "OAuth 1.0",
+      "required_work": "Only prioritize if target users require legacy APIs.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Only prioritize if target users require legacy APIs.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-013": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS2",
+      "feature": "JWT generation/signing",
+      "required_work": "Add after vault/key-storage design.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Add after vault/key-storage design.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-014": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS2",
+      "feature": "Digest / NTLM / AWS signing",
+      "required_work": "Prioritize AWS or enterprise auth from user demand.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Prioritize AWS or enterprise auth from user demand.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-015": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS2",
+      "feature": "Client certificates / custom CA",
+      "required_work": "Add mTLS/custom CA fixtures; never default to disabled verification.",
+      "acceptance_reference": "WS2 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-010"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Add mTLS/custom CA fixtures; never default to disabled verification.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-010"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-016": {
+      "candidate_phase": "P6",
+      "next_review_phase": "P6",
+      "workstream": "WS3",
+      "feature": "GraphQL explorer",
+      "required_work": "Schema introspection, variables, explorer and errors.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P6-001",
+        "P6-002"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P6",
+          "status": "pending",
+          "scope": "Schema introspection, variables, explorer and errors.",
+          "task_ids": [
+            "P6-001",
+            "P6-002"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-017": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS3",
+      "feature": "gRPC",
+      "required_work": "Defer until HTTP release quality and demand.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Defer until HTTP release quality and demand.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-018": {
+      "candidate_phase": "P6",
+      "next_review_phase": "P6",
+      "workstream": "WS3",
+      "feature": "WebSocket / Socket.IO",
+      "required_work": "Likely next protocol after core HTTP if users request it.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P6-001",
+        "P6-002"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P6",
+          "status": "pending",
+          "scope": "Likely next protocol after core HTTP if users request it.",
+          "task_ids": [
+            "P6-001",
+            "P6-002"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-019": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS3",
+      "feature": "MQTT",
+      "required_work": "Defer unless targeting IoT developers.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Defer unless targeting IoT developers.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-020": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS3",
+      "feature": "Webhook listener workflows",
+      "required_work": "Add explicit local listener/forwarding only with demand.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Add explicit local listener/forwarding only with demand.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-021": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS3",
+      "feature": "MCP client / inspector",
+      "required_work": "Do not confuse server integration with a client inspector.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Do not confuse server integration with a client inspector.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-022": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS3",
+      "feature": "AI model request type",
+      "required_work": "Defer a model playground; avoid unnecessary scope.",
+      "acceptance_reference": "WS3 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Defer a model playground; avoid unnecessary scope.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-023": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "Collection/request storage",
+      "required_work": "Complete collection/folder authoring and rename/reorder.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-001",
+        "P1-005",
+        "P1-007",
+        "P1-008",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Complete collection/folder authoring and rename/reorder.",
+          "task_ids": [
+            "P1-001",
+            "P1-005",
+            "P1-007",
+            "P1-008",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/P1_PROGRESS.md",
+            "docs/verification/P1_BROWSER.json",
+            "docs/P1_REPOSITORY_DESIGN.md",
+            "docs/adr/001-workspace-manifest.md",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/WORKSPACE_AUTHORING.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_DRAG_BROWSER.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-024": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "Nested folder authoring",
+      "required_work": "Drag/reorder/move/duplicate and folder settings.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-007",
+        "P1-008",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Drag/reorder/move/duplicate and folder settings.",
+          "task_ids": [
+            "P1-007",
+            "P1-008",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/WORKSPACE_AUTHORING.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_DRAG_BROWSER.json",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-025": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "Multi-request tabs and history",
+      "required_work": "High priority daily-workflow improvement.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-001",
+        "P1-009",
+        "P1-010",
+        "P1-014",
+        "P1-015"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "High priority daily-workflow improvement.",
+          "task_ids": [
+            "P1-001",
+            "P1-009",
+            "P1-010",
+            "P1-014",
+            "P1-015"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/P1_PROGRESS.md",
+            "docs/verification/P1_BROWSER.json",
+            "docs/WORKBENCH_STATE.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_BUSY_WATCH_BROWSER.json",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/verification/P1_FINAL_CLI_RESTART_BROWSER.json",
+            "docs/verification/P1_PERFORMANCE_GATE.json",
+            "docs/verification/P1_OS_FOREGROUND_PERFORMANCE_1.json",
+            "docs/verification/P1_PERFORMANCE_INVESTIGATION.md",
+            "docs/verification/P1_GATE_REVIEW.md"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-026": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "Unsaved edits and recovery",
+      "required_work": "Await switching saves, preserve failed edits, inject disk failures.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-004",
+        "P1-008",
+        "P1-009",
+        "P1-011",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Await switching saves, preserve failed edits, inject disk failures.",
+          "task_ids": [
+            "P1-004",
+            "P1-008",
+            "P1-009",
+            "P1-011",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/WORKSPACE_RECONCILIATION.md",
+            "docs/verification/P1_RECONCILIATION_BROWSER.json",
+            "docs/WORKSPACE_AUTHORING.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_DRAG_BROWSER.json",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/WORKBENCH_STATE.md",
+            "docs/verification/P1_BUSY_WATCH_BROWSER.json",
+            "docs/WORKSPACE_DRAFT_RECOVERY.md",
+            "docs/verification/P1_DRAFT_RECOVERY_BROWSER.json",
+            "docs/P1_PROGRESS.md"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-027": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P2",
+      "workstream": "WS4",
+      "feature": "Environment variables",
+      "required_work": "Vault references and clear scope diagnostics.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-013",
+        "P1-014",
+        "P2-001",
+        "P2-005",
+        "P2-012"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json",
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Environment CRUD, conflict-safe editing and scope diagnostics. Secure credential references remain in the P2 scope.",
+          "task_ids": [
+            "P1-013",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/WORKBENCH_STATE.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json"
+          ],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Secure credential references and explicit scope/export diagnostics after the P1 environment editing increment.",
+          "task_ids": [
+            "P2-001",
+            "P2-005",
+            "P2-012"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-028": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "Postman v2.1 JSON migration",
+      "required_work": "Real sanitized fixture corpus plus semantic diff report.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-006",
+        "P1-012",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Real sanitized fixture corpus plus semantic diff report.",
+          "task_ids": [
+            "P1-006",
+            "P1-012",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/P1_REPOSITORY_DESIGN.md",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/IMPORT_COMPATIBILITY.md"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-029": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS4",
+      "feature": "Native Git v3 YAML format",
+      "required_work": "State v2.1-only boundary; evaluate a native request-file format.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "State v2.1-only boundary; evaluate a native request-file format.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-030": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P2",
+      "workstream": "WS4",
+      "feature": "Git collaboration",
+      "required_work": "Per-request diffs, secret exclusion, external edits/conflicts.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-002",
+        "P1-004",
+        "P1-005",
+        "P1-014",
+        "P2-001",
+        "P2-005"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json",
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Versioned per-request files, metadata preservation, external reconciliation and explicit conflict handling. Credential references/export policy remain P2.",
+          "task_ids": [
+            "P1-002",
+            "P1-004",
+            "P1-005",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/P1_PROGRESS.md",
+            "docs/WORKSPACE_RECONCILIATION.md",
+            "docs/verification/P1_RECONCILIATION_BROWSER.json",
+            "docs/P1_REPOSITORY_DESIGN.md",
+            "docs/adr/001-workspace-manifest.md",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json"
+          ],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Secret-reference migration/export policy for portable Git workspaces; P1 owns files, identity and conflicts.",
+          "task_ids": [
+            "P2-001",
+            "P2-005"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-031": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "cURL and other import formats",
+      "required_work": "Explicit compatibility diagnostics; OpenAPI/HAR import later.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-012",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Explicit compatibility diagnostics; OpenAPI/HAR import later.",
+          "task_ids": [
+            "P1-012",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/IMPORT_COMPATIBILITY.md",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-032": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS5",
+      "feature": "Pre/post scripts and inheritance",
+      "required_work": "Differential fixtures for nesting and event behavior.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Differential fixtures for nesting and event behavior.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-033": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS5",
+      "feature": "Chai and asynchronous tests",
+      "required_work": "Expand fixtures; do not label every pm API compatible.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Expand fixtures; do not label every pm API compatible.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-034": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS5",
+      "feature": "Scope and iteration variables",
+      "required_work": "Document persistence and match scope semantics.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Document persistence and match scope semantics.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-035": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS5",
+      "feature": "pm.sendRequest and chaining",
+      "required_work": "Full request/response mutation compatibility remains absent.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Full request/response mutation compatibility remains absent.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-036": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS5",
+      "feature": "Dynamic variables",
+      "required_work": "Only add high-demand variables with deterministic tests.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Only add high-demand variables with deterministic tests.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-037": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS5",
+      "feature": "Package libraries / pm.require",
+      "required_work": "Avoid unsafe arbitrary host imports; design isolation first.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Avoid unsafe arbitrary host imports; design isolation first.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-038": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS5",
+      "feature": "Response visualizer",
+      "required_work": "Optional later; separate from ordinary JSON inspection.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Optional later; separate from ordinary JSON inspection.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-039": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS5",
+      "feature": "Hostile-script assurance",
+      "required_work": "Threat model, adversarial testing and independent review.",
+      "acceptance_reference": "WS5 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Threat model, adversarial testing and independent review.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-040": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS6",
+      "feature": "Collection runs",
+      "required_work": "Improve reports/history and failure debugging.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Improve reports/history and failure debugging.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-041": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS6",
+      "feature": "CSV / JSON data runs",
+      "required_work": "Keep local data runs free; improve file picker and previews.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Keep local data runs free; improve file picker and previews.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-042": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS6",
+      "feature": "CLI / CI / reports",
+      "required_work": "Do not claim free CLI reporting is exclusive to Rea.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Do not claim free CLI reporting is exclusive to Rea.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-043": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS6",
+      "feature": "Multi-protocol runs",
+      "required_work": "Follow protocol demand, not breadth for its own sake.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Follow protocol demand, not breadth for its own sake.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-044": {
+      "candidate_phase": "P3",
+      "next_review_phase": "P3",
+      "workstream": "WS6",
+      "feature": "Durable run history",
+      "required_work": "Persistent local results with retention and redaction.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P3-001",
+        "P3-002",
+        "P3-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P3",
+          "status": "pending",
+          "scope": "Persistent local results with retention and redaction.",
+          "task_ids": [
+            "P3-001",
+            "P3-002",
+            "P3-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-045": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS6",
+      "feature": "Scheduled monitors and alerts",
+      "required_work": "Start with user-owned CI scheduling rather than free hosted infrastructure.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Start with user-owned CI scheduling rather than free hosted infrastructure.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-046": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS6",
+      "feature": "Load / performance testing",
+      "required_work": "Integrate an existing load tool if users need it.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Integrate an existing load tool if users need it.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-047": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS6",
+      "feature": "Visual Flows",
+      "required_work": "Defer: high maintenance and no proven demand.",
+      "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Defer: high maintenance and no proven demand.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-048": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS7",
+      "feature": "Explicit HTTP forwarding",
+      "required_work": "Protect capture before expanding distribution.",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Protect capture before expanding distribution.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-049": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS7",
+      "feature": "Browser HTTPS capture",
+      "required_work": "Separate consent, domain permissions and bridge design.",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Separate consent, domain permissions and bridge design.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-050": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS7",
+      "feature": "Capture filtering / sessions",
+      "required_work": "Method/URL/status filters, pause, sessions and retention.",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Method/URL/status filters, pause, sessions and retention.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-051": {
+      "candidate_phase": "P0",
+      "next_review_phase": "P4",
+      "workstream": "WS7",
+      "feature": "Capture body limits / redaction",
+      "required_work": "Critical before beta expansion: byte budgets, timeouts and secret scrubber.",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "in_progress",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Critical before beta expansion: byte budgets, timeouts and secret scrubber.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-052": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS7",
+      "feature": "Capture \u2192 test / replay",
+      "required_work": "Turn selected captures into editable requests and regression fixtures.",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Turn selected captures into editable requests and regression fixtures.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-053": {
+      "candidate_phase": "P0",
+      "next_review_phase": "P4",
+      "workstream": "WS7",
+      "feature": "Repeated-query fidelity",
+      "required_work": "Preserve ordered duplicate query/header values in capture model.",
+      "acceptance_reference": "WS7 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "in_progress",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Preserve ordered duplicate query/header values in capture model.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-054": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS8",
+      "feature": "Observed traffic \u2192 OpenAPI",
+      "required_work": "Potential focus area, not proven exclusive superiority.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Potential focus area, not proven exclusive superiority.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-055": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS8",
+      "feature": "Inference vs actual contract",
+      "required_work": "Confidence/provenance editor and explicit human confirmation.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Confidence/provenance editor and explicit human confirmation.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-056": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS8",
+      "feature": "Spec authoring / multi-file",
+      "required_work": "OpenAPI import/validation and minimal editor first.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "OpenAPI import/validation and minimal editor first.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-057": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS8",
+      "feature": "Spec validation / governance",
+      "required_work": "Integrate a validator; defer organization policy engine.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Integrate a validator; defer organization policy engine.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-058": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS8",
+      "feature": "Spec \u2194 collection sync",
+      "required_work": "Track provenance and drift before automatic updates.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Track provenance and drift before automatic updates.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-059": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS8",
+      "feature": "Mocks / failure simulation",
+      "required_work": "Small local mock from approved examples is a later useful addition.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Small local mock from approved examples is a later useful addition.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-060": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS8",
+      "feature": "SDK generation",
+      "required_work": "Execute generated clients against fixtures, not compilation alone.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Execute generated clients against fixtures, not compilation alone.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-061": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS8",
+      "feature": "Published documentation",
+      "required_work": "Local static docs export before hosted portal.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "Local static docs export before hosted portal.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-062": {
+      "candidate_phase": "P9",
+      "next_review_phase": "P9",
+      "workstream": "WS9",
+      "feature": "Shared workspaces and sync",
+      "required_work": "Defer cloud sync until individual workflow retains users.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P9-001",
+        "P9-002",
+        "P9-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P9",
+          "status": "pending",
+          "scope": "Defer cloud sync until individual workflow retains users.",
+          "task_ids": [
+            "P9-001",
+            "P9-002",
+            "P9-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-063": {
+      "candidate_phase": "P9",
+      "next_review_phase": "P9",
+      "workstream": "WS9",
+      "feature": "Comments / forks / reviews",
+      "required_work": "Use Git first; do not count it as in-product parity.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P9-001",
+        "P9-002",
+        "P9-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P9",
+          "status": "pending",
+          "scope": "Use Git first; do not count it as in-product parity.",
+          "task_ids": [
+            "P9-001",
+            "P9-002",
+            "P9-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-064": {
+      "candidate_phase": "P9",
+      "next_review_phase": "P9",
+      "workstream": "WS9",
+      "feature": "API catalog / discovery",
+      "required_work": "Defer organization catalogue; improve local search.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P9-001",
+        "P9-002",
+        "P9-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P9",
+          "status": "pending",
+          "scope": "Defer organization catalogue; improve local search.",
+          "task_ids": [
+            "P9-001",
+            "P9-002",
+            "P9-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-065": {
+      "candidate_phase": "P10",
+      "next_review_phase": "P10",
+      "workstream": "WS9",
+      "feature": "Roles / organization controls",
+      "required_work": "Not required for a strictly local single-user beta.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P10-002",
+        "P10-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P10",
+          "status": "pending",
+          "scope": "Not required for a strictly local single-user beta.",
+          "task_ids": [
+            "P10-002",
+            "P10-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-066": {
+      "candidate_phase": "P10",
+      "next_review_phase": "P10",
+      "workstream": "WS9",
+      "feature": "SSO / SCIM / audit trails",
+      "required_work": "Enterprise expansion only after explicit demand/funding.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P10-002",
+        "P10-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P10",
+          "status": "pending",
+          "scope": "Enterprise expansion only after explicit demand/funding.",
+          "task_ids": [
+            "P10-002",
+            "P10-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-067": {
+      "candidate_phase": "P9",
+      "next_review_phase": "P9",
+      "workstream": "WS9",
+      "feature": "Integrations / operations",
+      "required_work": "Add a small set from real workflows.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P9-001",
+        "P9-002",
+        "P9-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P9",
+          "status": "pending",
+          "scope": "Add a small set from real workflows.",
+          "task_ids": [
+            "P9-001",
+            "P9-002",
+            "P9-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-068": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P5",
+      "workstream": "WS9",
+      "feature": "Encrypted local secrets",
+      "required_work": "High priority: OS keychain/vault references, migration and export controls.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "in_progress",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-004",
+        "P2-005",
+        "P5-001"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "High priority: OS keychain/vault references, migration and export controls.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-004",
+            "P2-005"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Certify native vault behavior on the supported OS matrix; implement private Windows metadata ACLs before enabling persistent credentials there, and verify Linux Secret Service.",
+          "task_ids": [
+            "P5-001"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-069": {
+      "candidate_phase": "P10",
+      "next_review_phase": "P10",
+      "workstream": "WS9",
+      "feature": "Shared / external vaults",
+      "required_work": "Defer team vault; support user-owned providers if demanded.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P10-002",
+        "P10-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P10",
+          "status": "pending",
+          "scope": "Defer team vault; support user-owned providers if demanded.",
+          "task_ids": [
+            "P10-002",
+            "P10-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-070": {
+      "candidate_phase": "P0",
+      "next_review_phase": "P2",
+      "workstream": "WS9",
+      "feature": "Secret scanning / redaction",
+      "required_work": "Redact capture/log/export paths; test unknown/derived secrets.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-004",
+        "P2-005",
+        "P2-012"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Redact capture/log/export paths; test unknown/derived secrets.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-004",
+            "P2-005",
+            "P2-012"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-071": {
+      "candidate_phase": "P0",
+      "next_review_phase": "P5",
+      "workstream": "WS9",
+      "feature": "Local service exposure",
+      "required_work": "Retain local-only scope; independently review boundaries.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Retain local-only scope; independently review boundaries.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-072": {
+      "candidate_phase": "P0",
+      "next_review_phase": "P5",
+      "workstream": "WS9",
+      "feature": "Recovery and concurrent writers",
+      "required_work": "Backups, file watchers, conflict detection and disk-failure tests.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "in_progress",
+      "task_ids": [
+        "P1-002",
+        "P1-003",
+        "P1-006",
+        "P1-011",
+        "P5-001",
+        "P5-002"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Backups, file watchers, conflict detection and disk-failure tests.",
+          "task_ids": [
+            "P1-002",
+            "P1-003",
+            "P1-006",
+            "P1-011"
+          ],
+          "evidence": [
+            "docs/P1_PROGRESS.md",
+            "docs/WORKSPACE_OWNERSHIP.md",
+            "docs/verification/P1_OWNERSHIP_COLD_START.json",
+            "docs/P1_REPOSITORY_DESIGN.md",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/WORKSPACE_DRAFT_RECOVERY.md",
+            "docs/verification/P1_DRAFT_RECOVERY_BROWSER.json",
+            "docs/verification/P1_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Supported-platform recovery/race validation and independent review beyond P1 local recovery fixtures.",
+          "task_ids": [
+            "P5-001",
+            "P5-002"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-073": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Local account-free workflow",
+      "required_work": "Account-free simplicity is useful, not proof Postman is cloud-only.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Account-free simplicity is useful, not proof Postman is cloud-only.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-074": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Web app / desktop installer",
+      "required_work": "Simple installation first; desktop wrapper only if demanded.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Simple installation first; desktop wrapper only if demanded.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-075": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "VS Code extension",
+      "required_work": "Finish extension-host QA and onboarding before Marketplace.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Finish extension-host QA and onboarding before Marketplace.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-076": {
+      "candidate_phase": "P7",
+      "next_review_phase": "P7",
+      "workstream": "WS10",
+      "feature": "Browser extension",
+      "required_work": "Later capture-specific extension; not another generic UI.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P7-001",
+        "P7-002",
+        "P7-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P7",
+          "status": "pending",
+          "scope": "Later capture-specific extension; not another generic UI.",
+          "task_ids": [
+            "P7-001",
+            "P7-002",
+            "P7-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-077": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "MCP server / agent integration",
+      "required_work": "Add granular permissions and useful local tools; avoid tool-count competition.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Add granular permissions and useful local tools; avoid tool-count competition.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-078": {
+      "candidate_phase": "P10",
+      "next_review_phase": "P10",
+      "workstream": "WS10",
+      "feature": "Built-in AI / Context Graph",
+      "required_work": "Defer built-in AI; improve deterministic tooling first.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P10-002",
+        "P10-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P10",
+          "status": "pending",
+          "scope": "Defer built-in AI; improve deterministic tooling first.",
+          "task_ids": [
+            "P10-002",
+            "P10-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-079": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Open-source modification",
+      "required_work": "Keep licenses clear and make contributions easy.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Keep licenses clear and make contributions easy.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-080": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Free usage and operating cost",
+      "required_work": "Free local product is viable; hosted compute/AI still costs money.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Free local product is viable; hosted compute/AI still costs money.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-081": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Speed / memory superiority",
+      "required_work": "Benchmark cold start, task time, combined RSS and long runs.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "in_progress",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003",
+        "P1-015"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Benchmark cold start, task time, combined RSS and long runs.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Resolve the current large-workspace interaction budget failure. Broader speed/memory claims remain P5.",
+          "task_ids": [
+            "P1-015"
+          ],
+          "evidence": [
+            "docs/verification/P1_PERFORMANCE_GATE.json",
+            "docs/verification/P1_OS_FOREGROUND_PERFORMANCE_1.json",
+            "docs/verification/P1_PERFORMANCE_INVESTIGATION.md",
+            "docs/verification/P1_GATE_REVIEW.md",
+            "docs/verification/P1_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-082": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Release evidence",
+      "required_work": "Finish browser/IDE/cross-platform QA and publish a support contract.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Finish browser/IDE/cross-platform QA and publish a support contract.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-083": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Real-user usefulness",
+      "required_work": "Observe 10 target developers, task completion and repeat use.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Observe 10 target developers, task completion and repeat use.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-084": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS1",
+      "feature": "Code snippets",
+      "required_work": "Compile or execute generated snippets against fixtures.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P4-001",
+        "P4-002",
+        "P4-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Compile or execute generated snippets against fixtures.",
+          "task_ids": [
+            "P4-001",
+            "P4-002",
+            "P4-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-085": {
+      "candidate_phase": "P4",
+      "next_review_phase": "P4",
+      "workstream": "WS1",
+      "feature": "Saved response examples",
+      "required_work": "Example editor with secret exclusion and reusable fixtures.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "in_progress",
+      "task_ids": [
+        "P1-010",
+        "P4-002"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Bounded page history and reviewed, sanitized local examples with inspect/reopen/delete; reusable fixture/example editing remains P4.",
+          "task_ids": [
+            "P1-010"
+          ],
+          "evidence": [
+            "docs/WORKBENCH_STATE.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_FINAL_CLI_RESTART_BROWSER.json",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/verification/P1_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        },
+        {
+          "phase": "P4",
+          "status": "pending",
+          "scope": "Example editor with secret exclusion and reusable fixtures.",
+          "task_ids": [
+            "P4-002"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-086": {
+      "candidate_phase": "P2",
+      "next_review_phase": "P2",
+      "workstream": "WS1",
+      "feature": "Detailed network diagnostics",
+      "required_work": "Explain DNS/TLS/connect errors without claiming complete timing breakdown.",
+      "acceptance_reference": "WS1 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P2-001",
+        "P2-002",
+        "P2-009",
+        "P2-010"
+      ],
+      "evidence": [
+        "docs/verification/P2_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.",
+      "scopes": [
+        {
+          "phase": "P2",
+          "status": "accepted",
+          "scope": "Explain DNS/TLS/connect errors without claiming complete timing breakdown.",
+          "task_ids": [
+            "P2-001",
+            "P2-002",
+            "P2-009",
+            "P2-010"
+          ],
+          "evidence": [
+            "docs/verification/P2_ACCEPTANCE.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-087": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "Restore/version history",
+      "required_work": "Local snapshots and tested backup/restore before cloud collaboration.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-006",
+        "P1-010",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Local snapshots and tested backup/restore before cloud collaboration.",
+          "task_ids": [
+            "P1-006",
+            "P1-010",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/P1_REPOSITORY_DESIGN.md",
+            "docs/verification/P1_IMPLEMENTATION_VERIFICATION.json",
+            "docs/WORKBENCH_STATE.md",
+            "docs/verification/P1_WORKBENCH_BROWSER.json",
+            "docs/verification/P1_FINAL_CLI_RESTART_BROWSER.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-088": {
+      "candidate_phase": "P1",
+      "next_review_phase": "P1",
+      "workstream": "WS4",
+      "feature": "External edits and file watching",
+      "required_work": "Watch/debounce changes and explicitly resolve conflicts.",
+      "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "accepted",
+      "task_ids": [
+        "P1-004",
+        "P1-014"
+      ],
+      "evidence": [
+        "docs/verification/P1_ACCEPTANCE.json"
+      ],
+      "cross_phase_note": "Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.",
+      "scopes": [
+        {
+          "phase": "P1",
+          "status": "accepted",
+          "scope": "Watch/debounce changes and explicitly resolve conflicts.",
+          "task_ids": [
+            "P1-004",
+            "P1-014"
+          ],
+          "evidence": [
+            "docs/verification/P1_ACCEPTANCE.json",
+            "docs/WORKSPACE_RECONCILIATION.md",
+            "docs/verification/P1_RECONCILIATION_BROWSER.json"
+          ],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-089": {
+      "candidate_phase": "P10",
+      "next_review_phase": "P10",
+      "workstream": "WS9",
+      "feature": "Governance rules and reports",
+      "required_work": "Local spec linting first; enterprise reporting later.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P10-002",
+        "P10-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P10",
+          "status": "pending",
+          "scope": "Local spec linting first; enterprise reporting later.",
+          "task_ids": [
+            "P10-002",
+            "P10-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-090": {
+      "candidate_phase": "P10",
+      "next_review_phase": "P10",
+      "workstream": "WS9",
+      "feature": "Enterprise encryption administration",
+      "required_work": "Only relevant if building a hosted enterprise platform.",
+      "acceptance_reference": "WS9 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P10-002",
+        "P10-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P10",
+          "status": "pending",
+          "scope": "Only relevant if building a hosted enterprise platform.",
+          "task_ids": [
+            "P10-002",
+            "P10-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-091": {
+      "candidate_phase": "P8",
+      "next_review_phase": "P8",
+      "workstream": "WS8",
+      "feature": "SDK distribution / updates",
+      "required_work": "First prove client runtime correctness; publishing can wait.",
+      "acceptance_reference": "WS8 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P8-001",
+        "P8-002",
+        "P8-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P8",
+          "status": "pending",
+          "scope": "First prove client runtime correctness; publishing can wait.",
+          "task_ids": [
+            "P8-001",
+            "P8-002",
+            "P8-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    },
+    "REA-092": {
+      "candidate_phase": "P5",
+      "next_review_phase": "P5",
+      "workstream": "WS10",
+      "feature": "Support and release operations",
+      "required_work": "Versioned changelog, support policy and reproducible installation.",
+      "acceptance_reference": "WS10 acceptance gates in ../IMPLEMENTATION_PLAN.md",
+      "status": "pending",
+      "task_ids": [
+        "P5-001",
+        "P5-002",
+        "P5-003"
+      ],
+      "evidence": [],
+      "cross_phase_note": "Existing baseline implementation does not waive acceptance revalidation.",
+      "scopes": [
+        {
+          "phase": "P5",
+          "status": "pending",
+          "scope": "Versioned changelog, support policy and reproducible installation.",
+          "task_ids": [
+            "P5-001",
+            "P5-002",
+            "P5-003"
+          ],
+          "evidence": [],
+          "deferred_to_task_ids": []
+        }
+      ]
+    }
+  },
+  "update_rules": [
+    "Update this JSON in the same change as implementation status/evidence; regenerate TASK_TRACKER.md.",
+    "A done task needs acceptance evidence after its last relevant mutation. Historical evidence must be named as historical.",
+    "Do not mark a broad REA requirement accepted from a partial increment or from its old current_status label.",
+    "A phase closes only when its tasks, scoped requirement dispositions and phase gate are verified.",
+    "Newly discovered work receives a stable task ID and requirement link; do not silently drop or renumber tasks.",
+    "Counts measure tasks, not effort; do not turn them into a product readiness percentage."
+  ]
+}

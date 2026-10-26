@@ -1,0 +1,823 @@
+# Implementation task tracker — P1 to P10
+
+Generated from [task-tracker.json](roadmap/task-tracker.json). Edit that file, then run `npm run roadmap:write`; CI checks synchronization with `npm run roadmap:check`.
+
+As of 2026-10-26. **Current phase: none (between phases or complete).** P1 and the supported local P2 subset accepted; P3 is next and has not started. Preserve P5 platform/release certification and P9/P10 threat-model/scope/funding gates. No automatic publish/merge or stable-release claim.
+
+**Delivery tasks: 58 total — 23 todo; 27 done; 8 gated.** Requirement acceptance is tracked separately: 92 rows; 23 accepted. Counts are not an effort or readiness percentage.
+
+P0's scoped local-core gates passed; broader security/recovery obligations remain assigned below. Existing functionality and old capability labels do not waive acceptance gates.
+
+## Working rules
+
+- Update this JSON in the same change as implementation status/evidence; regenerate TASK_TRACKER.md.
+- A done task needs acceptance evidence after its last relevant mutation. Historical evidence must be named as historical.
+- Do not mark a broad REA requirement accepted from a partial increment or from its old current_status label.
+- A phase closes only when its tasks, scoped requirement dispositions and phase gate are verified.
+- Newly discovered work receives a stable task ID and requirement link; do not silently drop or renumber tasks.
+- Counts measure tasks, not effort; do not turn them into a product readiness percentage.
+
+## P1 — Workspace foundation
+
+Status: **done**. Depends on P0. 15 done.
+
+- [x] **P1-001 — Bounded collection rendering and stable request identities** (done)
+  - Acceptance: 10,004-request fixture supports full search and keyboard navigation with bounded viewport rows
+  - Acceptance: Filter and selection meet recorded reference budgets
+  - Requirements: REA-023, REA-025.
+  - Recorded evidence: [P1_PROGRESS.md](P1_PROGRESS.md), [P1_BROWSER.json](verification/P1_BROWSER.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-002 — Workspace path and canonical-read integrity** (done)
+  - Acceptance: Reject symlink/redirection and changed directory identities without rewriting files
+  - Acceptance: Bound descriptor reads and preserve oversized or malformed resources
+  - Requirements: REA-030, REA-072.
+  - Dependencies: P1-001.
+  - Recorded evidence: [P1_PROGRESS.md](P1_PROGRESS.md), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-003 — Single-writer lease and explicit exited-owner recovery** (done)
+  - Acceptance: Competing cooperating writers are refused before initialization
+  - Acceptance: Reviewed-token recovery preserves workspace data; live/unknown owners are refused
+  - Requirements: REA-072.
+  - Dependencies: P1-002.
+  - Recorded evidence: [WORKSPACE_OWNERSHIP.md](WORKSPACE_OWNERSHIP.md), [P1_OWNERSHIP_COLD_START.json](verification/P1_OWNERSHIP_COLD_START.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-004 — External-file reconciliation and conflict context review** (done)
+  - Acceptance: Clean resources reconcile; dirty/busy drafts survive external edits/deletions
+  - Acceptance: Explicit choices recheck disk revision; stale Send/Run is rejected before transport
+  - Requirements: REA-026, REA-030, REA-088.
+  - Dependencies: P1-003.
+  - Recorded evidence: [WORKSPACE_RECONCILIATION.md](WORKSPACE_RECONCILIATION.md), [P1_RECONCILIATION_BROWSER.json](verification/P1_RECONCILIATION_BROWSER.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-005 — Versioned workspace repository and storage ADR** (done)
+  - Acceptance: One repository owns canonical collection/environment/request commits across callers
+  - Acceptance: ADR defines versioned manifest, per-request files, commit point, revisions and recovery
+  - Acceptance: Per-request edits produce isolated reviewable file diffs and preserve opaque imported fields
+  - Requirements: REA-023, REA-030.
+  - Dependencies: P1-004.
+  - Recorded evidence: [P1_REPOSITORY_DESIGN.md](P1_REPOSITORY_DESIGN.md), [001-workspace-manifest.md](adr/001-workspace-manifest.md), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-006 — Migration dry-run, backup and validated restore** (done)
+  - Acceptance: Preflight validates schemas/IDs/paths/checksums and reports changes without writes
+  - Acceptance: Migration retains a backup and resumes or rolls back interrupted commits
+  - Acceptance: Restore verifies checksums/schema and refuses stale or unreviewed destructive changes
+  - Acceptance: Fault-injected restart and round-trip fixtures show no silent loss; tests use disposable roots
+  - Requirements: REA-028, REA-072, REA-087.
+  - Dependencies: P1-005.
+  - Recorded evidence: [P1_REPOSITORY_DESIGN.md](P1_REPOSITORY_DESIGN.md), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-007 — Complete collection and folder authoring** (done)
+  - Acceptance: Create/rename/duplicate/delete collections and nested folders with stable IDs
+  - Acceptance: Move/reorder requests and folders with cycle/depth/identity validation
+  - Acceptance: Collection/folder inherited auth, variables and scripts are editable and affect actual execution
+  - Acceptance: Revision conflicts and failed writes retain drafts; keyboard users can invoke every action
+  - Requirements: REA-010, REA-023, REA-024.
+  - Dependencies: P1-004.
+  - Recorded evidence: [WORKSPACE_AUTHORING.md](WORKSPACE_AUTHORING.md), [P1_WORKBENCH_BROWSER.json](verification/P1_WORKBENCH_BROWSER.json), [P1_DRAG_BROWSER.json](verification/P1_DRAG_BROWSER.json), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-008 — Complete request authoring and identity-safe edits** (done)
+  - Acceptance: Create/rename/duplicate/delete/move/reorder requests inside folders
+  - Acceptance: Duplication creates fresh identities while preserving editable content and opaque metadata
+  - Acceptance: Pending operations cannot discard newer or unrelated drafts
+  - Requirements: REA-023, REA-024, REA-026.
+  - Dependencies: P1-007.
+  - Recorded evidence: [WORKSPACE_AUTHORING.md](WORKSPACE_AUTHORING.md), [P1_WORKBENCH_BROWSER.json](verification/P1_WORKBENCH_BROWSER.json), [P1_DRAG_BROWSER.json](verification/P1_DRAG_BROWSER.json), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-009 — Multiple request tabs and response ownership** (done)
+  - Acceptance: Open/switch/close independent request tabs; dirty close requires an explicit choice
+  - Acceptance: Late save/execution results update only their owning tab
+  - Acceptance: Execution cancellation and bounded tab/response retention are visible and tested
+  - Requirements: REA-025, REA-026.
+  - Dependencies: P1-004.
+  - Recorded evidence: [WORKBENCH_STATE.md](WORKBENCH_STATE.md), [P1_WORKBENCH_BROWSER.json](verification/P1_WORKBENCH_BROWSER.json), [P1_BUSY_WATCH_BROWSER.json](verification/P1_BUSY_WATCH_BROWSER.json), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-010 — Bounded request history, examples and undo** (done)
+  - Acceptance: History has declared count/byte retention and no automatic replay
+  - Acceptance: Users can inspect/reopen requests and save examples with explicit secret exclusion
+  - Acceptance: Undo/recovery choices preserve identities and never overwrite a newer revision
+  - Requirements: REA-025, REA-085, REA-087.
+  - Dependencies: P1-009.
+  - Recorded evidence: [WORKBENCH_STATE.md](WORKBENCH_STATE.md), [P1_WORKBENCH_BROWSER.json](verification/P1_WORKBENCH_BROWSER.json), [P1_FINAL_CLI_RESTART_BROWSER.json](verification/P1_FINAL_CLI_RESTART_BROWSER.json), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-011 — Durable draft and restart recovery** (done)
+  - Acceptance: Committed recoveries survive reload/restart independently of canonical saves
+  - Acceptance: Recovery retains the original revision/context and requires review when disk changed or vanished
+  - Acceptance: Concurrent tabs do not overwrite one another; failed/quota writes are visible
+  - Acceptance: Retention, local storage/privacy behavior and explicit discard are documented and testable
+  - Requirements: REA-026, REA-072.
+  - Dependencies: P1-004.
+  - Recorded evidence: [WORKSPACE_DRAFT_RECOVERY.md](WORKSPACE_DRAFT_RECOVERY.md), [P1_DRAFT_RECOVERY_BROWSER.json](verification/P1_DRAFT_RECOVERY_BROWSER.json), [P1_PROGRESS.md](P1_PROGRESS.md), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-012 — Import corpus and semantic migration reports** (done)
+  - Acceptance: Sanitized Postman v2.1/cURL fixtures cover nested inheritance, repeated/disabled values and unsupported fields
+  - Acceptance: Import/export/restart preserves opaque metadata and reports semantic differences
+  - Acceptance: Unsupported schemas/modes fail explicitly; v3 YAML remains P7
+  - Requirements: REA-028, REA-031.
+  - Dependencies: P1-006.
+  - Recorded evidence: [IMPORT_COMPATIBILITY.md](IMPORT_COMPATIBILITY.md), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-013 — Environment editing and scope diagnostics** (done)
+  - Acceptance: Environment CRUD/revision behavior and inherited scope explanations are tested
+  - Acceptance: Plaintext/reference limitations are explicit; keychain implementation stays in P2
+  - Acceptance: Failed/conflicting environment saves cannot silently change execution context
+  - Requirements: REA-027.
+  - Dependencies: P1-004.
+  - Recorded evidence: [WORKBENCH_STATE.md](WORKBENCH_STATE.md), [P1_WORKBENCH_BROWSER.json](verification/P1_WORKBENCH_BROWSER.json), [P1_IMPLEMENTATION_VERIFICATION.json](verification/P1_IMPLEMENTATION_VERIFICATION.json), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-014 — P1 acceptance and phase handoff** (done)
+  - Acceptance: All P1 deliverables have post-change automated and public browser evidence
+  - Acceptance: Package/extension builds and regression suite pass; large-list budget is remeasured after UI changes
+  - Acceptance: P1 progress and requirement dispositions name remaining cross-phase work without overstating parity
+  - Requirements: REA-023, REA-024, REA-025, REA-026, REA-027, REA-028, REA-030, REA-031, REA-087, REA-088.
+  - Dependencies: P1-001, P1-002, P1-003, P1-004, P1-005, P1-006, P1-007, P1-008, P1-009, P1-010, P1-011, P1-012, P1-013, P1-015.
+  - Recorded evidence: [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+- [x] **P1-015 — Resolve large-workspace event-to-frame outliers** (done)
+  - Acceptance: Investigate retained p95 failures with synchronous-work and frame-scheduling measurements; do not discard slow samples or attribute a cause from focus alone
+  - Acceptance: Meet the existing 100 ms filter/selection event-to-frame budget on the documented supported reference setup
+  - Acceptance: Record source hashes, browser/control methodology and raw samples before closing the performance gate
+  - Requirements: REA-025, REA-081.
+  - Dependencies: P1-001.
+  - Recorded evidence: [P1_PERFORMANCE_GATE.json](verification/P1_PERFORMANCE_GATE.json), [P1_OS_FOREGROUND_PERFORMANCE_1.json](verification/P1_OS_FOREGROUND_PERFORMANCE_1.json), [P1_PERFORMANCE_INVESTIGATION.md](verification/P1_PERFORMANCE_INVESTIGATION.md), [P1_GATE_REVIEW.md](verification/P1_GATE_REVIEW.md), [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json).
+
+## P2 — Daily HTTP, authentication and secrets
+
+Status: **done**. Depends on P1. 12 done.
+
+- [x] **P2-001 — Secure credential lifecycle** (done)
+  - Acceptance: Keychain providers fail closed/session-only; migration/export consent and recovery are explicit
+  - Acceptance: OAuth provider fixtures cover PKCE/state/callback/denial/refresh rotation and concurrent refresh
+  - Requirements: REA-001, REA-002, REA-003, REA-004, REA-005, REA-006, REA-007, REA-009, REA-010, REA-011, REA-015, REA-027, REA-030, REA-068, REA-070, REA-086.
+  - Dependencies: P2-004, P2-005, P2-006, P2-007, P2-012.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-002 — HTTP completion and transport settings** (done)
+  - Acceptance: Exact repeated fields, file selection, cancellation, redirects, cookies, binary download and streaming budgets are verified
+  - Acceptance: mTLS/custom CA fixtures preserve default TLS verification
+  - Requirements: REA-001, REA-002, REA-003, REA-004, REA-005, REA-006, REA-007, REA-009, REA-011, REA-015, REA-068, REA-070, REA-086.
+  - Dependencies: P2-008, P2-009, P2-010, P2-011, P2-012.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-003 — P2 acceptance gate** (done)
+  - Acceptance: Supported auth/secret/HTTP subset documented with real provider and wire fixtures; no seeded credentials leak
+  - Dependencies: P2-001, P2-002, P2-004, P2-005, P2-006, P2-007, P2-008, P2-009, P2-010, P2-011, P2-012.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-004 — OS credential providers and session-only lifecycle** (done)
+  - Acceptance: Secret values use the selected OS secure provider or explicit session-only storage; no plaintext fallback or process-argument exposure
+  - Acceptance: Provider refusal, restart/missing session state, typed purpose and per-origin isolation are exercised
+  - Requirements: REA-068, REA-070.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-005 — Secret references, consent migration and safe exports** (done)
+  - Acceptance: References resolve only for approved actual destinations after scripts/variables; resolved credential values are never automatically saved as plaintext
+  - Acceptance: Reviewed migration rechecks revisions and preserves recoverable source on failures
+  - Acceptance: Exports/backups/reports omit resolved values and require explicit consent for inline plaintext credentials
+  - Requirements: REA-009, REA-010, REA-027, REA-030, REA-068, REA-070.
+  - Dependencies: P2-004.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-006 — OAuth acquisition and owned callbacks** (done)
+  - Acceptance: Authorization code with PKCE/state/nonce and client credentials use maintained standards implementation
+  - Acceptance: Real fake-provider fixtures cover success, denial, wrong state/callback, replay, timeout and secure-store refusal
+  - Requirements: REA-011.
+  - Dependencies: P2-004.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-007 — OAuth expiry, refresh rotation and clear/revoke** (done)
+  - Acceptance: Expired/rotated tokens refresh once under concurrent calls and update an atomic secure bundle
+  - Acceptance: Refresh failure retains recoverable account state; clearing local state and remote revocation are explicit and tested
+  - Requirements: REA-011.
+  - Dependencies: P2-006.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-008 — Selected multipart and binary streaming uploads** (done)
+  - Acceptance: Only explicitly chosen bytes are uploaded with bounded private session file capabilities
+  - Acceptance: Real wire byte equality, multipart field order, import-path refusal and cancellation/limit cleanup are tested
+  - Requirements: REA-003, REA-006.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-009 — HTTP wire fidelity, cookies and diagnostics** (done)
+  - Acceptance: Repeated fields/method/encoding/redirect/deadline cases are verified against real peers
+  - Acceptance: Cookie editing, clear, domain/path/secure behavior and explicit secure persistence are tested
+  - Acceptance: Diagnostics explain observed failures without unsupported timing or secret leakage
+  - Requirements: REA-001, REA-002, REA-006, REA-007, REA-086.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-010 — Verified TLS, custom CA and mutual TLS** (done)
+  - Acceptance: Default certificate and hostname verification stays enabled; unknown/bypass settings fail explicitly
+  - Acceptance: mTLS fails without the selected key/certificate and succeeds with them; custom CA and cross-origin credential boundaries are exercised
+  - Requirements: REA-015, REA-086.
+  - Dependencies: P2-004.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-011 — Bounded streamed responses and exact downloads** (done)
+  - Acceptance: Progress/preview/download preserve owner identity with explicit preview/artifact limits and backpressure
+  - Acceptance: Larger binary/media types, compressed expansion, abort/disconnect and retention cleanup are verified
+  - Requirements: REA-004, REA-005, REA-006.
+  - Dependencies: P2-008, P2-009.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+- [x] **P2-012 — Schema-aware authoring and credential/HTTP workflows** (done)
+  - Acceptance: JSON syntax and supported schemas validate with bounded off-main-thread execution and no remote schema fetch
+  - Acceptance: Public browser credential/OAuth/file/TLS/cookie/streaming controls use explicit consent and retain failed inputs
+  - Acceptance: Sensitive inputs, reviewed examples and inspector/export flows exclude seeded secret values
+  - Requirements: REA-002, REA-004, REA-009, REA-010, REA-027, REA-070.
+  - Dependencies: P2-004, P2-005, P2-006, P2-008, P2-009, P2-010, P2-011.
+  - Recorded evidence: [P2_ACCEPTANCE.json](verification/P2_ACCEPTANCE.json), [P2_PROGRESS.md](P2_PROGRESS.md).
+
+## P3 — Compatible scripts and CI
+
+Status: **todo**. Depends on P1, P2. 4 todo.
+
+- [ ] **P3-001 — Versioned script and Send/Run policy** (todo)
+  - Acceptance: Pinned reference differential cases compare event order, typed precedence/mutation, wire bytes and errors
+  - Requirements: REA-032, REA-033, REA-034, REA-035, REA-036, REA-039, REA-040, REA-041, REA-042, REA-044.
+- [ ] **P3-002 — Worker and destination-policy enforcement** (todo)
+  - Acceptance: Bounded worker queue/bridge and adversarial script cancellation release resources
+  - Acceptance: Workspace grants apply to direct, redirected and script-originated network calls
+  - Requirements: REA-032, REA-033, REA-034, REA-035, REA-036, REA-039, REA-040, REA-041, REA-042, REA-044.
+- [ ] **P3-003 — Durable CI jobs and reports** (todo)
+  - Acceptance: Durable results are bounded/redacted and never silently rerun destructive work after restart
+  - Acceptance: Actual CLI/MCP clients verify cancellation, denial, stable exit codes and reports
+  - Requirements: REA-032, REA-033, REA-034, REA-035, REA-036, REA-039, REA-040, REA-041, REA-042, REA-044.
+- [ ] **P3-004 — P3 acceptance gate** (todo)
+  - Acceptance: Declared compatibility subset passes pinned differential suite and public negative paths
+  - Dependencies: P3-001, P3-002, P3-003.
+
+## P4 — Evidence-driven discovery
+
+Status: **todo**. Depends on P0, P1, P2, P3. 4 todo.
+
+- [ ] **P4-001 — Capture sessions and reviewed evidence** (todo)
+  - Acceptance: Filters/retention/selection preserve immutable sanitized observations and provenance
+  - Requirements: REA-048, REA-050, REA-051, REA-052, REA-053, REA-054, REA-055, REA-056, REA-057, REA-058, REA-060, REA-084.
+- [ ] **P4-002 — Reviewed contract and regression pipeline** (todo)
+  - Acceptance: Independent OpenAPI validation; observed/inferred/confirmed distinctions remain visible
+  - Acceptance: Approved fixture replay catches seeded contract drift and client failures
+  - Requirements: REA-048, REA-050, REA-051, REA-052, REA-053, REA-054, REA-055, REA-056, REA-057, REA-058, REA-060, REA-084, REA-085.
+- [ ] **P4-003 — Executable generated clients and snippets** (todo)
+  - Acceptance: Generated outputs compile and execute auth/path/body/error/binary/cancel fixture cases
+  - Requirements: REA-048, REA-050, REA-051, REA-052, REA-053, REA-054, REA-055, REA-056, REA-057, REA-058, REA-060, REA-084.
+- [ ] **P4-004 — P4 acceptance gate** (todo)
+  - Acceptance: Capture → review → contract → fixture → generated client succeeds without seeded-secret disclosure
+  - Dependencies: P4-001, P4-002, P4-003.
+
+## P5 — Stable local release
+
+Status: **todo**. Depends on P0, P1, P2, P3, P4. 4 todo.
+
+- [ ] **P5-001 — Install, onboarding and supported platform matrix** (todo)
+  - Acceptance: Clean supported OS installs exercise restart/upgrade/rollback with actionable doctor diagnostics
+  - Acceptance: Actual installed VS Code extension host and real MCP clients verify supported operations
+  - Acceptance: Native vault/platform matrix is explicit: implement private Windows metadata ACLs before enabling persistent credentials and verify Linux Secret Service; retain explicit session-only refusal paths
+  - Requirements: REA-071, REA-072, REA-073, REA-074, REA-075, REA-077, REA-079, REA-080, REA-081, REA-082, REA-083, REA-092, REA-068.
+- [ ] **P5-002 — Independent security and accessibility review** (todo)
+  - Acceptance: Independent review scope/findings/disposition recorded; no release-blocking security/data-loss findings
+  - Acceptance: Keyboard/accessibility/mobile/browser checks have recorded outcomes and manual review
+  - Requirements: REA-071, REA-072, REA-073, REA-074, REA-075, REA-077, REA-079, REA-080, REA-081, REA-082, REA-083, REA-092.
+- [ ] **P5-003 — Representative performance and target-user validation** (todo)
+  - Acceptance: Record process-tree RSS, startup/interaction/resource/load methodology and limits
+  - Acceptance: At least ten independent target developers attempt the supported task chain; investigate every loss event
+  - Acceptance: Repeat use over multiple weeks and proposed 90% task target are evaluated
+  - Requirements: REA-071, REA-073, REA-074, REA-075, REA-077, REA-079, REA-080, REA-081, REA-082, REA-083, REA-092.
+- [ ] **P5-004 — Stable local release decision** (todo)
+  - Acceptance: P0–P4 gates and P5 evidence pass; support/compatibility/license/upgrade policies are published
+  - Acceptance: External reviews, credentials and trials are real prerequisites, never self-awarded
+  - Dependencies: P5-001, P5-002, P5-003.
+
+## P6 — GraphQL and realtime
+
+Status: **todo**. Depends on P5. 3 todo.
+
+- [ ] **P6-001 — Shared protocol/event contracts** (todo)
+  - Acceptance: At least two real adapters establish connect/send/subscribe/cancel and bounded events without HTTP-only assumptions
+  - Requirements: REA-008, REA-016, REA-018.
+- [ ] **P6-002 — Protocol peer and reconnect acceptance** (todo)
+  - Acceptance: GraphQL, WebSocket/Socket.IO and SSE real peers cover auth, framing, cancellation, backpressure and reconnect duplication
+  - Requirements: REA-008, REA-016, REA-018.
+- [ ] **P6-003 — P6 release gate** (todo)
+  - Acceptance: Per-surface capability tables and unsupported protocol features match integration evidence
+  - Dependencies: P6-001, P6-002.
+
+## P7 — Additional protocols and integrations
+
+Status: **todo**. Depends on P5. 4 todo.
+
+- [ ] **P7-001 — Demand-ranked protocol and auth releases** (todo)
+  - Acceptance: gRPC/reflection/streams, MQTT/QoS, MCP inspector and signing each have separately reviewed scopes
+  - Acceptance: Maintained libraries are pinned with license/advisory/packaging/cancellation checks
+  - Requirements: REA-012, REA-013, REA-014, REA-017, REA-019, REA-021, REA-022, REA-029, REA-049, REA-076.
+- [ ] **P7-002 — Consented browser/native capture** (todo)
+  - Acceptance: Domain grants, recording indication and stop/revoke behavior verified; no background capture/upload
+  - Acceptance: TLS interception requires its own trust design and explicit manual certificate installation
+  - Requirements: REA-012, REA-013, REA-014, REA-017, REA-019, REA-021, REA-022, REA-029, REA-049, REA-076.
+- [ ] **P7-003 — Interoperability evaluation** (todo)
+  - Acceptance: Native v3 YAML is evaluated as a separate parser/serializer; internal schema remains explicit
+  - Requirements: REA-012, REA-013, REA-014, REA-017, REA-019, REA-021, REA-022, REA-029, REA-049, REA-076.
+- [ ] **P7-004 — P7 release gates** (todo)
+  - Acceptance: Each independent capability has real peer/signing-vector/format fixtures and documented limitations
+  - Dependencies: P7-001, P7-002, P7-003.
+
+## P8 — Broader API lifecycle
+
+Status: **todo**. Depends on P4, P5. 4 todo.
+
+- [ ] **P8-001 — Local lifecycle tools** (todo)
+  - Acceptance: Mocks isolate state/files/network; docs/examples exclude secrets; SDK publishing follows runtime correctness
+  - Requirements: REA-020, REA-037, REA-038, REA-043, REA-045, REA-046, REA-047, REA-059, REA-061, REA-091.
+- [ ] **P8-002 — Durable scheduling and load integration** (todo)
+  - Acceptance: Timezone/missed-run/duplicate/alert-spam tests; external load adapter identifies generator limits
+  - Acceptance: Retries and mixed-protocol runs use the shared job/event engine
+  - Requirements: REA-020, REA-037, REA-038, REA-043, REA-045, REA-046, REA-047, REA-059, REA-061, REA-091.
+- [ ] **P8-003 — Optional scripted UI extensions** (todo)
+  - Acceptance: Approved package libraries, sandboxed visualizers and visual workflows cannot bypass execution policy
+  - Requirements: REA-020, REA-037, REA-038, REA-043, REA-045, REA-046, REA-047, REA-059, REA-061, REA-091.
+- [ ] **P8-004 — P8 release gates** (todo)
+  - Acceptance: Independent demand-ranked increments have public functional, isolation and resource evidence
+  - Dependencies: P8-001, P8-002, P8-003.
+
+## P9 — Optional self-hosted teams
+
+Status: **gated**. Depends on P5. 4 gated.
+
+- [ ] **P9-001 — Self-hosted platform scope and threat model** (gated)
+  - Acceptance: Define operators, authentication boundary, tenant model, retention and operational budget before shared deployment
+  - Requirements: REA-062, REA-063, REA-064, REA-067.
+- [ ] **P9-002 — Durable collaborative platform** (gated)
+  - Acceptance: Every resource/job checks server-side authorization; users/orgs/invitations/revocation/RBAC/tenant isolation tested
+  - Acceptance: Sync/fork/review conflicts preserve concurrent work; durable jobs never silently replay side effects
+  - Requirements: REA-062, REA-063, REA-064, REA-067.
+  - Dependencies: P9-001.
+- [ ] **P9-003 — Self-hosted operations and recovery** (gated)
+  - Acceptance: Backup/restore, TLS, queues, incident/upgrade/runbook and cost/abuse controls verified
+  - Requirements: REA-062, REA-063, REA-064, REA-067.
+  - Dependencies: P9-001.
+- [ ] **P9-004 — P9 release gates** (gated)
+  - Acceptance: Real multi-user isolation/revocation/recovery tests and operational evidence pass
+  - Dependencies: P9-001, P9-002, P9-003.
+
+## P10 — Advanced platform
+
+Status: **gated**. Depends on P9. 4 gated.
+
+- [ ] **P10-001 — Funded enterprise scope decision** (gated)
+  - Acceptance: Explicit demand, scope, security owners and funding precede execution
+- [ ] **P10-002 — Identity, governance and vault integration** (gated)
+  - Acceptance: Real SSO/OIDC/SAML/SCIM provider fixtures validate lifecycle and revocation
+  - Acceptance: Audit integrity/retention, external vaults and encryption administration have reviewed threat models
+  - Requirements: REA-065, REA-066, REA-069, REA-078, REA-089, REA-090.
+  - Dependencies: P10-001.
+- [ ] **P10-003 — Private runners and opt-in AI/context** (gated)
+  - Acceptance: Runner isolation and egress grants enforced; model costs/privacy and explicit opt-in documented
+  - Requirements: REA-065, REA-066, REA-069, REA-078, REA-089, REA-090.
+  - Dependencies: P10-001.
+- [ ] **P10-004 — P10 release gates** (gated)
+  - Acceptance: Enterprise capabilities meet scoped conformance/operations evidence; no unearned certification claim
+  - Dependencies: P10-001, P10-002, P10-003.
+
+## Requirement acceptance ledger — all 92 reviewed rows
+
+Each row retains the original candidate phase. Next review phase assigns outstanding work; candidate phase never means full capability completion. Full workstream acceptance gates remain in [the implementation plan](IMPLEMENTATION_PLAN.md#6-ten-workstreams-and-acceptance-gates).
+
+- [x] **REA-001 — Methods, URL, query and headers** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-009.
+  - Remaining: Validate encoding and uncommon header/method cases.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Validate encoding and uncommon header/method cases.
+- [x] **REA-002 — JSON, text and URL-encoded bodies** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-009, P2-012.
+  - Remaining: Add schema-aware editing and better validation.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Add schema-aware editing and better validation.
+- [x] **REA-003 — Multipart and binary uploads** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-008.
+  - Remaining: Add safe local file selection and streaming upload.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Add safe local file selection and streaming upload.
+- [x] **REA-004 — Response inspection** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-011, P2-012.
+  - Remaining: Add richer inspectors and saved examples.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Add richer inspectors and saved examples.
+- [x] **REA-005 — Binary response download** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-011.
+  - Remaining: Exercise larger files and broaden media-type handling.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Exercise larger files and broaden media-type handling.
+- [x] **REA-006 — Timeout, cancellation and redirects** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-008, P2-009, P2-011.
+  - Remaining: Differential redirect/encoding/cancellation fixtures.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Differential redirect/encoding/cancellation fixtures.
+- [x] **REA-007 — Cookies** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-009.
+  - Remaining: Cookie editor, clear controls and optional persistence.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Cookie editor, clear controls and optional persistence.
+- [ ] **REA-008 — Streaming / SSE UI** (pending)
+  - WS1; original candidate P6; next review P6; tasks: P6-001, P6-002.
+  - Remaining: Implement only after bounded streaming architecture.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P6 scope: pending; Implement only after bounded streaming architecture.
+- [x] **REA-009 — Basic, Bearer and API key** (accepted)
+  - WS2; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-005, P2-012.
+  - Remaining: Improve sensitive-input UI and diagnostics.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Improve sensitive-input UI and diagnostics.
+- [x] **REA-010 — Inherited authentication** (accepted)
+  - WS2; original candidate P2; next review P2; tasks: P1-007, P2-001, P2-005, P2-012.
+  - Remaining: Finish authoring inherited settings directly in the UI.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P1 scope: accepted; Collection/folder inherited authentication, variables and scripts are editable and exercised through real transport; P2 owns the remaining authentication/credential scope.
+  - P2 scope: accepted; Finish authoring inherited settings directly in the UI.
+- [x] **REA-011 — OAuth 2.0 / PKCE / refresh** (accepted)
+  - WS2; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-006, P2-007.
+  - Remaining: High priority: OAuth with secure token lifecycle.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; High priority: OAuth with secure token lifecycle.
+- [ ] **REA-012 — OAuth 1.0** (pending)
+  - WS2; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Only prioritize if target users require legacy APIs.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Only prioritize if target users require legacy APIs.
+- [ ] **REA-013 — JWT generation/signing** (pending)
+  - WS2; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Add after vault/key-storage design.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Add after vault/key-storage design.
+- [ ] **REA-014 — Digest / NTLM / AWS signing** (pending)
+  - WS2; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Prioritize AWS or enterprise auth from user demand.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Prioritize AWS or enterprise auth from user demand.
+- [x] **REA-015 — Client certificates / custom CA** (accepted)
+  - WS2; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-010.
+  - Remaining: Add mTLS/custom CA fixtures; never default to disabled verification.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Add mTLS/custom CA fixtures; never default to disabled verification.
+- [ ] **REA-016 — GraphQL explorer** (pending)
+  - WS3; original candidate P6; next review P6; tasks: P6-001, P6-002.
+  - Remaining: Schema introspection, variables, explorer and errors.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P6 scope: pending; Schema introspection, variables, explorer and errors.
+- [ ] **REA-017 — gRPC** (pending)
+  - WS3; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Defer until HTTP release quality and demand.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Defer until HTTP release quality and demand.
+- [ ] **REA-018 — WebSocket / Socket.IO** (pending)
+  - WS3; original candidate P6; next review P6; tasks: P6-001, P6-002.
+  - Remaining: Likely next protocol after core HTTP if users request it.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P6 scope: pending; Likely next protocol after core HTTP if users request it.
+- [ ] **REA-019 — MQTT** (pending)
+  - WS3; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Defer unless targeting IoT developers.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Defer unless targeting IoT developers.
+- [ ] **REA-020 — Webhook listener workflows** (pending)
+  - WS3; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Add explicit local listener/forwarding only with demand.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Add explicit local listener/forwarding only with demand.
+- [ ] **REA-021 — MCP client / inspector** (pending)
+  - WS3; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Do not confuse server integration with a client inspector.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Do not confuse server integration with a client inspector.
+- [ ] **REA-022 — AI model request type** (pending)
+  - WS3; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Defer a model playground; avoid unnecessary scope.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Defer a model playground; avoid unnecessary scope.
+- [x] **REA-023 — Collection/request storage** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-001, P1-005, P1-007, P1-008, P1-014.
+  - Remaining: Complete collection/folder authoring and rename/reorder.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Complete collection/folder authoring and rename/reorder.
+- [x] **REA-024 — Nested folder authoring** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-007, P1-008, P1-014.
+  - Remaining: Drag/reorder/move/duplicate and folder settings.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Drag/reorder/move/duplicate and folder settings.
+- [x] **REA-025 — Multi-request tabs and history** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-001, P1-009, P1-010, P1-014, P1-015.
+  - Remaining: High priority daily-workflow improvement.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; High priority daily-workflow improvement.
+- [x] **REA-026 — Unsaved edits and recovery** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-004, P1-008, P1-009, P1-011, P1-014.
+  - Remaining: Await switching saves, preserve failed edits, inject disk failures.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Await switching saves, preserve failed edits, inject disk failures.
+- [x] **REA-027 — Environment variables** (accepted)
+  - WS4; original candidate P1; next review P2; tasks: P1-013, P1-014, P2-001, P2-005, P2-012.
+  - Remaining: Vault references and clear scope diagnostics.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P1 scope: accepted; Environment CRUD, conflict-safe editing and scope diagnostics. Secure credential references remain in the P2 scope.
+  - P2 scope: accepted; Secure credential references and explicit scope/export diagnostics after the P1 environment editing increment.
+- [x] **REA-028 — Postman v2.1 JSON migration** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-006, P1-012, P1-014.
+  - Remaining: Real sanitized fixture corpus plus semantic diff report.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Real sanitized fixture corpus plus semantic diff report.
+- [ ] **REA-029 — Native Git v3 YAML format** (pending)
+  - WS4; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: State v2.1-only boundary; evaluate a native request-file format.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; State v2.1-only boundary; evaluate a native request-file format.
+- [x] **REA-030 — Git collaboration** (accepted)
+  - WS4; original candidate P1; next review P2; tasks: P1-002, P1-004, P1-005, P1-014, P2-001, P2-005.
+  - Remaining: Per-request diffs, secret exclusion, external edits/conflicts.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P1 scope: accepted; Versioned per-request files, metadata preservation, external reconciliation and explicit conflict handling. Credential references/export policy remain P2.
+  - P2 scope: accepted; Secret-reference migration/export policy for portable Git workspaces; P1 owns files, identity and conflicts.
+- [x] **REA-031 — cURL and other import formats** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-012, P1-014.
+  - Remaining: Explicit compatibility diagnostics; OpenAPI/HAR import later.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Explicit compatibility diagnostics; OpenAPI/HAR import later.
+- [ ] **REA-032 — Pre/post scripts and inheritance** (pending)
+  - WS5; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Differential fixtures for nesting and event behavior.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Differential fixtures for nesting and event behavior.
+- [ ] **REA-033 — Chai and asynchronous tests** (pending)
+  - WS5; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Expand fixtures; do not label every pm API compatible.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Expand fixtures; do not label every pm API compatible.
+- [ ] **REA-034 — Scope and iteration variables** (pending)
+  - WS5; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Document persistence and match scope semantics.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Document persistence and match scope semantics.
+- [ ] **REA-035 — pm.sendRequest and chaining** (pending)
+  - WS5; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Full request/response mutation compatibility remains absent.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Full request/response mutation compatibility remains absent.
+- [ ] **REA-036 — Dynamic variables** (pending)
+  - WS5; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Only add high-demand variables with deterministic tests.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Only add high-demand variables with deterministic tests.
+- [ ] **REA-037 — Package libraries / pm.require** (pending)
+  - WS5; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Avoid unsafe arbitrary host imports; design isolation first.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Avoid unsafe arbitrary host imports; design isolation first.
+- [ ] **REA-038 — Response visualizer** (pending)
+  - WS5; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Optional later; separate from ordinary JSON inspection.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Optional later; separate from ordinary JSON inspection.
+- [ ] **REA-039 — Hostile-script assurance** (pending)
+  - WS5; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Threat model, adversarial testing and independent review.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Threat model, adversarial testing and independent review.
+- [ ] **REA-040 — Collection runs** (pending)
+  - WS6; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Improve reports/history and failure debugging.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Improve reports/history and failure debugging.
+- [ ] **REA-041 — CSV / JSON data runs** (pending)
+  - WS6; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Keep local data runs free; improve file picker and previews.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Keep local data runs free; improve file picker and previews.
+- [ ] **REA-042 — CLI / CI / reports** (pending)
+  - WS6; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Do not claim free CLI reporting is exclusive to Rea.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Do not claim free CLI reporting is exclusive to Rea.
+- [ ] **REA-043 — Multi-protocol runs** (pending)
+  - WS6; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Follow protocol demand, not breadth for its own sake.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Follow protocol demand, not breadth for its own sake.
+- [ ] **REA-044 — Durable run history** (pending)
+  - WS6; original candidate P3; next review P3; tasks: P3-001, P3-002, P3-003.
+  - Remaining: Persistent local results with retention and redaction.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P3 scope: pending; Persistent local results with retention and redaction.
+- [ ] **REA-045 — Scheduled monitors and alerts** (pending)
+  - WS6; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Start with user-owned CI scheduling rather than free hosted infrastructure.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Start with user-owned CI scheduling rather than free hosted infrastructure.
+- [ ] **REA-046 — Load / performance testing** (pending)
+  - WS6; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Integrate an existing load tool if users need it.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Integrate an existing load tool if users need it.
+- [ ] **REA-047 — Visual Flows** (pending)
+  - WS6; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Defer: high maintenance and no proven demand.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Defer: high maintenance and no proven demand.
+- [ ] **REA-048 — Explicit HTTP forwarding** (pending)
+  - WS7; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Protect capture before expanding distribution.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Protect capture before expanding distribution.
+- [ ] **REA-049 — Browser HTTPS capture** (pending)
+  - WS7; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Separate consent, domain permissions and bridge design.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Separate consent, domain permissions and bridge design.
+- [ ] **REA-050 — Capture filtering / sessions** (pending)
+  - WS7; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Method/URL/status filters, pause, sessions and retention.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Method/URL/status filters, pause, sessions and retention.
+- [ ] **REA-051 — Capture body limits / redaction** (in progress)
+  - WS7; original candidate P0; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Critical before beta expansion: byte budgets, timeouts and secret scrubber.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Critical before beta expansion: byte budgets, timeouts and secret scrubber.
+- [ ] **REA-052 — Capture → test / replay** (pending)
+  - WS7; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Turn selected captures into editable requests and regression fixtures.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Turn selected captures into editable requests and regression fixtures.
+- [ ] **REA-053 — Repeated-query fidelity** (in progress)
+  - WS7; original candidate P0; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Preserve ordered duplicate query/header values in capture model.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Preserve ordered duplicate query/header values in capture model.
+- [ ] **REA-054 — Observed traffic → OpenAPI** (pending)
+  - WS8; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Potential focus area, not proven exclusive superiority.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Potential focus area, not proven exclusive superiority.
+- [ ] **REA-055 — Inference vs actual contract** (pending)
+  - WS8; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Confidence/provenance editor and explicit human confirmation.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Confidence/provenance editor and explicit human confirmation.
+- [ ] **REA-056 — Spec authoring / multi-file** (pending)
+  - WS8; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: OpenAPI import/validation and minimal editor first.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; OpenAPI import/validation and minimal editor first.
+- [ ] **REA-057 — Spec validation / governance** (pending)
+  - WS8; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Integrate a validator; defer organization policy engine.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Integrate a validator; defer organization policy engine.
+- [ ] **REA-058 — Spec ↔ collection sync** (pending)
+  - WS8; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Track provenance and drift before automatic updates.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Track provenance and drift before automatic updates.
+- [ ] **REA-059 — Mocks / failure simulation** (pending)
+  - WS8; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Small local mock from approved examples is a later useful addition.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Small local mock from approved examples is a later useful addition.
+- [ ] **REA-060 — SDK generation** (pending)
+  - WS8; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Execute generated clients against fixtures, not compilation alone.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Execute generated clients against fixtures, not compilation alone.
+- [ ] **REA-061 — Published documentation** (pending)
+  - WS8; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: Local static docs export before hosted portal.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; Local static docs export before hosted portal.
+- [ ] **REA-062 — Shared workspaces and sync** (pending)
+  - WS9; original candidate P9; next review P9; tasks: P9-001, P9-002, P9-003.
+  - Remaining: Defer cloud sync until individual workflow retains users.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P9 scope: pending; Defer cloud sync until individual workflow retains users.
+- [ ] **REA-063 — Comments / forks / reviews** (pending)
+  - WS9; original candidate P9; next review P9; tasks: P9-001, P9-002, P9-003.
+  - Remaining: Use Git first; do not count it as in-product parity.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P9 scope: pending; Use Git first; do not count it as in-product parity.
+- [ ] **REA-064 — API catalog / discovery** (pending)
+  - WS9; original candidate P9; next review P9; tasks: P9-001, P9-002, P9-003.
+  - Remaining: Defer organization catalogue; improve local search.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P9 scope: pending; Defer organization catalogue; improve local search.
+- [ ] **REA-065 — Roles / organization controls** (pending)
+  - WS9; original candidate P10; next review P10; tasks: P10-002, P10-003.
+  - Remaining: Not required for a strictly local single-user beta.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P10 scope: pending; Not required for a strictly local single-user beta.
+- [ ] **REA-066 — SSO / SCIM / audit trails** (pending)
+  - WS9; original candidate P10; next review P10; tasks: P10-002, P10-003.
+  - Remaining: Enterprise expansion only after explicit demand/funding.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P10 scope: pending; Enterprise expansion only after explicit demand/funding.
+- [ ] **REA-067 — Integrations / operations** (pending)
+  - WS9; original candidate P9; next review P9; tasks: P9-001, P9-002, P9-003.
+  - Remaining: Add a small set from real workflows.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P9 scope: pending; Add a small set from real workflows.
+- [ ] **REA-068 — Encrypted local secrets** (in progress)
+  - WS9; original candidate P2; next review P5; tasks: P2-001, P2-002, P2-004, P2-005, P5-001.
+  - Remaining: High priority: OS keychain/vault references, migration and export controls.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; High priority: OS keychain/vault references, migration and export controls.
+  - P5 scope: pending; Certify native vault behavior on the supported OS matrix; implement private Windows metadata ACLs before enabling persistent credentials there, and verify Linux Secret Service.
+- [ ] **REA-069 — Shared / external vaults** (pending)
+  - WS9; original candidate P10; next review P10; tasks: P10-002, P10-003.
+  - Remaining: Defer team vault; support user-owned providers if demanded.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P10 scope: pending; Defer team vault; support user-owned providers if demanded.
+- [x] **REA-070 — Secret scanning / redaction** (accepted)
+  - WS9; original candidate P0; next review P2; tasks: P2-001, P2-002, P2-004, P2-005, P2-012.
+  - Remaining: Redact capture/log/export paths; test unknown/derived secrets.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Redact capture/log/export paths; test unknown/derived secrets.
+- [ ] **REA-071 — Local service exposure** (pending)
+  - WS9; original candidate P0; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Retain local-only scope; independently review boundaries.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Retain local-only scope; independently review boundaries.
+- [ ] **REA-072 — Recovery and concurrent writers** (in progress)
+  - WS9; original candidate P0; next review P5; tasks: P1-002, P1-003, P1-006, P1-011, P5-001, P5-002.
+  - Remaining: Backups, file watchers, conflict detection and disk-failure tests.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Backups, file watchers, conflict detection and disk-failure tests.
+  - P5 scope: pending; Supported-platform recovery/race validation and independent review beyond P1 local recovery fixtures.
+- [ ] **REA-073 — Local account-free workflow** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Account-free simplicity is useful, not proof Postman is cloud-only.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Account-free simplicity is useful, not proof Postman is cloud-only.
+- [ ] **REA-074 — Web app / desktop installer** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Simple installation first; desktop wrapper only if demanded.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Simple installation first; desktop wrapper only if demanded.
+- [ ] **REA-075 — VS Code extension** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Finish extension-host QA and onboarding before Marketplace.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Finish extension-host QA and onboarding before Marketplace.
+- [ ] **REA-076 — Browser extension** (pending)
+  - WS10; original candidate P7; next review P7; tasks: P7-001, P7-002, P7-003.
+  - Remaining: Later capture-specific extension; not another generic UI.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P7 scope: pending; Later capture-specific extension; not another generic UI.
+- [ ] **REA-077 — MCP server / agent integration** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Add granular permissions and useful local tools; avoid tool-count competition.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Add granular permissions and useful local tools; avoid tool-count competition.
+- [ ] **REA-078 — Built-in AI / Context Graph** (pending)
+  - WS10; original candidate P10; next review P10; tasks: P10-002, P10-003.
+  - Remaining: Defer built-in AI; improve deterministic tooling first.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P10 scope: pending; Defer built-in AI; improve deterministic tooling first.
+- [ ] **REA-079 — Open-source modification** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Keep licenses clear and make contributions easy.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Keep licenses clear and make contributions easy.
+- [ ] **REA-080 — Free usage and operating cost** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Free local product is viable; hosted compute/AI still costs money.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Free local product is viable; hosted compute/AI still costs money.
+- [ ] **REA-081 — Speed / memory superiority** (in progress)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003, P1-015.
+  - Remaining: Benchmark cold start, task time, combined RSS and long runs.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Benchmark cold start, task time, combined RSS and long runs.
+  - P1 scope: accepted; Resolve the current large-workspace interaction budget failure. Broader speed/memory claims remain P5.
+- [ ] **REA-082 — Release evidence** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Finish browser/IDE/cross-platform QA and publish a support contract.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Finish browser/IDE/cross-platform QA and publish a support contract.
+- [ ] **REA-083 — Real-user usefulness** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Observe 10 target developers, task completion and repeat use.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Observe 10 target developers, task completion and repeat use.
+- [ ] **REA-084 — Code snippets** (pending)
+  - WS1; original candidate P4; next review P4; tasks: P4-001, P4-002, P4-003.
+  - Remaining: Compile or execute generated snippets against fixtures.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P4 scope: pending; Compile or execute generated snippets against fixtures.
+- [ ] **REA-085 — Saved response examples** (in progress)
+  - WS1; original candidate P4; next review P4; tasks: P1-010, P4-002.
+  - Remaining: Example editor with secret exclusion and reusable fixtures.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P1 scope: accepted; Bounded page history and reviewed, sanitized local examples with inspect/reopen/delete; reusable fixture/example editing remains P4.
+  - P4 scope: pending; Example editor with secret exclusion and reusable fixtures.
+- [x] **REA-086 — Detailed network diagnostics** (accepted)
+  - WS1; original candidate P2; next review P2; tasks: P2-001, P2-002, P2-009, P2-010.
+  - Remaining: Explain DNS/TLS/connect errors without claiming complete timing breakdown.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation. P2 accepts the documented local HTTP/auth subset and bounded redaction policy, with native macOS evidence. Cross-platform/release certification remains P5; no arbitrary-secret detection or universal protocol/parity claim.
+  - P2 scope: accepted; Explain DNS/TLS/connect errors without claiming complete timing breakdown.
+- [x] **REA-087 — Restore/version history** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-006, P1-010, P1-014.
+  - Remaining: Local snapshots and tested backup/restore before cloud collaboration.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Local snapshots and tested backup/restore before cloud collaboration.
+- [x] **REA-088 — External edits and file watching** (accepted)
+  - WS4; original candidate P1; next review P1; tasks: P1-004, P1-014.
+  - Remaining: Watch/debounce changes and explicitly resolve conflicts.
+  - Boundary: Candidate phase is a first increment, not full capability completion. Vault references are P2; examples/fixtures extend into P4; cross-platform release certification is P5.
+  - P1 scope: accepted; Watch/debounce changes and explicitly resolve conflicts.
+- [ ] **REA-089 — Governance rules and reports** (pending)
+  - WS9; original candidate P10; next review P10; tasks: P10-002, P10-003.
+  - Remaining: Local spec linting first; enterprise reporting later.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P10 scope: pending; Local spec linting first; enterprise reporting later.
+- [ ] **REA-090 — Enterprise encryption administration** (pending)
+  - WS9; original candidate P10; next review P10; tasks: P10-002, P10-003.
+  - Remaining: Only relevant if building a hosted enterprise platform.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P10 scope: pending; Only relevant if building a hosted enterprise platform.
+- [ ] **REA-091 — SDK distribution / updates** (pending)
+  - WS8; original candidate P8; next review P8; tasks: P8-001, P8-002, P8-003.
+  - Remaining: First prove client runtime correctness; publishing can wait.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P8 scope: pending; First prove client runtime correctness; publishing can wait.
+- [ ] **REA-092 — Support and release operations** (pending)
+  - WS10; original candidate P5; next review P5; tasks: P5-001, P5-002, P5-003.
+  - Remaining: Versioned changelog, support policy and reproducible installation.
+  - Boundary: Existing baseline implementation does not waive acceptance revalidation.
+  - P5 scope: pending; Versioned changelog, support policy and reproducible installation.

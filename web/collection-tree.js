@@ -190,6 +190,7 @@ export class CollectionTree {
       const title = document.createElement("span");
       title.textContent = label(node.col.name);
       row.append(icon, title);
+      this.options.decorateRow?.(row, node);
       return row;
     }
     row.style.paddingLeft = `${8 + node.depth * 14}px`;
@@ -206,6 +207,7 @@ export class CollectionTree {
         this.update(this.options.collections(), this.query);
       };
       row.append(button);
+      this.options.decorateRow?.(row, node);
       return row;
     }
     row.classList.add("request-item");
@@ -241,6 +243,7 @@ export class CollectionTree {
     remove.textContent = "✕";
     remove.onclick = () => this.options.remove(node.request.id, node.col.id);
     row.append(button, remove);
+    this.options.decorateRow?.(row, node);
     return row;
   }
 

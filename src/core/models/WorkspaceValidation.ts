@@ -25,23 +25,24 @@ export function validWorkspaceResource(
   const auth = (value: any) =>
     value === undefined ||
     (object(value) &&
-      ["none", "inherit", "bearer", "basic", "apikey", "unsupported"].includes(
+      ["none", "inherit", "bearer", "basic", "apikey", "oauth2", "unsupported"].includes(
         value.type,
       ));
   const request = (value: any) =>
     object(value) &&
     (value.id === undefined || id(value.id)) &&
     typeof value.url === "string" &&
-    ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"].includes(
-      value.method,
-    ) &&
+    typeof value.method === "string" && /^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,64}$/.test(value.method) &&
     optionalParams(value.headers) &&
     optionalParams(value.queryParams) &&
     auth(value.auth) &&
+    (value.tls === undefined || (object(value.tls) && Object.keys(value.tls).every(key=>["ca","cert","keyRef","passphraseRef"].includes(key)) && Object.values(value.tls).every(entry=>typeof entry === "string" && entry.length<=256*1024))) &&
+    (value.streamResponse === undefined || typeof value.streamResponse === "boolean") &&
     scripts(value) &&
     (value.body === undefined ||
       (object(value.body) &&
         [
+          "binary",
           "none",
           "raw-json",
           "raw-text",

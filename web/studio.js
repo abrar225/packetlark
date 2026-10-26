@@ -1,8 +1,24 @@
+import { CredentialControls } from './credential-controls.js';
+import { HttpControls } from './http-controls.js';
+window.ReaCredentialControls = CredentialControls;
+window.ReaHttpControls = HttpControls;
 import "./fonts.css";
 import { CollectionTree } from "./collection-tree.js";
 import { WorkspaceSync } from "./workspace-sync.js";
+import { DraftRecovery } from "./draft-recovery.js";
+import { WorkspaceAuthoring } from "./workspace-authoring.js";
+import { WorkbenchState, WorkbenchActivity, sanitizeExample } from "./workbench-activity.js";
+import { validWorkspaceResource } from "../src/core/models/WorkspaceValidation.ts";
+import { resolveCollectionRequest } from "../src/core/models/CollectionContext.ts";
 window.ReaCollectionTree = CollectionTree;
 window.ReaWorkspaceSync = WorkspaceSync;
+window.ReaDraftRecovery = DraftRecovery;
+window.ReaWorkspaceAuthoring = WorkspaceAuthoring;
+window.ReaWorkbenchState = WorkbenchState;
+window.ReaWorkbenchActivity = WorkbenchActivity;
+window.ReaSanitizeExample = sanitizeExample;
+window.ReaValidWorkspaceResource = validWorkspaceResource;
+window.ReaResolveCollectionRequest = resolveCollectionRequest;
 import {
   createIcons,
   Plus,
