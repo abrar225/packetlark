@@ -1,0 +1,142 @@
+{
+  "measured_at": "2026-10-26T07:49:25.170Z",
+  "results": [
+    {
+      "check": "verifyPendingEnvironment",
+      "verdict": "PASS",
+      "cases": [
+        "Send waits for pending environment save",
+        "execution uses latest saved environment revision and value"
+      ]
+    },
+    {
+      "check": "verifyCreateDelete",
+      "verdict": "PASS",
+      "cases": [
+        "new request saves with returned collection revision",
+        "confirmed deletion discards only owned draft without orphan unload guard"
+      ]
+    },
+    {
+      "check": "verifyOwnership",
+      "verdict": "PASS",
+      "cases": [
+        "late save retains selected draft",
+        "draft restored on switch",
+        "edits during save stay dirty",
+        "failed save retains draft",
+        "late response cannot render or clear another execution",
+        "selection clears prior response"
+      ]
+    },
+    {
+      "check": "verifyEnvironmentOwnership",
+      "verdict": "PASS",
+      "cases": [
+        "environment uses update endpoint",
+        "edits serialize with current revision",
+        "latest queued input persists",
+        "failed environment save retains draft"
+      ]
+    },
+    {
+      "check": "verifyStaleDeletes",
+      "verdict": "PASS",
+      "cases": [
+        "stale request deletion preserves request",
+        "stale environment deletion reports conflict and preserves selection"
+      ]
+    },
+    {
+      "check": "verifyNativeIdentity",
+      "verdict": "PASS",
+      "cases": [
+        "first native item auto-selects and executes with item identity"
+      ]
+    },
+    {
+      "check": "verifyNestedSearch",
+      "verdict": "PASS",
+      "cases": [
+        "search matches displayed native label",
+        "search matches unsaved URL",
+        "nested folders collapse and expand with Enter"
+      ]
+    },
+    {
+      "check": "verifyCleanSiblingAfterRebase",
+      "verdict": "PASS",
+      "cases": [
+        "rebasing dirty B reloads cached clean A from disk"
+      ]
+    },
+    {
+      "check": "verifyCopyResolutionLock",
+      "verdict": "PASS",
+      "cases": [
+        "copy resolution prevents closing and editing until its bounded request settles"
+      ]
+    },
+    {
+      "check": "verifyDiscardWorkspaceDraft",
+      "verdict": "PASS",
+      "cases": [
+        "explicit discard loads disk and removes the owned unload guard"
+      ]
+    },
+    {
+      "check": "verifyEnvironmentRecovery",
+      "verdict": "PASS",
+      "cases": [
+        "failed environment draft survives disk conflict",
+        "recovered environment copy preserves both versions"
+      ]
+    },
+    {
+      "check": "verifyExternalWorkspace",
+      "verdict": "PASS",
+      "cases": [
+        "clean editor adopts disk edit",
+        "dirty request survives external change",
+        "explicit rebase preserves disk context",
+        "externally deleted collection recovers as a separate saved copy"
+      ]
+    },
+    {
+      "check": "verifyFailedBusySaveConflict",
+      "verdict": "PASS",
+      "cases": [
+        "failed busy save exposes conflict after an unchanged-disk refresh"
+      ]
+    },
+    {
+      "check": "verifyLateWorkspaceSnapshot",
+      "verdict": "PASS",
+      "cases": [
+        "late disk snapshot cannot replace a newer saved request"
+      ]
+    },
+    {
+      "check": "verifyReviewFooterIsolation",
+      "verdict": "PASS",
+      "cases": [
+        "review never retains another dialog's footer actions"
+      ]
+    },
+    {
+      "check": "verifyRunnerContextAdmission",
+      "verdict": "PASS",
+      "cases": [
+        "runner admits one pending submission",
+        "runner sends reviewed revision and reports a stale context before transport"
+      ]
+    },
+    {
+      "check": "verifyWorkspacePreviewMask",
+      "verdict": "PASS",
+      "cases": [
+        "review masks API-key fields and marked secret variable values"
+      ]
+    }
+  ]
+}

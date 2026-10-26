@@ -1,0 +1,160 @@
+{
+  "phase": "P2",
+  "verdict": "PASS",
+  "accepted_at": "2026-10-26T18:17:25.090734+00:00",
+  "scope": "Supported local HTTP/auth/secret subset; macOS native vault verified; fail-closed explicit session mode on unavailable providers. No stable cross-platform release claim.",
+  "tasks_completed": 12,
+  "tests": {
+    "file": "docs/verification/P2_TEST_RESULTS.json",
+    "passed": 309,
+    "files": 35,
+    "sha256": "58d6938a8c3d1edd816f206587a90aa78d6d95909ed4804f5fc83908c6e9ceb1"
+  },
+  "browser": [
+    {
+      "file": "docs/verification/P2_REAL_WORKFLOW_BROWSER.json",
+      "cases": 4,
+      "sha256": "6ff8edc525903259d5060eac5272e733e56c8aa76ab723a85cc323611b4c57bf"
+    },
+    {
+      "file": "docs/verification/P2_COMPONENT_BROWSER.json",
+      "cases": 12,
+      "sha256": "68e4c53c082482042637d9302fb34a18177f4af14dd48745d84c094d9f1cb4c7"
+    },
+    {
+      "file": "docs/verification/P2_OAUTH_BROWSER.json",
+      "cases": 4,
+      "sha256": "4d487415e5d807625755eb7be2eae8096f80d8ff45178a09ffbbd51cbc9bddf1"
+    },
+    {
+      "file": "docs/verification/P2_INHERITED_AUTH_BROWSER.json",
+      "cases": 4,
+      "sha256": "7d203b138f70cf5b76af170a7f1440e9777e4256e40e7f266f4469cb7cd0b58f"
+    },
+    {
+      "file": "docs/verification/P2_AUTHORING_REGRESSION_BROWSER.json",
+      "cases": 8,
+      "sha256": "dc2ae19a78256659bc72897bab7893279b808861fe63c691769085a63970182f"
+    },
+    {
+      "file": "docs/verification/P2_P1_REGRESSION_BROWSER.json",
+      "cases": 35,
+      "sha256": "4136a6bdda3f820b8eae5bda5095da0023c24a2c2a2911536a2bbc0298d12019"
+    }
+  ],
+  "browser_case_count": 67,
+  "native": {
+    "file": "docs/verification/P2_NATIVE_VAULT.json",
+    "sha256": "c9595d54a86e17a1dccdc168ddeed686e65e42b145ffcef90cbe2c028969122a"
+  },
+  "commands": [
+    {
+      "command": "npm run build && npx vitest run --reporter=json --outputFile=docs/verification/P2_TEST_RESULTS.json",
+      "exit_code": 0
+    },
+    {
+      "command": "npx vitest run tests/web.test.ts tests/workbench-state.test.ts (after responsive CSS fix)",
+      "exit_code": 0,
+      "passed": 15
+    },
+    {
+      "command": "npm run build:extension",
+      "exit_code": 0
+    },
+    {
+      "command": "node scripts/package-smoke.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "node scripts/check-p2-native-vault.mjs",
+      "exit_code": 0
+    }
+  ],
+  "integration_coverage": [
+    "real HTTP/raw TCP repeated fields and exact upload/download bytes",
+    "real custom-CA/mTLS fixtures, certificate/hostname verification retained",
+    "fake OAuth provider PKCE/OIDC signature/nonce, callback errors, refresh rotation/single-flight/clear/revoke",
+    "actual browser provider navigation and consumed callback replay",
+    "session/native provider refusal, typed purpose, origin/workspace isolation, private metadata",
+    "stalled-cookie-write deadline/uncertain outcome and serialized later choices",
+    "CLI/MCP/runner parity; private raw scope chaining; secret autosave refusal",
+    "schema worker structural/regex/cancellation limits; no remote schema fetch",
+    "capture/log/example/export/report seeded-secret and encoding redaction",
+    "P1 browser ownership/conflict/authoring regression"
+  ],
+  "limitations": [
+    "Linux native Secret Service remains unverified; Windows persistent credentials explicitly unavailable pending private metadata ACLs (P5-001).",
+    "Unknown free text/scripts and arbitrary cryptographic transformations require manual export review; bounded known/sensitive-field redaction is not universal secret detection.",
+    "Native credential writes cannot be forcibly cancelled; cookie timeouts report uncertain outcome without automatic retry and shutdown retains writer ownership until native work settles.",
+    "Selected files/response artifacts are private session capabilities; Postman export explicitly refuses those files, request TLS and local OAuth connections instead of silently dropping them.",
+    "HTTP/1.1 and declared auth subset only; no full protocol/tool parity, independent release security audit or installed extension-host certification."
+  ],
+  "source_sha256": {
+    "package-lock.json": "93b5f777578731ea573712f52fac68c05e0e571233ecaee58a0da3ee19f2b71e",
+    "package.json": "51d4b6e648b503fb06feedd3143fbd70ccc126a7ae70cc01c182826606994862",
+    "public/app.js": "3fc86128bb2c365e63ca7cb2021a97942d97faa7e02c0254402c7d9874583524",
+    "public/assets/landing.css": "b40217b8b7c554c670206f17b9c31e0502b01f8a65c22a7f6e6da666489729ed",
+    "public/assets/landing.js": "e9b6667f1cdd2dcc82e3bcdc3477e84c6dfe55630ddabb54cb2e4e71de026b33",
+    "public/assets/studio.css": "b40217b8b7c554c670206f17b9c31e0502b01f8a65c22a7f6e6da666489729ed",
+    "public/assets/studio.js": "4884d734c9b3cfaa261b2811bcefa28059fde741df605b10027a5f66dea161e2",
+    "public/index.html": "d38ff99b780b31e715e62282cbe873b28c4befa74a4649e0c2714d7a16fba2b1",
+    "public/landing.css": "4376232ebbeb15e89a6cd26268ffac3795e65af675873a56ea4844541d42efd5",
+    "public/studio.css": "22fd47f1aaed3c720532cbd497c0057840b6b447fdd0891c6cca2dccdda4fa24",
+    "public/studio.html": "2e9d1eb86dc5dc288eb816e85df4e5e1a475713ea60d3dc931d800f1664fe660",
+    "scripts/check-p2-browser.mjs": "2a86bc5e80c513e83b822b83941a66f61c55cf4dcf2999f33bfbe988fc90475e",
+    "scripts/check-p2-gate.mjs": "317da16de4891ae2931010eee67f2dc49db4491c81ed8e7bf634cdac4fe25fdb",
+    "scripts/check-p2-inherited-auth.mjs": "08f2946408d57c1d32e459f9842c1b3d8a4a58b09f47e9c23495cd19a9bbe9d8",
+    "scripts/check-p2-native-vault.mjs": "a3088dd5f5382e5f0b267429879e961aa894a22168b5b5e1d1f50075c0fb47eb",
+    "scripts/p2-browser-fixture.mjs": "64e98cf49a21d59c8487295e264d67949d546b1bfd358977b021af0d1cd661cc",
+    "src/cli.ts": "81858f39f49af0dca55a3e1ba8efd1799875a8feeafd0d2f4b65b7b20c6ebdb6",
+    "src/core/engine/BodyBudget.ts": "1f4836a70d9f068962cdd5153ddfc1a690ed880040fabd9326522d5a8e0d11a4",
+    "src/core/engine/CookieManager.ts": "e9b274552da3a92b253e8196cc11be466ba027f6a4e08d285c9654c3db6059bb",
+    "src/core/engine/HttpExecutor.ts": "1471fed8b6b3da3b8f929319bfdd75e3f9dbb689049837554dc9913bcc11a39b",
+    "src/core/engine/HttpTransport.ts": "a6e4f2c0ce6c60b8c678e46a1327e0577a0012ed5d78f74625cbbeebb25ec706",
+    "src/core/engine/JsonBodyValidation.ts": "94b7d67be44c1b300f97a3473cb40ee45879675570b304f559f86c14496003dd",
+    "src/core/engine/ResponseArtifactStore.ts": "6a5f57332004f26e21c365af7d365ad80304b86876cffb77e8153a62649c6ff6",
+    "src/core/engine/ScriptSandbox.ts": "199b0119fdd8b303da614f6ba3419b9f053d0ae920208a57f8d34dd856d4ac43",
+    "src/core/engine/SelectedFileStore.ts": "42404e8bff7e110568d291d2cfbba97e074af491847d2e9d3042ace8ad461aea",
+    "src/core/engine/VariableResolver.ts": "e88d41ffcbcfaf9aa553ba80de60542250f46ebb6be40c6a93dd0921dd445bb6",
+    "src/core/engine/WorkspaceExecution.ts": "1456943d562427e137e0cbaafe98b694b0a6e7583c370005cc49397a7b7d2775",
+    "src/core/models/CollectionContext.ts": "da8d834edad78fd34f9eb6e00d25039f6d4a4181f0de8d3eff6b7a57b12fa2c0",
+    "src/core/models/ImportDiagnostics.ts": "282f0f7c49fc7b86a373d12a64e9ceb5f3988eaf3bd6b5caad4af694158a35d8",
+    "src/core/models/JsonDocument.ts": "c6aa92b71585c86a6192c78e23c70a8bfdffa51862c035981afc43b23e463886",
+    "src/core/models/PostmanConverter.ts": "1a1245b739673500803b8033bdc9ce2ff945d0348a654e71180ed6142aca1db0",
+    "src/core/models/WorkspaceValidation.ts": "8e97eeac71aaa06cae0363637674b070b05f9469f93f65932b401f29b20fb676",
+    "src/core/models/types.ts": "17a4f39cd4aeb6a0dd5f14bcab7c27bc2d5f3a9b421610a09afb34b29ada4cc8",
+    "src/core/runner/CollectionRunner.ts": "bd5db5f201721ec34e68001b4e76d26568ca544d161e2b96dfca687a28b8d554",
+    "src/core/runner/DataFile.ts": "f37192b6a62fbfa1afd931740f73d014974de7bbc90836b5f2c57c69ba69befe",
+    "src/core/security/CredentialMigration.ts": "3afd7cffb5005e1377670ba091610ae5374f1598cc4b7561a10093fd22b03721",
+    "src/core/security/CredentialStore.ts": "36d02b3fa847e2d4740ccbc741c3c591722bf5cc247bcf7e1010ed74d8f6afe2",
+    "src/core/security/OAuthService.ts": "eda1dcc210c95316364a93727b846d66ce57cd02b9d6903b1ae6b18f8d4da867",
+    "src/core/security/SecretRedactor.ts": "6b0731ec09bd411b0f89b7681145e2d5c0440a8600662a2139e6eaa2d1687bc7",
+    "src/core/security/SensitiveFields.ts": "c29c0597cb4e074ef08d1d9b8e0eef99714181546905400b1e37582e9183aed8",
+    "src/core/sniffing/CaptureSanitizer.ts": "7a31cd771cdf5589ea6ad33171d80e82dea6979e171c45f84a46ea2103fa6bd6",
+    "src/core/sniffing/OpenApiGenerator.ts": "15e2c0d7660cfd7faa3236341269563f6ce90791328ea3dc51ab516f804a3171",
+    "src/core/sniffing/SchemaInferrer.ts": "a4a806a2a180a41d9ac15e1c4700401f0529e73c01b300fffd141e5d9644c24d",
+    "src/core/sniffing/SdkGenerator.ts": "62ce46dd6d0df7b908342a62cd635946f4486c19a89526003b326ece8225e119",
+    "src/core/sniffing/TrafficSnifferProxy.ts": "d8bc50391dd3d6d44eb13dd1461e325f256bb644824dfee163a18100d52f3939",
+    "src/core/workspace/CollectionCommands.ts": "c93984ba528ed8fbaaff842f3626ec43a9f6164a4b53ed782db0e85f9de2e9cc",
+    "src/core/workspace/WorkbenchState.ts": "189a065a643b1725c9f5a1dbcd6ede39c447fe523511e90dc93d2a9caaf3bc26",
+    "src/core/workspace/WorkspaceLease.ts": "756639f28ac1761f5cd9ff8d53ac71e6ec690f27237a41537496ebaccebeaba4",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/integrations/mcp.ts": "93e16ebc4540cdf5e6c33ff7431260eba9473187e0383fabba637722e5d33bd8",
+    "src/server/P2Api.ts": "3f5277182e56be089e0529d5ee604b83de6d8d91dbafda8025f21a58bcf4324f",
+    "src/server/StudioServer.ts": "4bec4d8ec204a63a08693107dc63bc623188d2d9c927772c3156da0ed565d62a",
+    "src/server/index.ts": "6f5ada99db0d862aee9f335b7e59c6020741aa62cf4690c2aee709dbec72bad1",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "web/credential-controls.js": "3f3c46dc92f3d69641ab3f0d6be5b2d7ccd2cc93348cdcd9ea02ba701e1b9c8d",
+    "web/draft-recovery.js": "abd3df505194d71d8923a5589de02ece936324eab81c1ebeed596e7a7a8f9b3b",
+    "web/fonts.css": "c9800cd363cf7a6080b8e2598d7a51ae2af7642507cae8cb0ac37efb181f89be",
+    "web/http-controls.js": "ed324369af387d94e50386c3d68707076e5b29cfa6582691501c376398744ebf",
+    "web/landing.js": "04f59b48e022a8fe5cb131a5c53c238981a8ed5b46d467aee03f509669e4f735",
+    "web/sandbox-bootstrap.js": "0164ec080dfe975f88076daea6ddadda8b3f0ab93be9446a34db2cded2bb57e0",
+    "web/sandbox-events.js": "8793bc23b277940830c6d488e6374b70de0e5e06f86b73cec96766f7f234ea4e",
+    "web/studio.js": "d64336932e5440eb45397fc908ce92428b265da3a3b4f2c718d346052d469d73",
+    "web/workbench-activity.js": "f7cbb75d56924f25b91b87bdab9e7840419398216fa156fed6ffaee4fdfb7192",
+    "web/workspace-authoring.js": "71e289e647963498922b53804e453b022c2e905db497c05ce4d36010c1b658d0",
+    "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d"
+  },
+  "historical_policy": "Preserve this snapshot when later phases change sources; current-source validation then intentionally no longer describes the new phase."
+}

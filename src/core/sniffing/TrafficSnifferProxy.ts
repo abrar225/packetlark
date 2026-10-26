@@ -1,5 +1,6 @@
 import http from "node:http";
 import { sanitizeCapture } from "./CaptureSanitizer.js";
+import type { SecretRedactor } from "../security/SecretRedactor.js";
 import { SniffedTrafficItem, HttpMethod } from "../models/types.js";
 import {
   BodyBudgetError,
@@ -9,6 +10,7 @@ import {
 export type TrafficListener = (item: SniffedTrafficItem) => void;
 export type CaptureOptions = Partial<CaptureLimits> & {
   sensitiveFields?: string[];
+  knownSecrets?: SecretRedactor;
 };
 export interface CaptureLimits {
   maxConnections: number;
@@ -81,8 +83,10 @@ export class TrafficSnifferProxy {
   private closing: Promise<void> | null = null;
   private readonly limits: CaptureLimits;
   private readonly sensitiveFields: string[];
+  private readonly knownSecrets?: SecretRedactor;
   constructor(port = 8085, options: CaptureOptions = {}) {
-    const { sensitiveFields = [], ...limits } = options;
+    const { sensitiveFields = [], knownSecrets, ...limits } = options;
+    this.knownSecrets = knownSecrets;
     if (
       !Array.isArray(sensitiveFields) ||
       sensitiveFields.length > 100 ||
@@ -124,7 +128,7 @@ export class TrafficSnifferProxy {
   public recordTraffic(item: SniffedTrafficItem) {
     let safe: SniffedTrafficItem;
     try {
-      safe = sanitizeCapture(item, this.sensitiveFields);
+      safe = sanitizeCapture(item, this.sensitiveFields, this.knownSecrets);
     } catch {
       this.omittedRecords++;
       return;

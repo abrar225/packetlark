@@ -1,9 +1,6 @@
 import type { KeyValueParam } from "../models/types.js";
-
-export const isSensitiveField = (key: string) =>
-  /authorization|cookie|token|secret|password|passwd|api.?key|credential|session/i.test(
-    key,
-  );
+import { isSensitiveField } from "./SensitiveFields.js";
+export { isSensitiveField } from "./SensitiveFields.js";
 const marker = "[REDACTED]";
 
 /** Run-local, bounded credential knowledge. Never serialize raw values into a report. */
@@ -17,7 +14,7 @@ export class SecretRedactor {
     if (value === undefined || value === null) return;
     const text = String(value);
     if (!text || this.#values.has(text) || this.#blocked) return;
-    const bytes = Buffer.byteLength(text);
+    const bytes = new TextEncoder().encode(text).byteLength;
     if (
       bytes > 8192 ||
       this.#values.size >= 256 ||
@@ -42,7 +39,7 @@ export class SecretRedactor {
     } catch {
       this.#blocked = true;
     }
-    this.#remember(Buffer.from(text).toString("base64"));
+    this.#remember(btoa(Array.from(new TextEncoder().encode(text), (byte) => String.fromCharCode(byte)).join("")));
   }
   observeBody(body: string, mime: string) {
     if (mime.includes("application/x-www-form-urlencoded")) {
@@ -106,12 +103,8 @@ export class SecretRedactor {
     if (/^bearer\s+/i.test(value)) this.add(value.replace(/^bearer\s+/i, ""));
     if (/^basic\s+/i.test(value)) {
       try {
-        for (const part of Buffer.from(
-          value.replace(/^basic\s+/i, ""),
-          "base64",
-        )
-          .toString("utf8")
-          .split(":"))
+        const encoded = value.replace(/^basic\s+/i, "").replace(/-/g, "+").replace(/_/g, "/").replace(/\s/g, "");
+        for (const part of new TextDecoder().decode(Uint8Array.from(atob(encoded + "=".repeat((4 - encoded.length % 4) % 4)), (char) => char.charCodeAt(0))).split(":"))
           this.add(part);
       } catch {}
     }

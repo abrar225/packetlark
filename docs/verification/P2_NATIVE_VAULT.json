@@ -1,0 +1,20 @@
+{
+  "verdict": "PASS",
+  "timestamp": "2026-10-26T18:17:24.921Z",
+  "platform": "darwin",
+  "os": "27.0.0",
+  "arch": "arm64",
+  "node": "v24.14.0",
+  "provider": "@napi-rs/keyring 2.1.2",
+  "cases": [
+    "native create/read",
+    "unapproved origin refused",
+    "metadata excludes value",
+    "independent process restart resolves reference",
+    "native delete and metadata cleanup"
+  ],
+  "limitations": [
+    "Only current OS tested; Windows persistence unavailable pending private metadata ACLs."
+  ],
+  "secretValuesLogged": false
+}

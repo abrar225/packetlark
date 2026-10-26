@@ -1,6 +1,6 @@
 # P1 workspace foundation
 
-Status: **in progress**. P0's scoped local-core gate is recorded in [P0_GATE.json](P0_GATE.json). The first P1 increment fixes large-workspace rendering; it does not close the whole phase.
+Status: **complete — 15 of 15 P1 tasks accepted locally**. [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json) records the final checks and source identities. P2 is queued. [TASK_TRACKER.md](TASK_TRACKER.md) is the current task record; the increment sections below retain historical evidence and limitations. P0's scoped local-core gate is recorded in [P0_GATE.json](P0_GATE.json).
 
 ## Implemented increment
 
@@ -33,7 +33,7 @@ The latest [fresh-process baseline](verification/P1_COLD_START.json) records 30 
 
 These are integrity checks for the trusted local-account model. They do not prevent a malicious same-user process from racing separate filesystem calls, supply a cooperating-process lease, make revision checks atomic, or certify power-loss recovery. Those boundaries remain explicit release work.
 
-The first CI submission of the path increment timed out in the oversized-file test. Its generic deep comparison of a 2 MiB Buffer took 1,952 ms locally and exceeded CI's five-second test limit. Switching that assertion to native exact byte equality reduced the local case to 36 ms without changing the expected file contents or raising timeouts. The corrected submission requires a fresh Node 22/24 CI pass.
+The first CI submission of the path increment timed out in the oversized-file test. Its generic deep comparison of a 2 MiB Buffer took 1,952 ms locally and exceeded CI's five-second test limit. Switching that assertion to native exact byte equality reduced the local case to 36 ms without changing the expected file contents or raising timeouts. The [corrected submission passed Node 22/24 CI](https://github.com/abrar225/rea-api-studio/actions/runs/40201638914).
 
 ## Cooperating-process ownership
 
@@ -43,13 +43,45 @@ A clean-source 30-process [ownership baseline](verification/P1_OWNERSHIP_COLD_ST
 
 This closes the first local cooperating-process lease/recovery slice; external-editor reconciliation and the broader repository/manifest design remain open. No automatic lock expiry, distributed lock or independent crash-durability certification is claimed.
 
-## Remaining P1 requirements
+## External-file reconciliation and context review
 
-- A repository boundary with external-file change reconciliation and versioned manifests. Local cooperating-process leases, explicit exited-owner recovery and basic path/symlink checks are implemented; stronger cross-platform/race validation remains open.
+Source: `503404f7d0977efb9681af95ef318853411beb2a` (core implementation `e94c467`). Validated conditional snapshots now reconcile disk changes while retaining dirty/busy resources. Explicit review supports disk reload, keeping request drafts with reviewed context and separate recovered collection/environment copies. Send and Run bind browser submissions to collection/environment revisions and reject stale context before transport. Workspace read/write budgets cover aggregate documents/bytes and managed directory entries.
+
+Observed locally: **144 tests in 18 files**, **41 browser cases**, strict extension build, compatibility probes and production-only package smoke passed. A fresh 10,004-request reference run recorded startup/filter/selection p95 of **158.5 / 9.0 / 9.8 ms**. Source, viewport, measurement limits, behavioral details and remaining risks are in [WORKSPACE_RECONCILIATION.md](WORKSPACE_RECONCILIATION.md). This uses periodic polling and explicit version choices, not automatic three-way merging or durable recovery.
+
+## Remaining requirements at the reconciliation increment (historical)
+
+- A versioned per-request repository/manifest boundary. Local cooperating-process leases, explicit exited-owner recovery, basic path/symlink checks and polling-based external reconciliation are implemented; stronger cross-platform/race validation remains open.
 - Complete collection/folder/request authoring: create, rename, duplicate, reorder, move, delete and inherited settings with stable identities.
 - Multiple request tabs and per-tab response ownership; bounded request history and examples.
-- Durable draft recovery and explicit conflict review, including external deletion, malformed files and recovery after restart.
+- Broader draft/restart platform validation. Optional acknowledged browser recovery is implemented in the increment below; browser-process crash/power-loss and cross-platform behavior remain unverified. Repository backup/restore is a separate open requirement.
 - Versioned per-request storage/manifest migration preserving imported metadata, migration diagnostics, backups and validated restore.
 - Expanded sanitized migration corpus and semantic differences for supported Postman v2.1/cURL imports. Postman native v3 YAML remains separately scoped to P7.
 
 P2–P10 remain staged as approved in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). This increment does not supply OAuth, encrypted secrets, new protocols or enterprise services, and does not justify a new product rating.
+
+## Program tracking and optional draft recovery — 26 October 2026
+
+[TASK_TRACKER.md](TASK_TRACKER.md), generated from [task-tracker.json](roadmap/task-tracker.json), tracks all P1–P10 delivery tasks and all 92 comparison requirements. Each task carries acceptance criteria, dependencies, status and evidence. Requirement scopes distinguish a phase increment from acceptance of the complete broad capability. `npm run roadmap:check` is part of the normal check command; executable negative cases reject skipped phase prerequisites, unresolved phase scopes, cycles and duplicate phase IDs.
+
+The browser now offers explicit local-consent recovery of dirty request drafts, their inherited collection context and failed environment edits. Acknowledged snapshots use IndexedDB, preserve original revisions and are independent across page loads. Recovery never automatically sends or saves. Storage/size failures retain the last acknowledged record and display a warning; malformed recovery is rejected before mutation. See [WORKSPACE_DRAFT_RECOVERY.md](WORKSPACE_DRAFT_RECOVERY.md) for privacy, retention, origin/identity boundaries and observed evidence.
+
+This is one P1 deliverable. The versioned repository/manifest, safe storage migration/backup/restore, full collection/folder/request authoring, tabs/history/examples/undo and expanded migration corpus remain open. The first local stable release and P2 have not been started by this increment.
+
+Observed for this increment: **146 automated tests in 19 files**, **18 new recovery browser cases** (including a real CLI process replacement), and **41 existing workspace browser cases** passed. Extension compilation, production-only package smoke and compatibility probes passed. The regression runner now resets the disposable fixture between groups; earlier attempts exposed fixture state leakage and an asynchronous confirmation-cleanup race, both recorded rather than represented as product passes.
+
+Performance is **not green**. The retained unfocused 10,004-request run recorded startup/filter/selection p95 of **176.3 / 917.0 / 8.2 ms**. A focused instrumented run recorded **216.2 / 867.2 / 38.2 ms**; synchronous filtering work p95 was **4.2 ms**. Both filter event-to-frame results miss the existing 100 ms target. A separate blank-page input/frame control measured **8.6 ms** p95. Focus alone therefore does not explain the Rea outliers, and synchronous work is not a substitute for the failing full interval. All raw samples remain in the [focused record](verification/P1_DRAFT_RECOVERY_PERFORMANCE.json), [earlier record](verification/P1_DRAFT_RECOVERY_PERFORMANCE_UNFOCUSED.json) and [control](verification/P1_FRAME_CONTROL.json). These are one-machine synthetic measurements, not a physical-input or competitor benchmark.
+
+**P1-015 remains in progress** to resolve that interaction gate. **P1-005** has a [repository design work record](P1_REPOSITORY_DESIGN.md), with format/commit/recovery decisions still open; no new storage schema or live migration is claimed. Exact code hashes and local verification are recorded in [the increment evidence](verification/P1_TRACKING_RECOVERY.json).
+
+## Completed delivery work — 26 October 2026
+
+The historical open items above are implemented. One [workspace repository](P1_REPOSITORY_DESIGN.md) owns canonical reads/commits across Studio, CLI and MCP. Explicit manifest migration retains legacy files and a verified backup, supports conditional restore and atomic cross-collection moves, and preserves per-request identities and opaque metadata. Disposable fault/restart tests include 10,004 requests; no live development workspace was migrated.
+
+[Collection/folder/request authoring](WORKSPACE_AUTHORING.md) now includes create, rename, duplicate, delete, reorder, move, inherited settings and native drag-and-drop with revision/dirty/busy guards. [Workbench state](WORKBENCH_STATE.md) adds independent tabs/responses, bounded history and reviewed examples, undo and environment scope diagnostics. The [sanitized import corpus](IMPORT_COMPATIBILITY.md) checks supported Postman v2.1/cURL semantics through import, migration, restart and export. Portable conditional polling observes external changes; running requests retain their context until settlement and old-context responses are invalidated when disk context is adopted.
+
+Observed functional evidence comprises 35 regression cases on each storage format, 22 authoring/workbench cases, 16 recovery cases, 6 large-list cases, 5 native drag cases, 2 automatic watch cases, 2 busy-watch cases and 2 real CLI restart cases: **125 browser case executions**, including repeated coverage across legacy/manifest formats. These are local Ego Page API checks, not remote/headless CI. The [implementation record](verification/P1_IMPLEMENTATION_VERIFICATION.json) names each artifact.
+
+The [performance investigation](verification/P1_PERFORMANCE_INVESTIGATION.md) retains the old and current failures, same-page controls and source identities. The accepted [reference timing assessment](verification/P1_PERFORMANCE_GATE.json) records all 30 filter/selection samples with p95 **3.3 / 6.9 ms** against 100 ms. All before-sample OS checks report Ego foreground; after-sample drift remains disclosed. No continuous foreground or definitive historical-root-cause claim is made. The original experiment's stricter whole-run foreground `FAIL` remains unchanged. Broader performance/platform claims remain P5.
+
+Final phase acceptance passed: **219 tests across 23 files**, extension compilation/bundling, a fresh production-only package install/CLI/WASM smoke, import compatibility/semantic probes, source-checked performance acceptance and diff validation. [P1_ACCEPTANCE.json](verification/P1_ACCEPTANCE.json) records the checks. All 14 P1 requirement scopes are accepted; eight requirements have no remaining cross-phase scope, while the six broader requirements retain their explicit P2/P4/P5 obligations. The tracker validator checks phase/task dependencies, evidence paths and these scoped dispositions. P2 remains queued; no stable release, deployment or full-product-parity claim is implied.

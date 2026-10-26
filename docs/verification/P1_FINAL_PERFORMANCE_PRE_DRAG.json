@@ -1,0 +1,796 @@
+{
+  "measured_at": "2026-10-26T08:02:42.450Z",
+  "methodology": "Foreground QA tab; 30 navigations with browser HTTP cache disabled; studio-ready mark after environments, collections and health load. Filter and selection timings are DOM-event dispatch to next animation frame, not physical input latency or guaranteed paint completion. Existing browser process/OS caches are warm; no competitor comparison. No warmup or samples are removed.",
+  "surface": {
+    "ready_ms": 157.30000000074506,
+    "rendered_requests": 31,
+    "viewport": [
+      948,
+      871
+    ],
+    "visibility": "visible",
+    "focused": false,
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "device_pixel_ratio": 1,
+    "hardware_concurrency": 10,
+    "tree_height": 569,
+    "workspace_requests": 10004
+  },
+  "startup_surfaces": [
+    {
+      "ready_ms": 177.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 203,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 177.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 168,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 135.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 180.09999999962747,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 173.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 159.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 237.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 143.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 152,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 142.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 149.90000000037253,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 137,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 138.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 140.40000000037253,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 141.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 144.7000000011176,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 150.40000000037253,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 138.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 134.40000000037253,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 138,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 154.40000000037253,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 137.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 143.09999999962747,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 138.7999999988824,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 135.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 136.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 136.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 157.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569,
+      "workspace_requests": 10004
+    }
+  ],
+  "interactionSurface": {
+    "visibility": "visible",
+    "focused": true
+  },
+  "focus_before_interactions": true,
+  "startup": {
+    "samples": 30,
+    "p50_ms": 143.1,
+    "p95_ms": 203,
+    "raw_ms": [
+      177.2,
+      203,
+      177.7,
+      168,
+      135.3,
+      180.1,
+      173.7,
+      159.3,
+      237.5,
+      143.5,
+      152,
+      142.3,
+      149.9,
+      137,
+      138.3,
+      140.4,
+      141.5,
+      144.7,
+      150.4,
+      138.2,
+      134.4,
+      138,
+      154.4,
+      137.2,
+      143.1,
+      138.8,
+      135.7,
+      136.5,
+      136.3,
+      157.3
+    ]
+  },
+  "filter": {
+    "samples": 30,
+    "p50_ms": 7.9,
+    "p95_ms": 10.2,
+    "raw_ms": [
+      3.2,
+      3.7,
+      5.8,
+      9.1,
+      6.9,
+      9.3,
+      7.9,
+      10,
+      7.1,
+      8.7,
+      7.4,
+      8.8,
+      7.8,
+      9.2,
+      8,
+      10.2,
+      7.4,
+      8.6,
+      6.6,
+      10.7,
+      7.7,
+      10,
+      6.8,
+      9.9,
+      7.7,
+      8.9,
+      7.8,
+      9.3,
+      7.8,
+      8.8
+    ]
+  },
+  "filter_synchronous_work": {
+    "samples": 30,
+    "p50_ms": 1.6,
+    "p95_ms": 1.8,
+    "raw_ms": [
+      1.7,
+      2,
+      1.6,
+      1.6,
+      1.6,
+      1.7,
+      1.6,
+      1.7,
+      1.6,
+      1.6,
+      1.4,
+      1.4,
+      1.4,
+      1.6,
+      1.5,
+      1.4,
+      1.5,
+      1.4,
+      1.5,
+      1.6,
+      1.5,
+      1.6,
+      1.7,
+      1.7,
+      1.7,
+      1.7,
+      1.6,
+      1.8,
+      1.5,
+      1.7
+    ]
+  },
+  "filter_frame_state": [
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 297.90000000037253,
+      "frame_timestamp_ms": 292.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 302.2000000011176,
+      "frame_timestamp_ms": 301.4
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 306.90000000037253,
+      "frame_timestamp_ms": 312.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 314.90000000037253,
+      "frame_timestamp_ms": 322.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 325.7000000011176,
+      "frame_timestamp_ms": 332.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 334.5,
+      "frame_timestamp_ms": 342.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 344.7000000011176,
+      "frame_timestamp_ms": 352.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 354.40000000037253,
+      "frame_timestamp_ms": 362.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 365.6000000014901,
+      "frame_timestamp_ms": 372.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 375.6000000014901,
+      "frame_timestamp_ms": 382.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 385.40000000037253,
+      "frame_timestamp_ms": 392.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 394.6000000014901,
+      "frame_timestamp_ms": 401.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 404.90000000037253,
+      "frame_timestamp_ms": 412.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 414.6000000014901,
+      "frame_timestamp_ms": 422.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 424.90000000037253,
+      "frame_timestamp_ms": 432.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 434.1000000014901,
+      "frame_timestamp_ms": 442.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 445.30000000074506,
+      "frame_timestamp_ms": 452.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 455.30000000074506,
+      "frame_timestamp_ms": 462.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 465.30000000074506,
+      "frame_timestamp_ms": 471.5
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 473.2000000011176,
+      "frame_timestamp_ms": 482.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 485,
+      "frame_timestamp_ms": 492.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 494.1000000014901,
+      "frame_timestamp_ms": 502.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 505.90000000037253,
+      "frame_timestamp_ms": 512.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 514,
+      "frame_timestamp_ms": 522.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 525.1000000014901,
+      "frame_timestamp_ms": 532.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 535.1000000014901,
+      "frame_timestamp_ms": 542.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 545,
+      "frame_timestamp_ms": 552.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 554.6000000014901,
+      "frame_timestamp_ms": 562.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 565,
+      "frame_timestamp_ms": 572.2
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 575.1000000014901,
+      "frame_timestamp_ms": 582.2
+    }
+  ],
+  "selection": {
+    "samples": 30,
+    "p50_ms": 8.3,
+    "p95_ms": 8.9,
+    "raw_ms": [
+      5.7,
+      8.4,
+      8.9,
+      7.8,
+      8.4,
+      8,
+      8.1,
+      8.1,
+      8.2,
+      8.5,
+      8.6,
+      8.4,
+      8.6,
+      8.6,
+      8.4,
+      8.1,
+      8.3,
+      7.5,
+      8.4,
+      8.2,
+      7.8,
+      8.9,
+      8.5,
+      8.4,
+      7.5,
+      8.3,
+      8.3,
+      7.9,
+      8,
+      8.7
+    ]
+  },
+  "source_state": "Uncommitted local working tree; fresh built server, disposable 10,004-request legacy workspace. No warmups or samples removed.",
+  "source_hashes": {
+    "public/app.js": "594680f13fe23b992aeda3c4fcecdc1f4e25af5fd468788e2bb16231af54f60d",
+    "public/studio.html": "8710c7d32afb371b468634253530afed2d7219ea6ce9fcc30a830df98bddc407",
+    "public/studio.css": "84702c53f58a133bbecd6a1835bd09f3c176ef487ce4720523d9529c2b2ab959",
+    "public/assets/studio.js": "c30d880e38d739bcae7e3031733c82872781d1e21a7a66514ed05343a1617d92",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "scripts/benchmark-browser.mjs": "2fb7d7d32d4cb870266aed8de0bb7c44f24828b0cbedb4b20bbcfafa8750b5d7",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/server/StudioServer.ts": "dd0414c645faeeef8b5b2e1b2f4f225aaace76ac3ff991a9a7f670c5bf2239e1"
+  },
+  "budgets": {
+    "filter_p95_ms": 100,
+    "selection_p95_ms": 100
+  },
+  "verdict": "PASS",
+  "concurrent_checks": [
+    "extension build and production-only package smoke"
+  ]
+}

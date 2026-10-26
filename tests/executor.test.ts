@@ -1,5 +1,5 @@
 import { startHttpFixture } from './http-fixture.js';
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { HttpExecutor, normalizeNetworkError } from '../src/core/engine/HttpExecutor.js';
 import { HttpRequest } from '../src/core/models/types.js';
 
@@ -26,16 +26,14 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
   it('normalizes DNS and network failures into clean structured errors without stack traces', async () => {
     const req: HttpRequest = {
       method: 'GET',
-      url: 'https://this-domain-does-not-exist-xyz123abc456.org',
+      url: 'http://rea-executor-fixture.invalid',
       headers: [],
       queryParams: [],
       body: { mode: 'none' },
       auth: { type: 'none' }
     };
 
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new TypeError('fetch failed', {cause:{code:'ENOTFOUND'}}));
-    let res;
-    try { res = await HttpExecutor.execute(req); } finally { fetchMock.mockRestore(); }
+    const res = await HttpExecutor.execute(req);
     expect(res.status).toBe(0);
     expect(res.error).toBeDefined();
     expect(res.error?.category).toMatch(/DNS Resolution Failed|Network Error/);

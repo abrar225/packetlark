@@ -3,8 +3,11 @@ import { SecretRedactor } from "../security/SecretRedactor.js";
 const reportSecrets = new WeakMap<RunResult, SecretRedactor>();
 import { ApiCollection, Environment, HttpResponse } from "../models/types.js";
 import { collectionRequests } from "../models/CollectionContext.js";
-import { HttpExecutor } from "../engine/HttpExecutor.js";
+import { validateJsonBody } from "../engine/JsonBodyValidation.js";
+import type { ExecutionOptions } from "../engine/HttpExecutor.js";
+import { HttpExecutor, getExecutionState } from "../engine/HttpExecutor.js";
 export interface RunOptions {
+  executionOptions?: ExecutionOptions;
   environment?: Environment;
   data?: Record<string, any>[];
   iterations?: number;
@@ -132,11 +135,11 @@ export class CollectionRunner {
           .map((v) => [v.key, v.value]),
       ),
     };
-    const secrets = new SecretRedactor();
+    const secrets = options.executionOptions?.secrets ?? new SecretRedactor();
     secrets.observeParameters(result.environment.values);
     secrets.observeParameters(collection.variables);
     reportSecrets.set(result, secrets);
-    const jar = new CookieJar();
+    const jar = options.executionOptions?.cookieJar ?? new CookieJar();
     let local = {},
       globals = {};
     let retainedBytes = 0;
@@ -188,9 +191,7 @@ export class CollectionRunner {
       }
     };
     const mutations = new Map<string, string | undefined>();
-    const signal = options.signal
-      ? AbortSignal.any([options.signal, AbortSignal.timeout(120000)])
-      : AbortSignal.timeout(120000);
+    const signal = AbortSignal.any([AbortSignal.timeout(120000), ...[options.signal,options.executionOptions?.signal].filter(Boolean)]);
     if (resultBytes() > maxResultBytes - 4096) {
       stopForRetention();
       result.durationMs = Date.now() - started;
@@ -238,6 +239,8 @@ export class CollectionRunner {
             variables,
             result.environment.values,
             {
+              ...options.executionOptions,
+              validateJsonBody: options.executionOptions?.validateJsonBody ?? ((raw,schema,signal)=>validateJsonBody(raw,schema,{signal})),
               signal,
               cookieJar: jar,
               secrets,
@@ -258,10 +261,11 @@ export class CollectionRunner {
               },
             },
           );
-          local = response.updatedLocalVariables || local;
-          globals = response.updatedGlobals || globals;
+          const state = getExecutionState(response);
+          local = state?.local || local;
+          globals = state?.globals || globals;
           for (const [key, value] of Object.entries(
-            response.updatedCollectionVariables || {},
+            state?.collection || {},
           )) {
             if (value !== variables.find((v) => v.key === key)?.value) {
               result.collectionVariables[key] = value;
@@ -270,8 +274,8 @@ export class CollectionRunner {
           }
           for (const variable of variables)
             if (
-              response.updatedCollectionVariables &&
-              !(variable.key in response.updatedCollectionVariables)
+              state?.collection &&
+              !(variable.key in state?.collection)
             ) {
               delete result.collectionVariables[variable.key];
               mutations.set(variable.key, undefined);
@@ -292,9 +296,9 @@ export class CollectionRunner {
             ...result.environment.values.filter(
               (v) =>
                 v.enabled === false &&
-                !Object.hasOwn(response.updatedEnvironment || {}, v.key),
+                !Object.hasOwn(state?.environment || {}, v.key),
             ),
-            ...Object.entries(response.updatedEnvironment || {}).map(
+            ...Object.entries(state?.environment || {}).map(
               ([key, value]) => ({
                 ...old.get(key),
                 key,
@@ -342,14 +346,14 @@ export class CollectionRunner {
             (response.error || tests.some((t) => !t.passed))
           )
             break outer;
-          if (response.nextRequest === null) break;
-          if (response.nextRequest !== undefined) {
+          if (state?.nextRequest === null) break;
+          if (state?.nextRequest !== undefined) {
             const matching = items
               .map((next, i) => ({ next, i }))
               .filter(
                 ({ next }) =>
-                  next.request.id === response.nextRequest ||
-                  next.request.name === response.nextRequest,
+                  next.request.id === state.nextRequest ||
+                  next.request.name === state.nextRequest,
               );
             if (matching.length !== 1)
               throw new Error(

@@ -1,0 +1,48 @@
+{
+  "measured_at": "2026-10-26T08:00:57.071Z",
+  "results": [
+    {
+      "check": "verifyInheritedMove",
+      "verdict": "PASS",
+      "cases": [
+        "inherited folder authentication, runtime variables and scripts affect real transport",
+        "manifest cross-collection move preserves request identity, selected tab and owned response"
+      ]
+    },
+    {
+      "check": "verifyEnvironmentCrud",
+      "verdict": "PASS",
+      "cases": [
+        "failed environment create reports failure without adding a phantom environment",
+        "environment create/rename/variable edit/remove and secret preview masking persist correctly",
+        "late environment deletion never replaces a subsequently opened dialog"
+      ]
+    },
+    {
+      "check": "verifyWorkbench",
+      "verdict": "PASS",
+      "cases": [
+        "late execution retains its owning response while another tab remains selected",
+        "request undo restores the previous edit without changing identity",
+        "dirty tab close supports cancel and explicit discard",
+        "example preview excludes known credentials and writes only after explicit confirmation",
+        "reviewed examples survive reload; reopening and discarding a copy never writes or leaves a phantom request",
+        "saved example deletion is explicit and scoped to its record",
+        "selected execution cancellation remains visible and clears only its owning operation"
+      ]
+    },
+    {
+      "check": "verifyTabLimit",
+      "verdict": "PASS",
+      "cases": [
+        "20-tab limit refuses another tab without losing existing drafts",
+        "closing a tab frees capacity and tabs support keyboard navigation"
+      ]
+    },
+    {
+      "check": "verifyWorkspaceAuthoring",
+      "cases": 8,
+      "verdict": "PASS"
+    }
+  ]
+}

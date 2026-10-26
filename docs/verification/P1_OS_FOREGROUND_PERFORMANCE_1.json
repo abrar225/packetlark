@@ -1,0 +1,2239 @@
+{
+  "measured_at": "2026-10-26T09:49:55.869Z",
+  "methodology": "Foreground QA tab; 30 navigations with browser HTTP cache disabled; studio-ready mark after environments, collections and health load. Filter and selection timings are DOM-event dispatch to next animation frame, not physical input latency or guaranteed paint completion. Existing browser process/OS caches are warm; no competitor comparison. No warmup or samples are removed.",
+  "surface": {
+    "ready_ms": 250.79999999701977,
+    "rendered_requests": 31,
+    "viewport": [
+      948,
+      871
+    ],
+    "visibility": "visible",
+    "focused": true,
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+    "device_pixel_ratio": 1,
+    "hardware_concurrency": 10,
+    "tree_height": 569,
+    "workspace_requests": 10004
+  },
+  "startup_surfaces": [
+    {
+      "ready_ms": 158.80000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 132.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 131.39999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 130.39999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 141.80000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 140.80000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 132.39999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 130.29999999701977,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 138.60000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 139.39999999850988,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 125.19999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 131.59999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 136.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 130.79999999701977,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 158.59999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 150.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 142.90000000223517,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 151,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 135.10000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 145.69999999925494,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 137.09999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 139.30000000074506,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 136.10000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 145.10000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 144.09999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 123.10000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 129.5,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": false,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 206.60000000149012,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 132.09999999776483,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569
+    },
+    {
+      "ready_ms": 250.79999999701977,
+      "rendered_requests": 31,
+      "viewport": [
+        948,
+        871
+      ],
+      "visibility": "visible",
+      "focused": true,
+      "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "device_pixel_ratio": 1,
+      "hardware_concurrency": 10,
+      "tree_height": 569,
+      "workspace_requests": 10004
+    }
+  ],
+  "host_observations": [
+    {
+      "phase": "startup",
+      "index": 0,
+      "boundary": "before",
+      "observed": "Brave Browser",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 0,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 1,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 1,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 2,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 2,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 3,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 3,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 4,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 4,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 5,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 5,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 6,
+      "boundary": "before",
+      "observed": "Brave Browser",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 6,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 7,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 7,
+      "boundary": "after",
+      "observed": "Brave Browser",
+      "activated": false,
+      "frontmost": "Brave Browser"
+    },
+    {
+      "phase": "startup",
+      "index": 8,
+      "boundary": "before",
+      "observed": "Brave Browser",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 8,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 9,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 9,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 10,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 10,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 11,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 11,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 12,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 12,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 13,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 13,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 14,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 14,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 15,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 15,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 16,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 16,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 17,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 17,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 18,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 18,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 19,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 19,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "startup",
+      "index": 20,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 20,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 21,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 21,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 22,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 22,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 23,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 23,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 24,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 24,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 25,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 25,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 26,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 26,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 27,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 27,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 28,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 28,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 29,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "startup",
+      "index": 29,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 0,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 0,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 1,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 1,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 2,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 2,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "filter",
+      "index": 3,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 3,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 4,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 4,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 5,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 5,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 6,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 6,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 7,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 7,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 8,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 8,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 9,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 9,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 10,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 10,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 11,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 11,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 12,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 12,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 13,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 13,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 14,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 14,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 15,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 15,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 16,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 16,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 17,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 17,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 18,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 18,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 19,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 19,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 20,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 20,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 21,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 21,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 22,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 22,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 23,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 23,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 24,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 24,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 25,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 25,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 26,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 26,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 27,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 27,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "filter",
+      "index": 28,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 28,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "filter",
+      "index": 29,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "filter",
+      "index": 29,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 0,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 0,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 1,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 1,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "selection",
+      "index": 2,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 2,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 3,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 3,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 4,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 4,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 5,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 5,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "selection",
+      "index": 6,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 6,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 7,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 7,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 8,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 8,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 9,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 9,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "selection",
+      "index": 10,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 10,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "selection",
+      "index": 11,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 11,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 12,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 12,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 13,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 13,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 14,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 14,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 15,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 15,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 16,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 16,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 17,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 17,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 18,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 18,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 19,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 19,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 20,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 20,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 21,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 21,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 22,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 22,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 23,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 23,
+      "boundary": "after",
+      "observed": "ChatGPT",
+      "activated": false,
+      "frontmost": "ChatGPT"
+    },
+    {
+      "phase": "selection",
+      "index": 24,
+      "boundary": "before",
+      "observed": "ChatGPT",
+      "activated": true,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 24,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 25,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 25,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 26,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 26,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 27,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 27,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 28,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 28,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 29,
+      "boundary": "before",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    },
+    {
+      "phase": "selection",
+      "index": 29,
+      "boundary": "after",
+      "observed": "ego lite",
+      "activated": false,
+      "frontmost": "ego lite"
+    }
+  ],
+  "interactionSurface": {
+    "visibility": "visible",
+    "focused": true
+  },
+  "focus_before_interactions": true,
+  "startup": {
+    "samples": 30,
+    "p50_ms": 137.1,
+    "p95_ms": 206.6,
+    "raw_ms": [
+      158.8,
+      132.5,
+      131.4,
+      130.4,
+      141.8,
+      140.8,
+      132.4,
+      130.3,
+      138.6,
+      139.4,
+      125.2,
+      131.6,
+      136.5,
+      130.8,
+      158.6,
+      150.7,
+      142.9,
+      151,
+      135.1,
+      145.7,
+      137.1,
+      139.3,
+      136.1,
+      145.1,
+      144.1,
+      123.1,
+      129.5,
+      206.6,
+      132.1,
+      250.8
+    ]
+  },
+  "filter": {
+    "samples": 30,
+    "p50_ms": 2.8,
+    "p95_ms": 3.3,
+    "raw_ms": [
+      3.5,
+      3.1,
+      3,
+      3.1,
+      2.8,
+      3,
+      3.3,
+      3.1,
+      2.9,
+      3.1,
+      2.9,
+      2.9,
+      3.1,
+      2.8,
+      2.5,
+      2.7,
+      2.4,
+      2.6,
+      2.5,
+      2.7,
+      2.7,
+      2.3,
+      2.7,
+      2.5,
+      3,
+      3.2,
+      2.6,
+      2.8,
+      2.8,
+      2.6
+    ]
+  },
+  "filter_synchronous_work": {
+    "samples": 30,
+    "p50_ms": 1.5,
+    "p95_ms": 2,
+    "raw_ms": [
+      2,
+      1.6,
+      1.5,
+      1.6,
+      1.4,
+      1.5,
+      1.6,
+      1.5,
+      1.5,
+      1.6,
+      1.5,
+      1.4,
+      1.6,
+      1.6,
+      1.4,
+      1.5,
+      1.4,
+      1.4,
+      1.4,
+      1.5,
+      1.5,
+      1.3,
+      1.5,
+      1.5,
+      1.6,
+      2.1,
+      1.5,
+      1.6,
+      1.6,
+      1.5
+    ]
+  },
+  "filter_frame_state": [
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 674.7999999970198,
+      "frame_timestamp_ms": 669.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 974.3999999985099,
+      "frame_timestamp_ms": 969.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 1272.2999999970198,
+      "frame_timestamp_ms": 1269.796
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 1837,
+      "frame_timestamp_ms": 1836.44
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2128.5,
+      "frame_timestamp_ms": 2119.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2412.2999999970198,
+      "frame_timestamp_ms": 2409.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 2703,
+      "frame_timestamp_ms": 2699.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3351.599999997765,
+      "frame_timestamp_ms": 3349.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3644.2999999970198,
+      "frame_timestamp_ms": 3638.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 3940.7999999970198,
+      "frame_timestamp_ms": 3938.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 4235.39999999851,
+      "frame_timestamp_ms": 4229.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 4519.5,
+      "frame_timestamp_ms": 4518.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 4813.599999997765,
+      "frame_timestamp_ms": 4809.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 5198.39999999851,
+      "frame_timestamp_ms": 5193.022
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 5495.79999999702,
+      "frame_timestamp_ms": 5489.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 5787.5,
+      "frame_timestamp_ms": 5779.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 6067.5,
+      "frame_timestamp_ms": 6066.364
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 6356.599999997765,
+      "frame_timestamp_ms": 6349.796
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 6643,
+      "frame_timestamp_ms": 6639.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 6936.79999999702,
+      "frame_timestamp_ms": 6929.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 7227.89999999851,
+      "frame_timestamp_ms": 7219.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 7514.199999999255,
+      "frame_timestamp_ms": 7509.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 7816.29999999702,
+      "frame_timestamp_ms": 7813.13
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 8156.89999999851,
+      "frame_timestamp_ms": 8149.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 8451.699999999255,
+      "frame_timestamp_ms": 8453.028
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 8763.39999999851,
+      "frame_timestamp_ms": 8759.8
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 9059.699999999255,
+      "frame_timestamp_ms": 9059.1
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 9353.099999997765,
+      "frame_timestamp_ms": 9349.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 9941.099999997765,
+      "frame_timestamp_ms": 9939.7
+    },
+    {
+      "visibility": "visible",
+      "focused": true,
+      "start_ms": 10496,
+      "frame_timestamp_ms": 10496.358
+    }
+  ],
+  "selection": {
+    "samples": 30,
+    "p50_ms": 1.5,
+    "p95_ms": 6.9,
+    "raw_ms": [
+      1.5,
+      1.5,
+      1.4,
+      1.5,
+      1.4,
+      1.9,
+      1.5,
+      1.4,
+      1.5,
+      7.4,
+      1.7,
+      1.4,
+      6.9,
+      1.5,
+      1.5,
+      1.5,
+      1.5,
+      1.4,
+      1.7,
+      1.4,
+      1.3,
+      1.4,
+      1.5,
+      1.4,
+      1.4,
+      1.4,
+      1.5,
+      3.2,
+      1.4,
+      1.4
+    ]
+  },
+  "host_methodology": "Read macOS frontmost application before and after every sample. Activate the dedicated Ego QA app only when a before-sample check finds another app in front. Activation and host checks are outside the unchanged event-to-frame interval. All raw samples retained, including any sample with a failed foreground precondition.",
+  "source_state": "Uncommitted local working tree; disposable 10,004-request workspace, current built assets.",
+  "source_hashes": {
+    "public/app.js": "f6a4ed0c29abe1385dc1ddb515da10e8b3177bacccd0df302de4a1a5a9705cd1",
+    "public/studio.html": "8710c7d32afb371b468634253530afed2d7219ea6ce9fcc30a830df98bddc407",
+    "public/studio.css": "66f47d589ec2946e72e52726545f20259c5209e0c15ebc94b474e215a3365dc5",
+    "public/assets/studio.js": "ea6e2dac6a12e0fe2cbeedde5d52bc339f2e1050670657fe662093b9762e7b84",
+    "web/collection-tree.js": "74269ef9a667a15863856f61694b992434602f7bda4d953f57261615b5247768",
+    "web/workspace-authoring.js": "f8508dead6eadc16ebae602826e9ea5588f9a283f23121605e62a571c9a02e81",
+    "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d",
+    "web/workbench-activity.js": "f7cbb75d56924f25b91b87bdab9e7840419398216fa156fed6ffaee4fdfb7192",
+    "scripts/benchmark-browser.mjs": "2ad620989f52da809d10425c7a46e9fec5f724cca204f26c84a00607b624ca17",
+    "src/core/workspace/WorkspaceRepository.ts": "164bd048dfc1a49b6bcd9b4f0f83fd8f691a6d898290f74d47f6a4f6300be97e",
+    "src/server/StudioServer.ts": "dd0414c645faeeef8b5b2e1b2f4f225aaace76ac3ff991a9a7f670c5bf2239e1"
+  },
+  "budgets": {
+    "filter_p95_ms": 100,
+    "selection_p95_ms": 100
+  },
+  "verdict": "FAIL"
+}

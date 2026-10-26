@@ -1,0 +1,15 @@
+{
+  "measured_at": "2026-10-26T09:49:55.874Z",
+  "records": [
+    {
+      "run": 1,
+      "verdict": "FAIL",
+      "host_valid": false,
+      "activations": 15,
+      "startup": 206.6,
+      "filter": 3.3,
+      "selection": 6.9
+    }
+  ],
+  "verdict": "FAIL"
+}

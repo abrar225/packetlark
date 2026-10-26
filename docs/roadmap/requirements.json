@@ -472,7 +472,8 @@
       ],
       "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
       "p0_implementation_evidence": "Canonical commit before memory, retained legacy migration source, resumable migration, revision-aware saves and deletes; complete workspace UI/recovery still P1.",
-      "p1_implementation_evidence": "0961215: bounded visible-row collection renderer; native item/request identity fallback; rejects ambiguous cross-item aliases. Full authoring/recovery remains open. f6eebb4: canonical root/directory identity guards, nonregular marker/destination rejection and descriptor-bound 2MiB reads/revisions; cross-process lease/recovery remains open. Local cooperating-process single-writer ownership now precedes migration/seeding; explicit token recovery handles a verified exited same-host owner. See WORKSPACE_OWNERSHIP.md; external-editor reconciliation and versioned manifests remain open."
+      "p1_implementation_evidence": "0961215: bounded visible-row collection renderer; native item/request identity fallback; rejects ambiguous cross-item aliases. Full authoring/recovery remains open. f6eebb4: canonical root/directory identity guards, nonregular marker/destination rejection and descriptor-bound 2MiB reads/revisions; cross-process lease/recovery remains open. Local cooperating-process single-writer ownership now precedes migration/seeding; explicit token recovery handles a verified exited same-host owner. See WORKSPACE_OWNERSHIP.md; external-editor reconciliation and versioned manifests remain open.",
+      "p1_reconciliation_evidence": "503404f (core e94c467): validated conditional disk snapshots, retained dirty/busy resources, explicit conflict review and recovered copies; browser Send/Run context revisions; bounded aggregate read/write quotas. 144 local tests/41 browser cases passed. Full authoring/tabs/durable recovery/versioned manifests remain open; see WORKSPACE_RECONCILIATION.md."
     },
     {
       "id": "REA-024",
@@ -534,7 +535,8 @@
       ],
       "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/public/app.js",
       "p0_implementation_evidence": "In-memory per-request drafts, delayed-completion ownership and unload guard verified in browser; durable crash recovery/tabs remain P1.",
-      "p1_implementation_evidence": "0961215: existing 16 ownership checks pass under virtualization; draft switching/search/scroll and native first-load execution verified. Durable recovery/tabs remain open."
+      "p1_implementation_evidence": "0961215: existing 16 ownership checks pass under virtualization; draft switching/search/scroll and native first-load execution verified. Durable recovery/tabs remain open.",
+      "p1_reconciliation_evidence": "503404f (core e94c467): validated conditional disk snapshots, retained dirty/busy resources, explicit conflict review and recovered copies; browser Send/Run context revisions; bounded aggregate read/write quotas. 144 local tests/41 browser cases passed. Full authoring/tabs/durable recovery/versioned manifests remain open; see WORKSPACE_RECONCILIATION.md."
     },
     {
       "id": "REA-027",
@@ -606,7 +608,7 @@
       "documented_comparator": "Native Git files plus optional Cloud View sharing.",
       "required_work": "Per-request diffs, secret exclusion, external edits/conflicts.",
       "candidate_phase": "P1",
-      "status": "planned-or-revalidation-required",
+      "status": "in-progress",
       "acceptance_reference": "WS4 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "postman_sources": [
         {
@@ -614,7 +616,8 @@
           "url": "https://www.postman.com/product/native-git/"
         }
       ],
-      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts"
+      "rea_evidence_url": "https://github.com/abrar225/rea-api-studio/blob/c25e02ca2415dd7b2e2826c96ea4ff0df34de311/src/server/StudioServer.ts",
+      "p1_reconciliation_evidence": "503404f (core e94c467): validated conditional disk snapshots, retained dirty/busy resources, explicit conflict review and recovered copies; browser Send/Run context revisions; bounded aggregate read/write quotas. 144 local tests/41 browser cases passed. Full authoring/tabs/durable recovery/versioned manifests remain open; see WORKSPACE_RECONCILIATION.md."
     },
     {
       "id": "REA-031",
@@ -1868,5 +1871,6 @@
     "implementation_commit": "0a7fc307cded932dc41213df88c7b7f29be05666",
     "note": "P0 local-core gates passed. The baseline comparison remains historical and remaining phase requirements stay open.",
     "p0_gate": "../P0_GATE.json"
-  }
+  },
+  "rea_progress_updated_at": "2026-10-26"
 }

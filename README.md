@@ -27,6 +27,7 @@ The website published on [GitHub Pages](https://abrar225.github.io/rea-api-studi
 - Local collections, nested imported folders, environments, and variables.
 - QuickJS-isolated pre-request JavaScript, Chai assertions, inherited scripts, async tests and a supported subset of `pm.*`.
 - Redirect-aware cookie sessions, cancellation, response limits and original binary downloads.
+- Origin-bound credential references, macOS Keychain or explicit session storage, OAuth PKCE/refresh/revoke, selected-file uploads, custom CA/mTLS, and bounded JSON Schema validation. See [P2 scope and platform limits](docs/P2_PROGRESS.md).
 - Collection runner with JSON/CSV data, iterations, request chaining and CLI JSON/JUnit summaries.
 - Stdio MCP tools and a packageable VS Code desktop preview; see [integrations](docs/INTEGRATIONS.md).
 - Postman v2.1 collection import/export and basic cURL import.
@@ -61,6 +62,8 @@ The proxy does **not** implement HTTPS CONNECT interception. `curl -x ... https:
 Workspace data is stored under `.rea-api/collections/` and `.rea-api/environments/`. Canonical files are authoritative; legacy monolithic sources are retained for resumable migration and are not live mirrors. These files are readable JSON, not encrypted storage, and are ignored by Git by default. If you explicitly version collections, exclude credentials first; files do not make merge conflicts impossible. Existing tracked workspace examples from earlier releases are no longer tracked by this revision; local files are preserved.
 
 Only one Studio may write a workspace at a time. Normal shutdown releases ownership; a hard exit requires reviewing `rea-api workspace status` and explicitly recovering the exited owner's token. See [workspace ownership and recovery](docs/WORKSPACE_OWNERSHIP.md) for commands, supported scope and maintenance details.
+
+The workbench checks external file changes while preserving unsaved drafts and offers explicit conflict review/recovered copies. Browser Send/Run operations bind their selected context revisions. Current workspace limits are 1,000 resource documents and 32 MiB combined, with 2 MiB per resource. See [reconciliation behavior and limits](docs/WORKSPACE_RECONCILIATION.md); durable unsaved-draft recovery remains unfinished.
 
 After installation/build, fonts, icons, and scripts are served locally. Calls to remote APIs still need a network connection. There is no implemented Rea telemetry service in this source tree.
 

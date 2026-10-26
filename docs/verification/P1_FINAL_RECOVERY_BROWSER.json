@@ -1,0 +1,63 @@
+{
+  "measured_at": "2026-10-26T08:00:00.693Z",
+  "results": [
+    {
+      "check": "verifyRecoveryPersistence",
+      "verdict": "PASS",
+      "cases": [
+        "recovery stores nothing before local consent",
+        "acknowledged recovery survives reload",
+        "explicit restoration retains dirty request without canonical writes or execution"
+      ]
+    },
+    {
+      "check": "verifyRecoveryConflict",
+      "verdict": "PASS",
+      "cases": [
+        "recovered draft retains original context and detects changed disk revision",
+        "stale recovered save is rejected while retaining both disk and draft"
+      ]
+    },
+    {
+      "check": "verifyRecoveryLimitsAndCorruption",
+      "verdict": "PASS",
+      "cases": [
+        "oversized recovery reports failure and preserves last acknowledged snapshot",
+        "missing environment revision rejects the whole recovery before state mutation"
+      ]
+    },
+    {
+      "check": "verifyFailedEnvironmentRecovery",
+      "verdict": "PASS",
+      "cases": [
+        "failed environment edits are durably acknowledged",
+        "environment recovery survives reload without automatically overwriting canonical values"
+      ]
+    },
+    {
+      "check": "verifyRecoveryStorageFailure",
+      "verdict": "PASS",
+      "cases": [
+        "storage-provider failure is visible and leaves the live draft dirty",
+        "failed storage transaction preserves the previous acknowledged recovery"
+      ]
+    },
+    {
+      "check": "verifyRecoveryConcurrency",
+      "verdict": "PASS",
+      "cases": [
+        "concurrent pages retain separate recovery records",
+        "restoring a page never overwrites another live page's recovery"
+      ]
+    },
+    {
+      "check": "verifyRecoveryControlsAndRetention",
+      "verdict": "PASS",
+      "cases": [
+        "disabling recovery preserves stored records and stops future edit writes",
+        "explicit discard deletes only recovery while retaining the live dirty draft",
+        "a seventeenth page is refused without evicting sixteen prior recovery records"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "info": {"_postman_id":"corpus_nested", "name":"Sanitized nested corpus", "description":{"content":"Fixture collection", "type":"text/plain"}, "schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json", "x-fixture":true},
+  "auth":{"type":"bearer", "bearer":[{"key":"token", "value":"fixture-token", "type":"string", "x-note":"keep"}]},
+  "variable":[{"key":"base", "value":"https://fixture.invalid", "x-note":"keep"}, {"key":"repeat", "value":"one"}, {"key":"repeat", "value":"two", "disabled":true}],
+  "event":[{"listen":"prerequest", "script":{"exec":["pm.variables.set('scope', 'collection');"], "type":"text/javascript", "packages":{}}}, {"listen":"test", "disabled":true, "script":{"exec":["throw new Error('disabled');"]}}],
+  "x-collection":{"retained":true},
+  "item":[{"id":"outer", "name":"Outer", "description":{"content":"Folder docs", "type":"text/plain"}, "variable":[{"key":"base", "value":"https://folder.invalid"}], "event":[{"listen":"prerequest", "script":{"exec":["pm.variables.set('scope', 'outer');"]}}], "item":[{"id":"inner", "name":"Inner", "auth":{"type":"basic", "basic":[{"key":"username", "value":"fixture-user"},{"key":"password", "value":"fixture-password"}]}, "item":[{
+    "id":"request_example", "name":"Repeated rows and example", "response":[{"id":"example_1", "name":"Example", "code":200, "status":"OK", "body":"{\"ok\":true}", "header":[{"key":"Set-Cookie", "value":"fixture=1"}], "originalRequest":{"method":"POST", "url":"https://fixture.invalid"}}],
+    "request":{"method":"POST", "description":{"content":"Request docs", "type":"text/plain"}, "url":{"raw":"https://fixture.invalid/:id?tag=one&tag=two#section", "host":["fixture", "invalid"], "path":[":id"], "variable":[{"key":"id", "value":"42", "description":"path metadata"}], "query":[{"key":"tag", "value":"one", "x-row":1},{"key":"tag", "value":"two"},{"key":"tag", "value":"off", "disabled":true}]}, "header":[{"key":"X-Repeat", "value":"one", "x-row":1},{"key":"X-Repeat", "value":"two"},{"key":"X-Off", "value":"disabled", "disabled":true}], "body":{"mode":"urlencoded", "x-body":"keep", "urlencoded":[{"key":"field", "value":"one", "x-row":1},{"key":"field", "value":"two", "disabled":true}]}, "protocolProfileBehavior":{"disableBodyPruning":true}, "x-request":"keep"}
+  }]}]}]
+}

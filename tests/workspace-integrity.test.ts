@@ -42,6 +42,242 @@ async function workspace(
 }
 
 describe("workspace API and restart integrity", () => {
+  it("keeps browser recovery identity stable across restart and distinct across workspace roots", () =>
+    workspace(async (root, api, restart) => {
+      const identity = await (await api("workspace/identity")).json();
+      expect(identity).toEqual({ id: expect.stringMatching(/^[a-f0-9]{64}$/) });
+      expect(JSON.stringify(identity)).not.toContain(root);
+      await restart();
+      expect(await (await api("workspace/identity")).json()).toEqual(identity);
+      await workspace(async (_, other) => {
+        expect(await (await other("workspace/identity")).json()).not.toEqual(identity);
+      });
+    }));
+
+  it("counts the combined collection and environment document limit before committing", () =>
+    workspace(async (root, api) => {
+      for (let i = 0; i < 997; i++)
+        fs.writeFileSync(
+          path.join(root, "collections", `quota_${i}.json`),
+          JSON.stringify({
+            id: `quota_${i}`,
+            name: "Quota",
+            variables: [],
+            items: [],
+          }),
+        );
+      expect(
+        (
+          await api("collections", "POST", {
+            id: "thousandth",
+            name: "Last",
+            variables: [],
+            items: [],
+          })
+        ).status,
+      ).toBe(200);
+      expect(
+        (
+          await api("environments", "POST", {
+            id: "excess",
+            name: "Too many",
+            values: [],
+          })
+        ).status,
+      ).toBe(413);
+      expect(
+        fs.existsSync(path.join(root, "environments", "excess.json")),
+      ).toBe(false);
+      const snapshot = await (await api("workspace")).json();
+      expect(snapshot.collections.length + snapshot.environments.length).toBe(
+        1000,
+      );
+    }));
+  it("does not create initialization metadata past the managed directory limit", async () => {
+    const root = fs.mkdtempSync(path.join(tmpdir(), "rea-init-entry-limit-"));
+    const directory = path.join(root, "collections");
+    fs.mkdirSync(directory);
+    for (let i = 0; i < 2047; i++)
+      fs.writeFileSync(path.join(directory, `preserved_${i}`), "");
+    try {
+      expect(() => new StudioServer(0, 0, root)).toThrow(
+        /Workspace exceeds the supported limit/,
+      );
+      expect(fs.readdirSync(directory).length).toBe(2048);
+      expect(fs.existsSync(path.join(directory, ".initialized"))).toBe(false);
+      expect(fs.readFileSync(path.join(directory, "preserved_0"), "utf8")).toBe(
+        "",
+      );
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+  it("rejects a new file at the managed-directory entry limit without poisoning refresh", () =>
+    workspace(async (root, api) => {
+      const directory = path.join(root, "collections");
+      const present = fs.readdirSync(directory).length;
+      for (let i = present; i < 2048; i++)
+        fs.writeFileSync(path.join(directory, `unmanaged_${i}`), "");
+      const response = await api("collections", "POST", {
+        id: "one_too_many",
+        name: "Too many",
+        variables: [],
+        items: [],
+      });
+      expect(response.status).toBe(413);
+      expect(fs.existsSync(path.join(directory, "one_too_many.json"))).toBe(
+        false,
+      );
+      expect((await api("workspace")).status).toBe(200);
+    }));
+  it("keeps the previous validated snapshot when another resource is malformed", () =>
+    workspace(async (root, api) => {
+      const before = await (await api("workspace")).json();
+      const collection = before.collections[0],
+        environment = before.environments[0];
+      const collectionFile = path.join(
+        root,
+        "collections",
+        collection.id + ".json",
+      );
+      const envFile = path.join(root, "environments", environment.id + ".json");
+      const envBytes = fs.readFileSync(envFile);
+      const external = JSON.parse(fs.readFileSync(collectionFile, "utf8"));
+      external.name = "Valid edit waits for complete snapshot";
+      fs.writeFileSync(collectionFile, JSON.stringify(external));
+      fs.writeFileSync(envFile, "{malformed");
+      expect((await api("workspace")).status).toBe(503);
+      expect(
+        (await (await api(`collections/${collection.id}`)).json()).name,
+      ).toBe(collection.name);
+      expect(fs.readFileSync(envFile, "utf8")).toBe("{malformed");
+      fs.writeFileSync(envFile, envBytes);
+      expect((await (await api("workspace")).json()).collections[0].name).toBe(
+        "Valid edit waits for complete snapshot",
+      );
+    }));
+  it("bounds aggregate workspace refresh and refuses writes that exceed the same budget", () =>
+    workspace(async (root, api) => {
+      const payload = "x".repeat(2 * 1024 * 1024 - 2048);
+      for (let i = 0; i < 17; i++)
+        fs.writeFileSync(
+          path.join(root, "collections", `large_${i}.json`),
+          JSON.stringify({
+            id: `large_${i}`,
+            name: "Large",
+            variables: [],
+            items: [],
+            importedMetadata: payload,
+          }),
+        );
+      const snapshot = await api("workspace");
+      expect(snapshot.status).toBe(503);
+      expect((await snapshot.json()).error.code).toBe("ERR_WORKSPACE_LIMIT");
+      const proposed = {
+        id: "over_limit",
+        name: "Too much",
+        variables: [],
+        items: [],
+      };
+      expect((await api("collections", "POST", proposed)).status).toBe(413);
+      expect(
+        fs.existsSync(path.join(root, "collections", "over_limit.json")),
+      ).toBe(false);
+      fs.unlinkSync(path.join(root, "collections", "large_16.json"));
+      expect((await api("collections", "POST", proposed)).status).toBe(200);
+    }));
+  it("rejects stale collection execution context before transport and runs the reviewed revision", () =>
+    workspace(async (root, api) => {
+      let calls = 0;
+      const target = http.createServer((_req, res) => {
+        calls++;
+        res.end("safe");
+      });
+      await new Promise<void>((resolve) =>
+        target.listen(0, "127.0.0.1", resolve),
+      );
+      try {
+        const request = {
+          id: "request",
+          method: "GET",
+          url: `http://127.0.0.1:${(target.address() as any).port}/`,
+        };
+        const original = await (
+          await api("collections", "POST", {
+            id: "context",
+            name: "Context",
+            variables: [],
+            items: [{ id: "request", name: "Request", request }],
+            testScript:
+              'pm.test("original", () => pm.expect(pm.response.code).to.equal(200))',
+          })
+        ).json();
+        const file = path.join(root, "collections", "context.json");
+        const external = JSON.parse(fs.readFileSync(file, "utf8"));
+        external.testScript =
+          'pm.test("reviewed", () => pm.expect(pm.response.code).to.equal(200))';
+        fs.writeFileSync(file, JSON.stringify(external));
+        const stale = await api("execute", "POST", {
+          collectionId: original.id,
+          collectionRevision: original.revision,
+          request,
+        });
+        expect(stale.status).toBe(412);
+        expect((await stale.json()).error.code).toBe("ERR_WORKSPACE_CONFLICT");
+        expect(calls).toBe(0);
+        const staleRun = await api("runs", "POST", {
+          collectionId: original.id,
+          collectionRevision: original.revision,
+        });
+        expect(staleRun.status).toBe(412);
+        expect(calls).toBe(0);
+        const latest = (await (await api("workspace")).json()).collections.find(
+          (col) => col.id === original.id,
+        );
+        const reviewed = await api("execute", "POST", {
+          collectionId: latest.id,
+          collectionRevision: latest.revision,
+          request,
+        });
+        expect(reviewed.status).toBe(200);
+        expect((await reviewed.json()).testResults).toEqual([
+          { name: "reviewed", passed: true },
+        ]);
+        expect(calls).toBe(1);
+      } finally {
+        target.closeAllConnections();
+        await new Promise<void>((resolve) => target.close(() => resolve()));
+      }
+    }));
+  it("exposes a conditional workspace snapshot that reflects external edits and deletions", () =>
+    workspace(async (root, api) => {
+      const first = await api("workspace");
+      expect(first.status).toBe(200);
+      const snapshot = await first.json();
+      const tag = first.headers.get("etag");
+      expect(tag).toBe(`"${snapshot.revision}"`);
+      expect(
+        (await api("workspace", "GET", undefined, { "If-None-Match": tag }))
+          .status,
+      ).toBe(304);
+      const file = path.join(
+        root,
+        "collections",
+        snapshot.collections[0].id + ".json",
+      );
+      const external = JSON.parse(fs.readFileSync(file, "utf8"));
+      external.name = "Changed in external editor";
+      fs.writeFileSync(file, JSON.stringify(external));
+      const changed = await api("workspace", "GET", undefined, {
+        "If-None-Match": tag,
+      });
+      expect(changed.status).toBe(200);
+      const next = await changed.json();
+      expect(next.revision).not.toBe(snapshot.revision);
+      expect(next.collections[0].name).toBe("Changed in external editor");
+      fs.unlinkSync(file);
+      expect((await (await api("workspace")).json()).collections).toEqual([]);
+    }));
   it.skipIf(process.platform === "win32")(
     "rejects symlinked managed directories before initialization writes outside the workspace",
     async () => {
@@ -364,7 +600,7 @@ describe("workspace API and restart integrity", () => {
             queryParams: [],
             body: { mode: "none" },
             auth: { type: "none" },
-            testScript: 'pm.environment.set("apiKey", "old-execution-token")',
+            testScript: 'pm.environment.set("counter", "old-execution-value")',
           },
         });
         await started;
@@ -372,7 +608,7 @@ describe("workspace API and restart integrity", () => {
           `environments/${env.id}`,
           "PUT",
           {
-            values: [{ key: "apiKey", value: "new-user-token", enabled: true }],
+            values: [{ key: "counter", value: "new-user-value", enabled: true }],
           },
           { "If-Match": `"${env.revision}"` },
         );
@@ -385,7 +621,7 @@ describe("workspace API and restart integrity", () => {
         );
         expect(
           (await (await api(`environments/${env.id}`)).json()).values[0].value,
-        ).toBe("new-user-token");
+        ).toBe("new-user-value");
       } finally {
         target.closeAllConnections();
         await new Promise<void>((resolve) => target.close(() => resolve()));

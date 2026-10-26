@@ -40,7 +40,7 @@ export function collectionRequests(
       const variables = new Map<string, KeyValueParam>();
       for (const parent of parents)
         for (const variable of parent.variables || [])
-          variables.set(variable.key, variable);
+          if (variable.enabled !== false) variables.set(variable.key, variable);
       found.push({
         request,
         variables: [...variables.values()],

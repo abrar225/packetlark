@@ -1,0 +1,90 @@
+{
+  "as_of": "2026-10-26",
+  "base_commit": "c65dfcc4ff606af7c1a15039a43128e572e4a8b0",
+  "source_state": "uncommitted working tree; hashes bind local evidence to the tested source, not a remote CI claim",
+  "scope": "P1\u2013P10 execution tracking plus P1-011 optional local browser draft recovery. P1 is not complete; P2 remains queued.",
+  "task_counts": {
+    "done": 5,
+    "in_progress": 2,
+    "todo": 34,
+    "gated": 8
+  },
+  "checks": [
+    {
+      "command": "npm run check",
+      "status": "PASS",
+      "tests": 146,
+      "files": 19,
+      "includes": [
+        "roadmap coverage/dependencies/generated summary",
+        "build",
+        "API identity/restart test",
+        "negative tracker closure cases"
+      ]
+    },
+    {
+      "command": "npm run build:extension",
+      "status": "PASS"
+    },
+    {
+      "command": "node scripts/package-smoke.mjs",
+      "status": "PASS"
+    },
+    {
+      "command": "node scripts/assessment-probes.mjs",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    {
+      "name": "Public recovery browser workflows",
+      "status": "PASS",
+      "cases": 18,
+      "artifact": "P1_DRAFT_RECOVERY_BROWSER.json"
+    },
+    {
+      "name": "Public workspace regression workflows",
+      "status": "PASS",
+      "cases": 41,
+      "artifact": "P1_RECOVERY_REGRESSION_BROWSER.json"
+    },
+    {
+      "name": "10,004-request filter event-to-frame reference budget",
+      "status": "FAIL",
+      "target_p95_ms": 100,
+      "observed_p95_ms": 867.2,
+      "synchronous_work_p95_ms": 4.2,
+      "artifact": "P1_DRAFT_RECOVERY_PERFORMANCE.json",
+      "tracked_by": "P1-015"
+    }
+  ],
+  "source_sha256": {
+    "docs/roadmap/requirements.json": "533ca2278f87bd1647f3f93009d32b19741f97eda0d28773cbbb5ad1704dfa9d",
+    "docs/roadmap/task-tracker.json": "218afd114786a7b128952e2969f29822d6c42da725cf988f94d352fc760e4f35",
+    "package-lock.json": "5953a53985c7fedcf35aa429b631a163657926f58013439f2dea78fbe371364f",
+    "package.json": "a52b3adbcd5fdbe9132b069ba09cba5e95517fe40da85ad6175a339a366ba15f",
+    "public/app.js": "6b771530b476d6c0a8fe5f33c25490e0254df3b4a51ba40d70d692647ccce9ad",
+    "public/assets/studio.js": "4aef72d462a3b8ccc2811a720a7cd7337db40a6b290c83792bc3c567f4e3ec38",
+    "public/studio.html": "332fcdbe5db06234f455d6e75724b84f79af3a7771d2554121934a215a709d8d",
+    "scripts/benchmark-browser.mjs": "dc96b5ca25849c67e16c74050721541e1d09fcb51177fa4ecc482f7fbd4249e2",
+    "scripts/check-p1-draft-recovery.mjs": "1872ec0f21d17342ba6d32aabe969e22f38c077f69052c137506bfdc7241f1ef",
+    "scripts/check-p1-reconciliation.mjs": "ecb3b5a9e16e481302ee66c03b86091f7a481c273c5757839ae51358acf96502",
+    "scripts/check-p1-workspace-regression.mjs": "6624853b938c8d56ce6876709e746904ed6c8498efe059e26ca43a6e9ccd5a97",
+    "scripts/p1-draft-restart-fixture.mjs": "5302f0a6b25855f1325bec1696d369e23f1e5ab3ea3b253857dd68bd9df50fe7",
+    "scripts/roadmap-tracker.mjs": "2b7614d8c6830760288e100bff2890bf50cf3e0ee559213201af4c94350f4731",
+    "src/server/StudioServer.ts": "ec754f7f7104ff20cbd187038258ac48cdcde79122d60ba3cc4b17405e97bc26",
+    "tests/roadmap-tracker.test.ts": "383c8f6bf419feb8816f016eab1b2424720c1999c62a80930ed231477f3044e3",
+    "tests/workspace-integrity.test.ts": "5a80637056bf9d999e1a46e0cfebc0f74ca3b80509e3dffae3e3ad331bba9443",
+    "web/draft-recovery.js": "abd3df505194d71d8923a5589de02ece936324eab81c1ebeed596e7a7a8f9b3b",
+    "web/studio.js": "740156993eb320ecda90eb479637dc1222b3d7ba2970d454f99183e79d05215e"
+  },
+  "limitations": [
+    "Functional browser checks are manual Ego Page API workflows, not headless CI or cross-OS/installed-editor certification.",
+    "The two retained full event-to-frame filter runs fail the target. Synchronous work and blank-page control do not establish the cause of Rea outliers.",
+    "Draft recovery is opt-in plaintext browser-origin storage with acknowledged transaction boundaries, not encrypted secrets or canonical backup/restore.",
+    "No stable release, migration of live workspace data, remote publish or merge was performed."
+  ],
+  "verdict": "FAIL -- P1 remains open; filter p95 867.2 ms exceeds the existing 100 ms target. Tracker and optional recovery increment checks passed."
+}
