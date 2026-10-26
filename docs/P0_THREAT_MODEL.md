@@ -4,7 +4,7 @@
 
 ## Trust assumptions
 
-The local OS account, installed Rea application code and explicitly selected workspace are trusted. The service binds to loopback. Host/Origin/Fetch Metadata checks restrict browser use; they do not authenticate other local native processes. Multi-user or remotely hosted operation requires the P9 authenticated-server design.
+The local OS account, installed PacketLark application code and explicitly selected workspace are trusted. The service binds to loopback. Host/Origin/Fetch Metadata checks restrict browser use; they do not authenticate other local native processes. Multi-user or remotely hosted operation requires the P9 authenticated-server design.
 
 Target API responses, imported document content, malformed bodies, network timing and consumer mutation are treated as untrusted inputs. Imported scripts currently execute as trusted, user-invoked automation inside a bounded interpreter. They can make HTTP requests, including local/private destinations. The complete import-review/destination-grant policy and worker architecture remain P3 release requirements. Do not interpret interpreter isolation or a passing advisory scan as approval to run hostile collections.
 

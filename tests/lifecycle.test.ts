@@ -5,7 +5,7 @@ import path from "node:path";
 import os from "node:os";
 import { StudioServer } from "../src/server/StudioServer.js";
 it("stopping Studio cancels an active direct execution and closes its upstream connection", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-stop-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-stop-"));
   let received: () => void, closed: () => void;
   const started = new Promise<void>((resolve) => (received = resolve)),
     upstreamClosed = new Promise<void>((resolve) => (closed = resolve));
@@ -47,7 +47,7 @@ it("stopping Studio cancels an active direct execution and closes its upstream c
 });
 
 it("admits at most two direct executions while keeping cancellation available", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-admission-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-admission-"));
   let count = 0,
     received: () => void;
   const started = new Promise<void>((resolve) => (received = resolve));
@@ -93,7 +93,7 @@ it("admits at most two direct executions while keeping cancellation available", 
   }
 });
 it("rejects an oversized declared API body before waiting for its bytes", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-api-body-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-body-"));
   const studio = new StudioServer(0, 0, root);
   const port = await studio.start();
   let request: http.ClientRequest;

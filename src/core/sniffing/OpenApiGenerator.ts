@@ -152,7 +152,7 @@ export class OpenApiGenerator {
     if (origin && serversSet.size === 0)
       throw new Error("No captured traffic matches the selected origin");
     return {
-      "x-rea-inference": {
+      "x-packetlark-inference": {
         source: "observed traffic",
         completeContract: false,
         reviewRequired: true,
@@ -162,7 +162,7 @@ export class OpenApiGenerator {
         title: apiTitle,
         version: apiVersion,
         description:
-          "Auto-generated specification reverse-engineered from live HTTP traffic via ReaAPI Studio.",
+          "Auto-generated specification reverse-engineered from live HTTP traffic via PacketLark.",
       },
       servers: Array.from(serversSet).map((s) => ({ url: s })),
       paths: pathsObj,

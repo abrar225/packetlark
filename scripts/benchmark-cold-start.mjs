@@ -6,12 +6,12 @@ import path from "node:path";
 const samples = 30;
 const measurements = [];
 for (let i = 0; i < samples; i++) {
-  const workspace = await mkdtemp(path.join(os.tmpdir(), "rea-cold-"));
+  const workspace = await mkdtemp(path.join(os.tmpdir(), "packetlark-cold-"));
   const start = performance.now();
   const child = spawn(
     process.execPath,
     [
-      path.resolve("bin/rea-api.js"),
+      path.resolve("bin/packetlark.js"),
       "studio",
       "--port",
       "0",

@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 describe("runner workbench API", () => {
-  const workspace = mkdtempSync(join(tmpdir(), "rea-run-api-"));
+  const workspace = mkdtempSync(join(tmpdir(), "packetlark-run-api-"));
   const studio = new StudioServer(0, 0, workspace);
   const peer = createServer((_request, response) => {
     response.writeHead(200, { "Content-Type": "application/json" });

@@ -6,7 +6,7 @@ import http from "node:http";
 import { StudioServer } from "../src/server/StudioServer.js";
 
 describe("Local studio origin and web boundaries", () => {
-  const workspace = mkdtempSync(join(tmpdir(), "rea-web-"));
+  const workspace = mkdtempSync(join(tmpdir(), "packetlark-web-"));
   const studio = new StudioServer(4498, 8498, workspace);
   beforeAll(() => studio.start());
   afterAll(async () => {

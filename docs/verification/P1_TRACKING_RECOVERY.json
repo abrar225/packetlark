@@ -82,7 +82,7 @@
   },
   "limitations": [
     "Functional browser checks are manual Ego Page API workflows, not headless CI or cross-OS/installed-editor certification.",
-    "The two retained full event-to-frame filter runs fail the target. Synchronous work and blank-page control do not establish the cause of Rea outliers.",
+    "The two retained full event-to-frame filter runs fail the target. Synchronous work and blank-page control do not establish the cause of PacketLark outliers.",
     "Draft recovery is opt-in plaintext browser-origin storage with acknowledged transaction boundaries, not encrypted secrets or canonical backup/restore.",
     "No stable release, migration of live workspace data, remote publish or merge was performed."
   ],

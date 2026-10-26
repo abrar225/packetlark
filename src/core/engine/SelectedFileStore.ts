@@ -39,7 +39,7 @@ export class SelectedFileStore {
     // Avoid an unobserved rejection while the file is being opened.
     void cancelled.catch(()=>{});
     try {
-      signal.throwIfAborted();this.#directory??=mkdtemp(join(tmpdir(),'rea-selected-'));
+      signal.throwIfAborted();this.#directory??=mkdtemp(join(tmpdir(),'packetlark-selected-'));
       path=join(await this.#directory,id);handle=await open(path,'wx',0o600);
       while(true){
         signal.throwIfAborted();const next=await Promise.race([iterator.next(),cancelled]);

@@ -18,9 +18,9 @@ export async function verifyP2InheritedAuth(page, baseUrl) {
   const apply = async () => { await page.click('[data-workspace-authoring] button[type=submit]'); await page.waitForFunction(() => document.getElementById('modal-backdrop').style.display !== 'flex'); };
   const latest = () => call(`/api/collections/${id}`);
   try {
-    await page.goto(baseUrl + '/studio'); await page.waitForFunction(() => Boolean(window.ReaWorkspaceAuthoring));
+    await page.goto(baseUrl + '/studio'); await page.waitForFunction(() => Boolean(window.PacketLarkWorkspaceAuthoring));
     await call('/api/collections', 'POST', { id, name: id, auth: { type: 'bearer', bearerToken: 'p2-parent-plaintext' }, variables: [{ key: 'api_token', value: 'p2-variable-plaintext', secret: true }], items: [{ id: folderId, name: 'Parent folder', isFolder: true, auth: { type: 'unsupported', originalType: 'digest', postman: { digest: [{ key: 'realm', value: 'opaque' }] } }, items: [] }] });
-    await page.goto(baseUrl + '/studio'); await page.waitForFunction(() => performance.getEntriesByName('rea:studio-ready').length > 0);
+    await page.goto(baseUrl + '/studio'); await page.waitForFunction(() => performance.getEntriesByName('packetlark:studio-ready').length > 0);
     await open(false);
     assert.equal(await page.evaluate(() => document.querySelector('#inherited-auth-controls input[type=password]').value), 'p2-parent-plaintext');
     assert.equal(await page.evaluate(() => document.querySelector('[aria-label="Inherited variables (JSON array)"]').hidden), true);

@@ -11,7 +11,7 @@ export class WorkbenchActivity {
       this.database = await new Promise((resolve, reject) => {
         let expired = false;
         const timer = setTimeout(() => { expired = true; reject(new Error("Example storage did not open within 3 seconds")); }, 3000);
-        const request = indexedDB.open("rea-reviewed-examples-v1", 1);
+        const request = indexedDB.open("packetlark-reviewed-examples-v1", 1);
         request.onupgradeneeded = () => request.result.createObjectStore("examples", { keyPath: "id" }).createIndex("workspace", "workspace");
         request.onerror = () => { clearTimeout(timer); reject(request.error); };
         request.onblocked = () => { clearTimeout(timer); expired = true; reject(new Error("Example storage upgrade blocked")); };

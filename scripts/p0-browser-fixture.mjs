@@ -1,10 +1,10 @@
-// Isolated fixture: never points at the user's .rea-api workspace.
+// Isolated fixture: never points at the user's .packetlark workspace.
 import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { StudioServer } from "../dist/server/StudioServer.js";
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-p0-browser-"));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-p0-browser-"));
 const target = http.createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
   setTimeout(

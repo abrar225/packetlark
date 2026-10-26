@@ -1,7 +1,7 @@
 import { CredentialControls } from './credential-controls.js';
 import { HttpControls } from './http-controls.js';
-window.ReaCredentialControls = CredentialControls;
-window.ReaHttpControls = HttpControls;
+window.PacketLarkCredentialControls = CredentialControls;
+window.PacketLarkHttpControls = HttpControls;
 import "./fonts.css";
 import { CollectionTree } from "./collection-tree.js";
 import { WorkspaceSync } from "./workspace-sync.js";
@@ -10,15 +10,15 @@ import { WorkspaceAuthoring } from "./workspace-authoring.js";
 import { WorkbenchState, WorkbenchActivity, sanitizeExample } from "./workbench-activity.js";
 import { validWorkspaceResource } from "../src/core/models/WorkspaceValidation.ts";
 import { resolveCollectionRequest } from "../src/core/models/CollectionContext.ts";
-window.ReaCollectionTree = CollectionTree;
-window.ReaWorkspaceSync = WorkspaceSync;
-window.ReaDraftRecovery = DraftRecovery;
-window.ReaWorkspaceAuthoring = WorkspaceAuthoring;
-window.ReaWorkbenchState = WorkbenchState;
-window.ReaWorkbenchActivity = WorkbenchActivity;
-window.ReaSanitizeExample = sanitizeExample;
-window.ReaValidWorkspaceResource = validWorkspaceResource;
-window.ReaResolveCollectionRequest = resolveCollectionRequest;
+window.PacketLarkCollectionTree = CollectionTree;
+window.PacketLarkWorkspaceSync = WorkspaceSync;
+window.PacketLarkDraftRecovery = DraftRecovery;
+window.PacketLarkWorkspaceAuthoring = WorkspaceAuthoring;
+window.PacketLarkWorkbenchState = WorkbenchState;
+window.PacketLarkWorkbenchActivity = WorkbenchActivity;
+window.PacketLarkSanitizeExample = sanitizeExample;
+window.PacketLarkValidWorkspaceResource = validWorkspaceResource;
+window.PacketLarkResolveCollectionRequest = resolveCollectionRequest;
 import {
   createIcons,
   Plus,

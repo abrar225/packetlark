@@ -1,6 +1,6 @@
 # P1 canonical workspace repository
 
-P1-005 and P1-006 use `WorkspaceRepository` as the sole storage owner. Studio inherits its public commands; CLI workspace commands and MCP reads use the same owner. Transport, execution and browser state remain outside the repository. This is an accepted opt-in storage transition; development has not migrated the live `.rea-api` directory.
+P1-005 and P1-006 use `WorkspaceRepository` as the sole storage owner. Studio inherits its public commands; CLI workspace commands and MCP reads use the same owner. Transport, execution and browser state remain outside the repository. This is an accepted opt-in storage transition; development has not migrated the live `.packetlark` directory.
 
 ## Public contract
 
@@ -28,15 +28,15 @@ Managed reads retain no-follow regular-file checks and bound directory identitie
 
 ## Migration and restore
 
-Stop Studio before applying a migration/restore so the CLI can acquire the writer lease. Preview is available while a writer is running. CLI paths are project roots, with `.rea-api` appended.
+Stop Studio before applying a migration/restore so the CLI can acquire the writer lease. Preview is available while a writer is running. CLI paths are project roots, with `.packetlark` appended.
 
 ```sh
-rea-api workspace migrate --workspace /path/to/project
-rea-api workspace migrate --workspace /path/to/project --apply --checksum REVIEWED_PLAN_CHECKSUM
-rea-api workspace snapshot --workspace /path/to/project
-rea-api workspace backup --workspace /path/to/project --backup-file /path/to/new-backup.json
-rea-api workspace restore --workspace /path/to/project --backup-file /path/to/backup.json
-rea-api workspace restore --workspace /path/to/project --backup-file /path/to/backup.json --apply --checksum REVIEWED_BACKUP_CHECKSUM --revision REVIEWED_CURRENT_REVISION
+packetlark workspace migrate --workspace /path/to/project
+packetlark workspace migrate --workspace /path/to/project --apply --checksum REVIEWED_PLAN_CHECKSUM
+packetlark workspace snapshot --workspace /path/to/project
+packetlark workspace backup --workspace /path/to/project --backup-file /path/to/new-backup.json
+packetlark workspace restore --workspace /path/to/project --backup-file /path/to/backup.json
+packetlark workspace restore --workspace /path/to/project --backup-file /path/to/backup.json --apply --checksum REVIEWED_BACKUP_CHECKSUM --revision REVIEWED_CURRENT_REVISION
 ```
 
 Migration retains the original files untouched, writes/fsyncs a logical old-format backup named `backup-CHECKSUM.json`, reads it back for verification, stages immutable objects and publishes the manifest last. Restore validates the whole backup, refuses unreviewed/stale destruction, retains a pre-restore backup and publishes a complete manifest transaction. It does not downgrade a workspace or overwrite retained legacy files. Backups contain workspace values and must be handled as private local data; nothing is uploaded.

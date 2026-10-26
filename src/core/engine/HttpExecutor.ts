@@ -678,7 +678,7 @@ export class HttpExecutor {
           body = { [Symbol.asyncIterator]: async function* () { yield* fileChunks(file); } };
           if (!headers.has("content-type")) headers.set("content-type",file.contentType);
         } else if (request.body?.mode === "form-data") {
-          const boundary = "rea-" + randomUUID();
+          const boundary = "packetlark-" + randomUUID();
           const parts: Array<Buffer | SelectedFile> = [];
           let serialized = 0;
           const add = (text:string) => { const chunk=Buffer.from(text);serialized+=chunk.length;parts.push(chunk); };

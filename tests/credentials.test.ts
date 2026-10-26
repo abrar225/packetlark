@@ -6,7 +6,7 @@ import { CredentialStore, type CredentialProvider } from '../src/core/security/C
 
 const dirs: string[] = [];
 async function fixture(workspaceId = 'workspace-A', provider?: CredentialProvider) {
-  const dir = await realpath(await mkdtemp(path.join(os.tmpdir(), 'rea-vault-'))); dirs.push(dir);
+  const dir = await realpath(await mkdtemp(path.join(os.tmpdir(), 'packetlark-vault-'))); dirs.push(dir);
   return { dir, store: new CredentialStore({ workspaceId, metadataPath: path.join(dir, 'metadata.json'), provider }) };
 }
 afterEach(async () => { for (const dir of dirs.splice(0)) await rm(dir, { recursive: true, force: true }); });

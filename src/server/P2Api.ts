@@ -8,7 +8,7 @@ import { validateJsonBody } from '../core/engine/JsonBodyValidation.js';
 import { credentialOrigin } from '../core/security/CredentialStore.js';
 import { scanCredentialCandidates, credentialMigrationValue, projectCredentialMigration, safeCredentialExport } from '../core/security/CredentialMigration.js';
 
-const cookieOrigin = 'https://rea-cookie-store.invalid';
+const cookieOrigin = 'https://packetlark-cookie-store.invalid';
 const bad = (message: string, code = 'ERR_P2_SETTINGS', statusCode = 400) => Object.assign(new Error(message), { code, statusCode });
 type CookieSettings = { enabled: boolean; credentialId?: string };
 interface MigrationPlan { kind: 'collections' | 'environments'; id: string; revision: string; source: any; origins: string[]; storage: 'session' | 'keychain'; expires: number }
@@ -163,8 +163,8 @@ export class P2Api {
     if (p === '/api/oauth/start' && req.method === 'POST') { send(await this.context.oauth.start(await readBody())); return true; }
     if (p === '/api/oauth/client-credentials' && req.method === 'POST') { send(await this.context.oauth.clientCredentials(await readBody())); return true; }
     if (p === '/api/oauth/callback' && req.method === 'GET') {
-      try { await this.context.oauth.callbackForUrl(this.baseUrl + p + url.search); res.writeHead(200, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end('Authorization complete. Close this window and select the stored connection in Rea.'); }
-      catch { res.writeHead(400, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end('Authorization did not complete. Return to Rea to review or start a new attempt.'); }
+      try { await this.context.oauth.callbackForUrl(this.baseUrl + p + url.search); res.writeHead(200, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end('Authorization complete. Close this window and select the stored connection in PacketLark.'); }
+      catch { res.writeHead(400, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end('Authorization did not complete. Return to PacketLark to review or start a new attempt.'); }
       return true;
     }
     const oauth = p.match(/^\/api\/oauth\/([a-f0-9-]{36})\/(clear|revoke)$/);

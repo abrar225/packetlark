@@ -1255,3 +1255,8 @@ html.lenis body {
 .line-numbers {
   color: #91899f;
 }
+
+/* Keep the full product name readable at compact header widths. */
+.wordmark > span { font-size: 27px; letter-spacing: -1.1px; white-space: nowrap; }
+@media (max-width: 1100px) { .wordmark-detail { display: none; } }
+@media (max-width: 480px) { .wordmark > span { font-size: 22px; } .wordmark { gap: 7px; } .wordmark img { width: 34px; height: 34px; } }

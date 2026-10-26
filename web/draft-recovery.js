@@ -1,4 +1,4 @@
-const DATABASE = "rea-draft-recovery-v1";
+const DATABASE = "packetlark-draft-recovery-v1";
 const MAX_SNAPSHOT_BYTES = 8 * 1024 * 1024;
 const MAX_WORKSPACE_BYTES = 32 * 1024 * 1024;
 const MAX_SESSIONS = 16;

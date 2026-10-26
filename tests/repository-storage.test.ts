@@ -13,8 +13,8 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 const roots: string[] = [];
 const owners: WorkspaceRepository[] = [];
 function fixture() {
-  const base = fs.mkdtempSync(path.join(os.tmpdir(), "rea-repository-")); roots.push(base);
-  const root = path.join(base, ".rea-api");
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-repository-")); roots.push(base);
+  const root = path.join(base, ".packetlark");
   const repo = new WorkspaceRepository(root); owners.push(repo);
   return { base, root, repo };
 }
@@ -228,7 +228,7 @@ describe("canonical workspace repository", () => {
   it("uses the migrated owner through real CLI processes and stdio MCP instead of retained legacy files", async () => {
     const { repo, base, root } = fixture(); repo.close();
     const cli = (...args: string[]) => {
-      const result = spawnSync(process.execPath, ["bin/rea-api.js", "workspace", ...args, "--workspace", base], { encoding: "utf8" });
+      const result = spawnSync(process.execPath, ["bin/packetlark.js", "workspace", ...args, "--workspace", base], { encoding: "utf8" });
       expect(result.stderr).toBe(""); expect(result.status).toBe(0);
       return JSON.parse(result.stdout);
     };
@@ -241,7 +241,7 @@ describe("canonical workspace repository", () => {
     const restorePlan = cli("restore", "--backup-file", backupFile);
     expect(restorePlan.checksum).toBe(saved.checksum);
     cli("restore", "--backup-file", backupFile, "--apply", "--consent", "plaintext", "--checksum", saved.checksum, "--revision", restorePlan.revision);
-    const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve("bin/rea-api.js"), "mcp", "--workspace", base], stderr: "pipe" });
+    const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve("bin/packetlark.js"), "mcp", "--workspace", base], stderr: "pipe" });
     const client = new Client({ name: "repository-test", version: "1" });
     try {
       await client.connect(transport);

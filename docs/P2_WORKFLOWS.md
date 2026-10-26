@@ -20,7 +20,7 @@ Sending a request can consume an NDJSON stream with headers, progress, and compl
 
 ## Integration hooks
 
-`window.ReaCredentialControls` and `window.ReaHttpControls` are exported by the studio bundle. Both accept `{getRequest, changed, fetch?}`. `getRequest()` must return the current request object; `changed()` uses existing draft ownership and dirty tracking. Call `renderAuth(container)` and `renderBody(container)` on draft/tab render. The remaining entry points are `openManager()`, `openOAuth()`, `openTls()`, `openCookies()`, `execute(payload, {signal,onEvent})`, and `renderInspector(container,response)`.
+`window.PacketLarkCredentialControls` and `window.PacketLarkHttpControls` are exported by the studio bundle. Both accept `{getRequest, changed, fetch?}`. `getRequest()` must return the current request object; `changed()` uses existing draft ownership and dirty tracking. Call `renderAuth(container)` and `renderBody(container)` on draft/tab render. The remaining entry points are `openManager()`, `openOAuth()`, `openTls()`, `openCookies()`, `execute(payload, {signal,onEvent})`, and `renderInspector(container,response)`.
 
 Credential migration, file upload, and TLS application capture the request object and reject stale application after a draft switch. Independent native dialogs trap keyboard focus, restore focus on close, disable pending actions, retain values on errors, and refuse Escape while a write is pending. Existing request tabs and workspace synchronization remain owned by the application.
 

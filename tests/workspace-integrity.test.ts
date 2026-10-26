@@ -18,7 +18,7 @@ async function workspace(
     restart: () => Promise<void>,
   ) => Promise<void>,
 ) {
-  const root = fs.mkdtempSync(path.join(tmpdir(), "rea-integrity-"));
+  const root = fs.mkdtempSync(path.join(tmpdir(), "packetlark-integrity-"));
   let server: StudioServer;
   let port: number;
   const restart = async () => {
@@ -94,7 +94,7 @@ describe("workspace API and restart integrity", () => {
       );
     }));
   it("does not create initialization metadata past the managed directory limit", async () => {
-    const root = fs.mkdtempSync(path.join(tmpdir(), "rea-init-entry-limit-"));
+    const root = fs.mkdtempSync(path.join(tmpdir(), "packetlark-init-entry-limit-"));
     const directory = path.join(root, "collections");
     fs.mkdirSync(directory);
     for (let i = 0; i < 2047; i++)
@@ -281,9 +281,9 @@ describe("workspace API and restart integrity", () => {
   it.skipIf(process.platform === "win32")(
     "rejects symlinked managed directories before initialization writes outside the workspace",
     async () => {
-      const root = fs.mkdtempSync(path.join(tmpdir(), "rea-linked-root-"));
+      const root = fs.mkdtempSync(path.join(tmpdir(), "packetlark-linked-root-"));
       const outside = fs.mkdtempSync(
-        path.join(tmpdir(), "rea-linked-outside-"),
+        path.join(tmpdir(), "packetlark-linked-outside-"),
       );
       try {
         fs.symlinkSync(outside, path.join(root, "collections"), "dir");
@@ -306,7 +306,7 @@ describe("workspace API and restart integrity", () => {
           const directory = path.join(root, kind);
           const retained = directory + "-retained";
           const outside = fs.mkdtempSync(
-            path.join(tmpdir(), "rea-redirected-"),
+            path.join(tmpdir(), "packetlark-redirected-"),
           );
           const file = path.join(outside, original.id + ".json");
           const data = fs.readFileSync(
@@ -386,7 +386,7 @@ describe("workspace API and restart integrity", () => {
   it.skipIf(process.platform === "win32")(
     "rejects a linked initialization marker instead of treating it as a committed workspace",
     async () => {
-      const root = fs.mkdtempSync(path.join(tmpdir(), "rea-linked-marker-"));
+      const root = fs.mkdtempSync(path.join(tmpdir(), "packetlark-linked-marker-"));
       const outside = path.join(root, "outside-marker");
       const original = new StudioServer(0, 0, root);
       await original.stop();
@@ -629,7 +629,7 @@ describe("workspace API and restart integrity", () => {
     }));
 
   it("resumes an interrupted legacy migration without dropping remaining resources", async () => {
-    const root = fs.mkdtempSync(path.join(tmpdir(), "rea-migration-"));
+    const root = fs.mkdtempSync(path.join(tmpdir(), "packetlark-migration-"));
     const resources = ["first", "second", "third"].map((id) => ({
       id,
       name: id,
@@ -692,7 +692,7 @@ describe("workspace API and restart integrity", () => {
       }
     }));
   it("migrates compact legacy data without creating an oversized unreadable canonical file", async () => {
-    const root = fs.mkdtempSync(path.join(tmpdir(), "rea-migration-size-"));
+    const root = fs.mkdtempSync(path.join(tmpdir(), "packetlark-migration-size-"));
     const resource = {
       id: "compact",
       name: "Compact",

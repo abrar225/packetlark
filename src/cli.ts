@@ -32,7 +32,7 @@ export async function main(args: string[]): Promise<number> {
   const command = args[0] || "studio";
   if (["--help", "-h", "help"].includes(command)) {
     console.log(
-      `Rea API Studio\n\nrea-api studio [--port 4040] [--sniffer-port 8085] [--workspace directory]\nrea-api run collection.json [--environment env.json] [--data rows.json|rows.csv]\n  [--iterations count] [--folder name-or-request-id] [--timeout milliseconds]\n  [--bail] [--reporter cli|json|junit] [--report-file path] [--workspace directory]\nrea-api mcp --workspace directory\nrea-api workspace status --workspace directory\nrea-api workspace recover --workspace directory --token reviewed-owner-token\nrea-api workspace snapshot --workspace directory\nrea-api workspace migrate --workspace directory [--apply --checksum reviewed-plan-checksum]\nrea-api workspace backup --workspace directory --backup-file new-backup.json\nrea-api workspace restore --workspace directory --backup-file backup.json [--apply --checksum reviewed-backup-checksum --revision reviewed-workspace-revision]\n\nRuns imported scripts in the bounded interpreter. Run only collections whose network behavior you trust.\nSnapshot and backup exports redact inline credentials by default. Raw exports require --include-secrets --consent plaintext.\nMigration/restore apply requires --consent plaintext when its lossless recovery backup contains inline credentials.\nJSON/JUnit reports omit bodies, headers and environment values by default.`,
+      `PacketLark\n\npacketlark studio [--port 4040] [--sniffer-port 8085] [--workspace directory]\npacketlark run collection.json [--environment env.json] [--data rows.json|rows.csv]\n  [--iterations count] [--folder name-or-request-id] [--timeout milliseconds]\n  [--bail] [--reporter cli|json|junit] [--report-file path] [--workspace directory]\npacketlark mcp --workspace directory\npacketlark workspace status --workspace directory\npacketlark workspace recover --workspace directory --token reviewed-owner-token\npacketlark workspace snapshot --workspace directory\npacketlark workspace migrate --workspace directory [--apply --checksum reviewed-plan-checksum]\npacketlark workspace backup --workspace directory --backup-file new-backup.json\npacketlark workspace restore --workspace directory --backup-file backup.json [--apply --checksum reviewed-backup-checksum --revision reviewed-workspace-revision]\n\nRuns imported scripts in the bounded interpreter. Run only collections whose network behavior you trust.\nSnapshot and backup exports redact inline credentials by default. Raw exports require --include-secrets --consent plaintext.\nMigration/restore apply requires --consent plaintext when its lossless recovery backup contains inline credentials.\nJSON/JUnit reports omit bodies, headers and environment values by default.`,
     );
     return 0;
   }
@@ -111,7 +111,7 @@ export async function main(args: string[]): Promise<number> {
   )
     throw new Error("Timeout must be 1–300000 ms");
   if (["workspace-snapshot", "workspace-migrate", "workspace-backup", "workspace-restore"].includes(command)) {
-    const root = path.resolve(String(flags.workspace || process.cwd()), ".rea-api");
+    const root = path.resolve(String(flags.workspace || process.cwd()), ".packetlark");
     const mutating = !!flags.apply;
     if (mutating && !["workspace-migrate", "workspace-restore"].includes(command)) throw new Error("Invalid apply command");
     const repository = new WorkspaceRepository(root, { readOnly: !mutating });
@@ -163,7 +163,7 @@ export async function main(args: string[]): Promise<number> {
     console.log(
       JSON.stringify(
         WorkspaceLease.inspect(
-          path.resolve(String(flags.workspace || process.cwd()), ".rea-api"),
+          path.resolve(String(flags.workspace || process.cwd()), ".packetlark"),
         ),
       ),
     );
@@ -173,7 +173,7 @@ export async function main(args: string[]): Promise<number> {
     console.log(
       JSON.stringify(
         WorkspaceLease.recover(
-          path.resolve(String(flags.workspace || process.cwd()), ".rea-api"),
+          path.resolve(String(flags.workspace || process.cwd()), ".packetlark"),
           flags.token as string,
         ),
       ),
@@ -190,7 +190,7 @@ export async function main(args: string[]): Promise<number> {
         throw new Error("Ports must be between 0 and 65535");
     const workspace = path.resolve(
       String(flags.workspace || process.cwd()),
-      ".rea-api",
+      ".packetlark",
     );
     let server: StudioServer;
     const shutdown = async () => {
@@ -198,7 +198,7 @@ export async function main(args: string[]): Promise<number> {
         await server?.stop();
         process.exit(0);
       } catch (error) {
-        console.error("Rea: " + error.message);
+        console.error("PacketLark: " + error.message);
         process.exit(2);
       }
     };
@@ -207,7 +207,7 @@ export async function main(args: string[]): Promise<number> {
     try {
       server = new StudioServer(port, sniffer, workspace);
       const actual = await server.start();
-      console.log(`Rea API Studio: http://127.0.0.1:${actual}/studio`);
+      console.log(`PacketLark: http://127.0.0.1:${actual}/studio`);
       return 0;
     } catch (error) {
       for (const signal of signals) process.removeListener(signal, shutdown);
@@ -241,7 +241,7 @@ export async function main(args: string[]): Promise<number> {
   let execution: WorkspaceExecution | undefined;
   let pendingContext:Promise<WorkspaceExecution>|undefined;
   const context = async () => {
-    pendingContext??=import("./core/engine/WorkspaceExecution.js").then(({WorkspaceExecution})=>execution=new WorkspaceExecution(path.resolve(String(flags.workspace || process.cwd()),".rea-api")));
+    pendingContext??=import("./core/engine/WorkspaceExecution.js").then(({WorkspaceExecution})=>execution=new WorkspaceExecution(path.resolve(String(flags.workspace || process.cwd()),".packetlark")));
     return (await pendingContext).options();
   };
   const executionOptions:ExecutionOptions={

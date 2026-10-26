@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 // Public DOM/HTTP/IndexedDB checks. Use disposable p0-browser-fixture roots only.
 const ready = async (page, base) => {
   await page.goto(base + '/studio');
-  await page.waitForFunction(() => performance.getEntriesByName('rea:studio-ready').length);
+  await page.waitForFunction(() => performance.getEntriesByName('packetlark:studio-ready').length);
   await page.evaluate(() => { window.__alerts = []; window.alert = (text) => window.__alerts.push(text); window.confirm = () => true; });
 };
 const api = async (base, route, method = 'GET', body) => {
@@ -15,7 +15,7 @@ const closed = (page) => page.waitForFunction(() => document.getElementById('mod
 const examples = (page) => page.evaluate(async () => {
   const { id } = await (await fetch('/api/workspace/identity')).json();
   return new Promise((resolve, reject) => {
-    const open = indexedDB.open('rea-reviewed-examples-v1', 1);
+    const open = indexedDB.open('packetlark-reviewed-examples-v1', 1);
     open.onerror = () => reject(open.error);
     open.onsuccess = () => { const db = open.result, tx = db.transaction('examples'); const req = tx.objectStore('examples').index('workspace').getAll(IDBKeyRange.only(id)); req.onsuccess = () => resolve(req.result); tx.oncomplete = () => db.close(); };
   });

@@ -388,19 +388,19 @@ export class WorkspaceRepository {
         schemaVersion: "2.1.0",
         variables: [
           { key: "baseUrl", value: "https://api.github.com", enabled: true },
-          { key: "repo", value: "abrar225/rea-api-studio", enabled: true },
+          { key: "repo", value: "abrar225/packetlark", enabled: true },
         ],
         items: [
           {
             id: "req_1",
-            name: "Get Rea repository",
+            name: "Get PacketLark repository",
             request: {
               id: "req_1",
-              name: "Get Rea repository",
+              name: "Get PacketLark repository",
               method: "GET",
               url: "{{baseUrl}}/repos/{{repo}}",
               headers: [
-                { key: "User-Agent", value: "ReaAPI-Studio", enabled: true },
+                { key: "User-Agent", value: "PacketLark", enabled: true },
               ],
               queryParams: [],
               body: { mode: "none" },
@@ -412,7 +412,7 @@ export class WorkspaceRepository {
 
 pm.test("Has valid repo name", function () {
     var data = pm.response.json();
-    pm.expect(data.name).to.equal("rea-api-studio");
+    pm.expect(data.name).to.equal("packetlark");
 });`,
             },
           },
@@ -439,8 +439,8 @@ pm.test("Has valid repo name", function () {
                 raw: JSON.stringify(
                   {
                     timestamp: "{{$timestamp}}",
-                    client: "ReaAPI Studio",
-                    message: "Hello from Rea",
+                    client: "PacketLark",
+                    message: "Hello from PacketLark",
                   },
                   null,
                   2,
@@ -450,7 +450,7 @@ pm.test("Has valid repo name", function () {
               testScript: `pm.test("Echo response received", function () {
     pm.expect(pm.response.code).to.equal(200);
     var json = pm.response.json();
-    pm.expect(json.json.client).to.equal("ReaAPI Studio");
+    pm.expect(json.json.client).to.equal("PacketLark");
 });`,
             },
           },

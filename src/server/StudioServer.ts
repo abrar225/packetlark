@@ -33,7 +33,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "../../");
 const publicDir = path.resolve(projectRoot, "public");
-const storageDir = path.resolve(projectRoot, ".rea-api");
+const storageDir = path.resolve(projectRoot, ".packetlark");
 
 function findAndUpdateRequest(
   items: CollectionItem[],
@@ -423,7 +423,7 @@ export class StudioServer extends WorkspaceRepository {
       sendJson({
         status: "healthy",
         uptimeSec: Math.floor(process.uptime()),
-        product: "rea-api-studio",
+        product: "packetlark",
         version: "1.1.0",
         memoryRssMb: (mem.rss / 1024 / 1024).toFixed(2),
         memoryHeapUsedMb: (mem.heapUsed / 1024 / 1024).toFixed(2),

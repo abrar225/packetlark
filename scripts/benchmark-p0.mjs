@@ -8,7 +8,7 @@ import { TrafficSnifferProxy } from "../dist/core/sniffing/TrafficSnifferProxy.j
 import { StudioServer } from "../dist/server/StudioServer.js";
 const samples = 200,
   warmup = 20;
-const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "rea-p0-bench-"));
+const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-p0-bench-"));
 const payload = JSON.stringify({ message: "x".repeat(1024) });
 const target = http.createServer((_req, res) => {
   res.setHeader("Content-Type", "application/json");

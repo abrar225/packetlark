@@ -51,7 +51,7 @@ export class WorkspaceAuthoring {
         if (this.busy) { event.preventDefault(); return; }
         this.dragged = { collectionId: node.col.id, itemId: node.item?.id || node.request?.id, revision: node.col.revision };
         event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setData('application/x-rea-workspace-item', JSON.stringify(this.dragged));
+        event.dataTransfer.setData('application/x-packetlark-workspace-item', JSON.stringify(this.dragged));
       };
       row.ondragend = () => { this.dragged = null; };
     }

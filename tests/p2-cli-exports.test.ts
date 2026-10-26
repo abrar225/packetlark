@@ -10,8 +10,8 @@ const roots: string[] = [];
 const secret = 'cli-inline-sensitive-fixture';
 const reference = '{{secret:11111111-1111-4111-8111-111111111111}}';
 function fixture(migrated = false) {
-  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'rea-cli-export-')); roots.push(base);
-  const root = path.join(base, '.rea-api');
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'packetlark-cli-export-')); roots.push(base);
+  const root = path.join(base, '.packetlark');
   const repo = new WorkspaceRepository(root);
   repo.persistEnvironment('export-env', { id: 'export-env', name: 'Export fixture', values: [
     { key: 'apiKey', value: secret, enabled: true },

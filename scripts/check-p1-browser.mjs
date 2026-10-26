@@ -39,7 +39,7 @@ export async function verifyNativeIdentity(page, baseUrl) {
       );
     await page.goto(baseUrl + "/studio");
     await page.waitForFunction(
-      () => performance.getEntriesByName("rea:studio-ready").length > 0,
+      () => performance.getEntriesByName("packetlark:studio-ready").length > 0,
     );
     assert.equal(
       await page.evaluate(
@@ -188,7 +188,7 @@ export async function verifyNestedSearch(page, baseUrl) {
 export async function verifyLargeWorkspace(page, baseUrl) {
   await page.goto(baseUrl + "/studio");
   await page.waitForFunction(
-    () => performance.getEntriesByName("rea:studio-ready").length > 0,
+    () => performance.getEntriesByName("packetlark:studio-ready").length > 0,
   );
   const count = await page.evaluate(
     () => document.querySelectorAll(".request-item").length,

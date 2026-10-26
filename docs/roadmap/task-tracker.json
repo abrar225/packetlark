@@ -119,8 +119,8 @@
       "title": "Bounded collection rendering and stable request identities",
       "status": "done",
       "requirement_ids": [
-        "REA-023",
-        "REA-025"
+        "PACKETLARK-023",
+        "PACKETLARK-025"
       ],
       "depends_on": [],
       "acceptance": [
@@ -141,8 +141,8 @@
       "title": "Workspace path and canonical-read integrity",
       "status": "done",
       "requirement_ids": [
-        "REA-030",
-        "REA-072"
+        "PACKETLARK-030",
+        "PACKETLARK-072"
       ],
       "depends_on": [
         "P1-001"
@@ -164,7 +164,7 @@
       "title": "Single-writer lease and explicit exited-owner recovery",
       "status": "done",
       "requirement_ids": [
-        "REA-072"
+        "PACKETLARK-072"
       ],
       "depends_on": [
         "P1-002"
@@ -187,9 +187,9 @@
       "title": "External-file reconciliation and conflict context review",
       "status": "done",
       "requirement_ids": [
-        "REA-026",
-        "REA-030",
-        "REA-088"
+        "PACKETLARK-026",
+        "PACKETLARK-030",
+        "PACKETLARK-088"
       ],
       "depends_on": [
         "P1-003"
@@ -212,8 +212,8 @@
       "title": "Versioned workspace repository and storage ADR",
       "status": "done",
       "requirement_ids": [
-        "REA-023",
-        "REA-030"
+        "PACKETLARK-023",
+        "PACKETLARK-030"
       ],
       "depends_on": [
         "P1-004"
@@ -238,9 +238,9 @@
       "title": "Migration dry-run, backup and validated restore",
       "status": "done",
       "requirement_ids": [
-        "REA-028",
-        "REA-072",
-        "REA-087"
+        "PACKETLARK-028",
+        "PACKETLARK-072",
+        "PACKETLARK-087"
       ],
       "depends_on": [
         "P1-005"
@@ -265,9 +265,9 @@
       "title": "Complete collection and folder authoring",
       "status": "done",
       "requirement_ids": [
-        "REA-010",
-        "REA-023",
-        "REA-024"
+        "PACKETLARK-010",
+        "PACKETLARK-023",
+        "PACKETLARK-024"
       ],
       "depends_on": [
         "P1-004"
@@ -294,9 +294,9 @@
       "title": "Complete request authoring and identity-safe edits",
       "status": "done",
       "requirement_ids": [
-        "REA-023",
-        "REA-024",
-        "REA-026"
+        "PACKETLARK-023",
+        "PACKETLARK-024",
+        "PACKETLARK-026"
       ],
       "depends_on": [
         "P1-007"
@@ -322,8 +322,8 @@
       "title": "Multiple request tabs and response ownership",
       "status": "done",
       "requirement_ids": [
-        "REA-025",
-        "REA-026"
+        "PACKETLARK-025",
+        "PACKETLARK-026"
       ],
       "depends_on": [
         "P1-004"
@@ -349,9 +349,9 @@
       "title": "Bounded request history, examples and undo",
       "status": "done",
       "requirement_ids": [
-        "REA-025",
-        "REA-085",
-        "REA-087"
+        "PACKETLARK-025",
+        "PACKETLARK-085",
+        "PACKETLARK-087"
       ],
       "depends_on": [
         "P1-009"
@@ -377,8 +377,8 @@
       "title": "Durable draft and restart recovery",
       "status": "done",
       "requirement_ids": [
-        "REA-026",
-        "REA-072"
+        "PACKETLARK-026",
+        "PACKETLARK-072"
       ],
       "depends_on": [
         "P1-004"
@@ -404,8 +404,8 @@
       "title": "Import corpus and semantic migration reports",
       "status": "done",
       "requirement_ids": [
-        "REA-028",
-        "REA-031"
+        "PACKETLARK-028",
+        "PACKETLARK-031"
       ],
       "depends_on": [
         "P1-006"
@@ -429,7 +429,7 @@
       "title": "Environment editing and scope diagnostics",
       "status": "done",
       "requirement_ids": [
-        "REA-027"
+        "PACKETLARK-027"
       ],
       "depends_on": [
         "P1-004"
@@ -454,16 +454,16 @@
       "title": "P1 acceptance and phase handoff",
       "status": "done",
       "requirement_ids": [
-        "REA-023",
-        "REA-024",
-        "REA-025",
-        "REA-026",
-        "REA-027",
-        "REA-028",
-        "REA-030",
-        "REA-031",
-        "REA-087",
-        "REA-088"
+        "PACKETLARK-023",
+        "PACKETLARK-024",
+        "PACKETLARK-025",
+        "PACKETLARK-026",
+        "PACKETLARK-027",
+        "PACKETLARK-028",
+        "PACKETLARK-030",
+        "PACKETLARK-031",
+        "PACKETLARK-087",
+        "PACKETLARK-088"
       ],
       "depends_on": [
         "P1-001",
@@ -498,22 +498,22 @@
       "title": "Secure credential lifecycle",
       "status": "done",
       "requirement_ids": [
-        "REA-001",
-        "REA-002",
-        "REA-003",
-        "REA-004",
-        "REA-005",
-        "REA-006",
-        "REA-007",
-        "REA-009",
-        "REA-010",
-        "REA-011",
-        "REA-015",
-        "REA-027",
-        "REA-030",
-        "REA-068",
-        "REA-070",
-        "REA-086"
+        "PACKETLARK-001",
+        "PACKETLARK-002",
+        "PACKETLARK-003",
+        "PACKETLARK-004",
+        "PACKETLARK-005",
+        "PACKETLARK-006",
+        "PACKETLARK-007",
+        "PACKETLARK-009",
+        "PACKETLARK-010",
+        "PACKETLARK-011",
+        "PACKETLARK-015",
+        "PACKETLARK-027",
+        "PACKETLARK-030",
+        "PACKETLARK-068",
+        "PACKETLARK-070",
+        "PACKETLARK-086"
       ],
       "depends_on": [
         "P2-004",
@@ -539,19 +539,19 @@
       "title": "HTTP completion and transport settings",
       "status": "done",
       "requirement_ids": [
-        "REA-001",
-        "REA-002",
-        "REA-003",
-        "REA-004",
-        "REA-005",
-        "REA-006",
-        "REA-007",
-        "REA-009",
-        "REA-011",
-        "REA-015",
-        "REA-068",
-        "REA-070",
-        "REA-086"
+        "PACKETLARK-001",
+        "PACKETLARK-002",
+        "PACKETLARK-003",
+        "PACKETLARK-004",
+        "PACKETLARK-005",
+        "PACKETLARK-006",
+        "PACKETLARK-007",
+        "PACKETLARK-009",
+        "PACKETLARK-011",
+        "PACKETLARK-015",
+        "PACKETLARK-068",
+        "PACKETLARK-070",
+        "PACKETLARK-086"
       ],
       "depends_on": [
         "P2-008",
@@ -606,16 +606,16 @@
       "title": "Versioned script and Send/Run policy",
       "status": "todo",
       "requirement_ids": [
-        "REA-032",
-        "REA-033",
-        "REA-034",
-        "REA-035",
-        "REA-036",
-        "REA-039",
-        "REA-040",
-        "REA-041",
-        "REA-042",
-        "REA-044"
+        "PACKETLARK-032",
+        "PACKETLARK-033",
+        "PACKETLARK-034",
+        "PACKETLARK-035",
+        "PACKETLARK-036",
+        "PACKETLARK-039",
+        "PACKETLARK-040",
+        "PACKETLARK-041",
+        "PACKETLARK-042",
+        "PACKETLARK-044"
       ],
       "depends_on": [],
       "acceptance": [
@@ -631,16 +631,16 @@
       "title": "Worker and destination-policy enforcement",
       "status": "todo",
       "requirement_ids": [
-        "REA-032",
-        "REA-033",
-        "REA-034",
-        "REA-035",
-        "REA-036",
-        "REA-039",
-        "REA-040",
-        "REA-041",
-        "REA-042",
-        "REA-044"
+        "PACKETLARK-032",
+        "PACKETLARK-033",
+        "PACKETLARK-034",
+        "PACKETLARK-035",
+        "PACKETLARK-036",
+        "PACKETLARK-039",
+        "PACKETLARK-040",
+        "PACKETLARK-041",
+        "PACKETLARK-042",
+        "PACKETLARK-044"
       ],
       "depends_on": [],
       "acceptance": [
@@ -657,16 +657,16 @@
       "title": "Durable CI jobs and reports",
       "status": "todo",
       "requirement_ids": [
-        "REA-032",
-        "REA-033",
-        "REA-034",
-        "REA-035",
-        "REA-036",
-        "REA-039",
-        "REA-040",
-        "REA-041",
-        "REA-042",
-        "REA-044"
+        "PACKETLARK-032",
+        "PACKETLARK-033",
+        "PACKETLARK-034",
+        "PACKETLARK-035",
+        "PACKETLARK-036",
+        "PACKETLARK-039",
+        "PACKETLARK-040",
+        "PACKETLARK-041",
+        "PACKETLARK-042",
+        "PACKETLARK-044"
       ],
       "depends_on": [],
       "acceptance": [
@@ -701,18 +701,18 @@
       "title": "Capture sessions and reviewed evidence",
       "status": "todo",
       "requirement_ids": [
-        "REA-048",
-        "REA-050",
-        "REA-051",
-        "REA-052",
-        "REA-053",
-        "REA-054",
-        "REA-055",
-        "REA-056",
-        "REA-057",
-        "REA-058",
-        "REA-060",
-        "REA-084"
+        "PACKETLARK-048",
+        "PACKETLARK-050",
+        "PACKETLARK-051",
+        "PACKETLARK-052",
+        "PACKETLARK-053",
+        "PACKETLARK-054",
+        "PACKETLARK-055",
+        "PACKETLARK-056",
+        "PACKETLARK-057",
+        "PACKETLARK-058",
+        "PACKETLARK-060",
+        "PACKETLARK-084"
       ],
       "depends_on": [],
       "acceptance": [
@@ -728,19 +728,19 @@
       "title": "Reviewed contract and regression pipeline",
       "status": "todo",
       "requirement_ids": [
-        "REA-048",
-        "REA-050",
-        "REA-051",
-        "REA-052",
-        "REA-053",
-        "REA-054",
-        "REA-055",
-        "REA-056",
-        "REA-057",
-        "REA-058",
-        "REA-060",
-        "REA-084",
-        "REA-085"
+        "PACKETLARK-048",
+        "PACKETLARK-050",
+        "PACKETLARK-051",
+        "PACKETLARK-052",
+        "PACKETLARK-053",
+        "PACKETLARK-054",
+        "PACKETLARK-055",
+        "PACKETLARK-056",
+        "PACKETLARK-057",
+        "PACKETLARK-058",
+        "PACKETLARK-060",
+        "PACKETLARK-084",
+        "PACKETLARK-085"
       ],
       "depends_on": [],
       "acceptance": [
@@ -757,18 +757,18 @@
       "title": "Executable generated clients and snippets",
       "status": "todo",
       "requirement_ids": [
-        "REA-048",
-        "REA-050",
-        "REA-051",
-        "REA-052",
-        "REA-053",
-        "REA-054",
-        "REA-055",
-        "REA-056",
-        "REA-057",
-        "REA-058",
-        "REA-060",
-        "REA-084"
+        "PACKETLARK-048",
+        "PACKETLARK-050",
+        "PACKETLARK-051",
+        "PACKETLARK-052",
+        "PACKETLARK-053",
+        "PACKETLARK-054",
+        "PACKETLARK-055",
+        "PACKETLARK-056",
+        "PACKETLARK-057",
+        "PACKETLARK-058",
+        "PACKETLARK-060",
+        "PACKETLARK-084"
       ],
       "depends_on": [],
       "acceptance": [
@@ -802,19 +802,19 @@
       "title": "Install, onboarding and supported platform matrix",
       "status": "todo",
       "requirement_ids": [
-        "REA-071",
-        "REA-072",
-        "REA-073",
-        "REA-074",
-        "REA-075",
-        "REA-077",
-        "REA-079",
-        "REA-080",
-        "REA-081",
-        "REA-082",
-        "REA-083",
-        "REA-092",
-        "REA-068"
+        "PACKETLARK-071",
+        "PACKETLARK-072",
+        "PACKETLARK-073",
+        "PACKETLARK-074",
+        "PACKETLARK-075",
+        "PACKETLARK-077",
+        "PACKETLARK-079",
+        "PACKETLARK-080",
+        "PACKETLARK-081",
+        "PACKETLARK-082",
+        "PACKETLARK-083",
+        "PACKETLARK-092",
+        "PACKETLARK-068"
       ],
       "depends_on": [],
       "acceptance": [
@@ -832,18 +832,18 @@
       "title": "Independent security and accessibility review",
       "status": "todo",
       "requirement_ids": [
-        "REA-071",
-        "REA-072",
-        "REA-073",
-        "REA-074",
-        "REA-075",
-        "REA-077",
-        "REA-079",
-        "REA-080",
-        "REA-081",
-        "REA-082",
-        "REA-083",
-        "REA-092"
+        "PACKETLARK-071",
+        "PACKETLARK-072",
+        "PACKETLARK-073",
+        "PACKETLARK-074",
+        "PACKETLARK-075",
+        "PACKETLARK-077",
+        "PACKETLARK-079",
+        "PACKETLARK-080",
+        "PACKETLARK-081",
+        "PACKETLARK-082",
+        "PACKETLARK-083",
+        "PACKETLARK-092"
       ],
       "depends_on": [],
       "acceptance": [
@@ -860,17 +860,17 @@
       "title": "Representative performance and target-user validation",
       "status": "todo",
       "requirement_ids": [
-        "REA-071",
-        "REA-073",
-        "REA-074",
-        "REA-075",
-        "REA-077",
-        "REA-079",
-        "REA-080",
-        "REA-081",
-        "REA-082",
-        "REA-083",
-        "REA-092"
+        "PACKETLARK-071",
+        "PACKETLARK-073",
+        "PACKETLARK-074",
+        "PACKETLARK-075",
+        "PACKETLARK-077",
+        "PACKETLARK-079",
+        "PACKETLARK-080",
+        "PACKETLARK-081",
+        "PACKETLARK-082",
+        "PACKETLARK-083",
+        "PACKETLARK-092"
       ],
       "depends_on": [],
       "acceptance": [
@@ -907,9 +907,9 @@
       "title": "Shared protocol/event contracts",
       "status": "todo",
       "requirement_ids": [
-        "REA-008",
-        "REA-016",
-        "REA-018"
+        "PACKETLARK-008",
+        "PACKETLARK-016",
+        "PACKETLARK-018"
       ],
       "depends_on": [],
       "acceptance": [
@@ -925,9 +925,9 @@
       "title": "Protocol peer and reconnect acceptance",
       "status": "todo",
       "requirement_ids": [
-        "REA-008",
-        "REA-016",
-        "REA-018"
+        "PACKETLARK-008",
+        "PACKETLARK-016",
+        "PACKETLARK-018"
       ],
       "depends_on": [],
       "acceptance": [
@@ -960,16 +960,16 @@
       "title": "Demand-ranked protocol and auth releases",
       "status": "todo",
       "requirement_ids": [
-        "REA-012",
-        "REA-013",
-        "REA-014",
-        "REA-017",
-        "REA-019",
-        "REA-021",
-        "REA-022",
-        "REA-029",
-        "REA-049",
-        "REA-076"
+        "PACKETLARK-012",
+        "PACKETLARK-013",
+        "PACKETLARK-014",
+        "PACKETLARK-017",
+        "PACKETLARK-019",
+        "PACKETLARK-021",
+        "PACKETLARK-022",
+        "PACKETLARK-029",
+        "PACKETLARK-049",
+        "PACKETLARK-076"
       ],
       "depends_on": [],
       "acceptance": [
@@ -986,16 +986,16 @@
       "title": "Consented browser/native capture",
       "status": "todo",
       "requirement_ids": [
-        "REA-012",
-        "REA-013",
-        "REA-014",
-        "REA-017",
-        "REA-019",
-        "REA-021",
-        "REA-022",
-        "REA-029",
-        "REA-049",
-        "REA-076"
+        "PACKETLARK-012",
+        "PACKETLARK-013",
+        "PACKETLARK-014",
+        "PACKETLARK-017",
+        "PACKETLARK-019",
+        "PACKETLARK-021",
+        "PACKETLARK-022",
+        "PACKETLARK-029",
+        "PACKETLARK-049",
+        "PACKETLARK-076"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1012,16 +1012,16 @@
       "title": "Interoperability evaluation",
       "status": "todo",
       "requirement_ids": [
-        "REA-012",
-        "REA-013",
-        "REA-014",
-        "REA-017",
-        "REA-019",
-        "REA-021",
-        "REA-022",
-        "REA-029",
-        "REA-049",
-        "REA-076"
+        "PACKETLARK-012",
+        "PACKETLARK-013",
+        "PACKETLARK-014",
+        "PACKETLARK-017",
+        "PACKETLARK-019",
+        "PACKETLARK-021",
+        "PACKETLARK-022",
+        "PACKETLARK-029",
+        "PACKETLARK-049",
+        "PACKETLARK-076"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1055,16 +1055,16 @@
       "title": "Local lifecycle tools",
       "status": "todo",
       "requirement_ids": [
-        "REA-020",
-        "REA-037",
-        "REA-038",
-        "REA-043",
-        "REA-045",
-        "REA-046",
-        "REA-047",
-        "REA-059",
-        "REA-061",
-        "REA-091"
+        "PACKETLARK-020",
+        "PACKETLARK-037",
+        "PACKETLARK-038",
+        "PACKETLARK-043",
+        "PACKETLARK-045",
+        "PACKETLARK-046",
+        "PACKETLARK-047",
+        "PACKETLARK-059",
+        "PACKETLARK-061",
+        "PACKETLARK-091"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1080,16 +1080,16 @@
       "title": "Durable scheduling and load integration",
       "status": "todo",
       "requirement_ids": [
-        "REA-020",
-        "REA-037",
-        "REA-038",
-        "REA-043",
-        "REA-045",
-        "REA-046",
-        "REA-047",
-        "REA-059",
-        "REA-061",
-        "REA-091"
+        "PACKETLARK-020",
+        "PACKETLARK-037",
+        "PACKETLARK-038",
+        "PACKETLARK-043",
+        "PACKETLARK-045",
+        "PACKETLARK-046",
+        "PACKETLARK-047",
+        "PACKETLARK-059",
+        "PACKETLARK-061",
+        "PACKETLARK-091"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1106,16 +1106,16 @@
       "title": "Optional scripted UI extensions",
       "status": "todo",
       "requirement_ids": [
-        "REA-020",
-        "REA-037",
-        "REA-038",
-        "REA-043",
-        "REA-045",
-        "REA-046",
-        "REA-047",
-        "REA-059",
-        "REA-061",
-        "REA-091"
+        "PACKETLARK-020",
+        "PACKETLARK-037",
+        "PACKETLARK-038",
+        "PACKETLARK-043",
+        "PACKETLARK-045",
+        "PACKETLARK-046",
+        "PACKETLARK-047",
+        "PACKETLARK-059",
+        "PACKETLARK-061",
+        "PACKETLARK-091"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1149,10 +1149,10 @@
       "title": "Self-hosted platform scope and threat model",
       "status": "gated",
       "requirement_ids": [
-        "REA-062",
-        "REA-063",
-        "REA-064",
-        "REA-067"
+        "PACKETLARK-062",
+        "PACKETLARK-063",
+        "PACKETLARK-064",
+        "PACKETLARK-067"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1168,10 +1168,10 @@
       "title": "Durable collaborative platform",
       "status": "gated",
       "requirement_ids": [
-        "REA-062",
-        "REA-063",
-        "REA-064",
-        "REA-067"
+        "PACKETLARK-062",
+        "PACKETLARK-063",
+        "PACKETLARK-064",
+        "PACKETLARK-067"
       ],
       "depends_on": [
         "P9-001"
@@ -1190,10 +1190,10 @@
       "title": "Self-hosted operations and recovery",
       "status": "gated",
       "requirement_ids": [
-        "REA-062",
-        "REA-063",
-        "REA-064",
-        "REA-067"
+        "PACKETLARK-062",
+        "PACKETLARK-063",
+        "PACKETLARK-064",
+        "PACKETLARK-067"
       ],
       "depends_on": [
         "P9-001"
@@ -1243,12 +1243,12 @@
       "title": "Identity, governance and vault integration",
       "status": "gated",
       "requirement_ids": [
-        "REA-065",
-        "REA-066",
-        "REA-069",
-        "REA-078",
-        "REA-089",
-        "REA-090"
+        "PACKETLARK-065",
+        "PACKETLARK-066",
+        "PACKETLARK-069",
+        "PACKETLARK-078",
+        "PACKETLARK-089",
+        "PACKETLARK-090"
       ],
       "depends_on": [
         "P10-001"
@@ -1267,12 +1267,12 @@
       "title": "Private runners and opt-in AI/context",
       "status": "gated",
       "requirement_ids": [
-        "REA-065",
-        "REA-066",
-        "REA-069",
-        "REA-078",
-        "REA-089",
-        "REA-090"
+        "PACKETLARK-065",
+        "PACKETLARK-066",
+        "PACKETLARK-069",
+        "PACKETLARK-078",
+        "PACKETLARK-089",
+        "PACKETLARK-090"
       ],
       "depends_on": [
         "P10-001"
@@ -1308,8 +1308,8 @@
       "title": "Resolve large-workspace event-to-frame outliers",
       "status": "done",
       "requirement_ids": [
-        "REA-025",
-        "REA-081"
+        "PACKETLARK-025",
+        "PACKETLARK-081"
       ],
       "depends_on": [
         "P1-001"
@@ -1335,8 +1335,8 @@
       "title": "OS credential providers and session-only lifecycle",
       "status": "done",
       "requirement_ids": [
-        "REA-068",
-        "REA-070"
+        "PACKETLARK-068",
+        "PACKETLARK-070"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1356,12 +1356,12 @@
       "title": "Secret references, consent migration and safe exports",
       "status": "done",
       "requirement_ids": [
-        "REA-009",
-        "REA-010",
-        "REA-027",
-        "REA-030",
-        "REA-068",
-        "REA-070"
+        "PACKETLARK-009",
+        "PACKETLARK-010",
+        "PACKETLARK-027",
+        "PACKETLARK-030",
+        "PACKETLARK-068",
+        "PACKETLARK-070"
       ],
       "depends_on": [
         "P2-004"
@@ -1384,7 +1384,7 @@
       "title": "OAuth acquisition and owned callbacks",
       "status": "done",
       "requirement_ids": [
-        "REA-011"
+        "PACKETLARK-011"
       ],
       "depends_on": [
         "P2-004"
@@ -1406,7 +1406,7 @@
       "title": "OAuth expiry, refresh rotation and clear/revoke",
       "status": "done",
       "requirement_ids": [
-        "REA-011"
+        "PACKETLARK-011"
       ],
       "depends_on": [
         "P2-006"
@@ -1428,8 +1428,8 @@
       "title": "Selected multipart and binary streaming uploads",
       "status": "done",
       "requirement_ids": [
-        "REA-003",
-        "REA-006"
+        "PACKETLARK-003",
+        "PACKETLARK-006"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1449,11 +1449,11 @@
       "title": "HTTP wire fidelity, cookies and diagnostics",
       "status": "done",
       "requirement_ids": [
-        "REA-001",
-        "REA-002",
-        "REA-006",
-        "REA-007",
-        "REA-086"
+        "PACKETLARK-001",
+        "PACKETLARK-002",
+        "PACKETLARK-006",
+        "PACKETLARK-007",
+        "PACKETLARK-086"
       ],
       "depends_on": [],
       "acceptance": [
@@ -1474,8 +1474,8 @@
       "title": "Verified TLS, custom CA and mutual TLS",
       "status": "done",
       "requirement_ids": [
-        "REA-015",
-        "REA-086"
+        "PACKETLARK-015",
+        "PACKETLARK-086"
       ],
       "depends_on": [
         "P2-004"
@@ -1497,9 +1497,9 @@
       "title": "Bounded streamed responses and exact downloads",
       "status": "done",
       "requirement_ids": [
-        "REA-004",
-        "REA-005",
-        "REA-006"
+        "PACKETLARK-004",
+        "PACKETLARK-005",
+        "PACKETLARK-006"
       ],
       "depends_on": [
         "P2-008",
@@ -1522,12 +1522,12 @@
       "title": "Schema-aware authoring and credential/HTTP workflows",
       "status": "done",
       "requirement_ids": [
-        "REA-002",
-        "REA-004",
-        "REA-009",
-        "REA-010",
-        "REA-027",
-        "REA-070"
+        "PACKETLARK-002",
+        "PACKETLARK-004",
+        "PACKETLARK-009",
+        "PACKETLARK-010",
+        "PACKETLARK-027",
+        "PACKETLARK-070"
       ],
       "depends_on": [
         "P2-004",
@@ -1551,7 +1551,7 @@
     }
   ],
   "requirements": {
-    "REA-001": {
+    "PACKETLARK-001": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1585,7 +1585,7 @@
         }
       ]
     },
-    "REA-002": {
+    "PACKETLARK-002": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1621,7 +1621,7 @@
         }
       ]
     },
-    "REA-003": {
+    "PACKETLARK-003": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1655,7 +1655,7 @@
         }
       ]
     },
-    "REA-004": {
+    "PACKETLARK-004": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1691,7 +1691,7 @@
         }
       ]
     },
-    "REA-005": {
+    "PACKETLARK-005": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1725,7 +1725,7 @@
         }
       ]
     },
-    "REA-006": {
+    "PACKETLARK-006": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1763,7 +1763,7 @@
         }
       ]
     },
-    "REA-007": {
+    "PACKETLARK-007": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -1797,7 +1797,7 @@
         }
       ]
     },
-    "REA-008": {
+    "PACKETLARK-008": {
       "candidate_phase": "P6",
       "next_review_phase": "P6",
       "workstream": "WS1",
@@ -1825,7 +1825,7 @@
         }
       ]
     },
-    "REA-009": {
+    "PACKETLARK-009": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS2",
@@ -1861,7 +1861,7 @@
         }
       ]
     },
-    "REA-010": {
+    "PACKETLARK-010": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS2",
@@ -1913,7 +1913,7 @@
         }
       ]
     },
-    "REA-011": {
+    "PACKETLARK-011": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS2",
@@ -1949,7 +1949,7 @@
         }
       ]
     },
-    "REA-012": {
+    "PACKETLARK-012": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS2",
@@ -1979,7 +1979,7 @@
         }
       ]
     },
-    "REA-013": {
+    "PACKETLARK-013": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS2",
@@ -2009,7 +2009,7 @@
         }
       ]
     },
-    "REA-014": {
+    "PACKETLARK-014": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS2",
@@ -2039,7 +2039,7 @@
         }
       ]
     },
-    "REA-015": {
+    "PACKETLARK-015": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS2",
@@ -2073,7 +2073,7 @@
         }
       ]
     },
-    "REA-016": {
+    "PACKETLARK-016": {
       "candidate_phase": "P6",
       "next_review_phase": "P6",
       "workstream": "WS3",
@@ -2101,7 +2101,7 @@
         }
       ]
     },
-    "REA-017": {
+    "PACKETLARK-017": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS3",
@@ -2131,7 +2131,7 @@
         }
       ]
     },
-    "REA-018": {
+    "PACKETLARK-018": {
       "candidate_phase": "P6",
       "next_review_phase": "P6",
       "workstream": "WS3",
@@ -2159,7 +2159,7 @@
         }
       ]
     },
-    "REA-019": {
+    "PACKETLARK-019": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS3",
@@ -2189,7 +2189,7 @@
         }
       ]
     },
-    "REA-020": {
+    "PACKETLARK-020": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS3",
@@ -2219,7 +2219,7 @@
         }
       ]
     },
-    "REA-021": {
+    "PACKETLARK-021": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS3",
@@ -2249,7 +2249,7 @@
         }
       ]
     },
-    "REA-022": {
+    "PACKETLARK-022": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS3",
@@ -2279,7 +2279,7 @@
         }
       ]
     },
-    "REA-023": {
+    "PACKETLARK-023": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -2325,7 +2325,7 @@
         }
       ]
     },
-    "REA-024": {
+    "PACKETLARK-024": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -2363,7 +2363,7 @@
         }
       ]
     },
-    "REA-025": {
+    "PACKETLARK-025": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -2412,7 +2412,7 @@
         }
       ]
     },
-    "REA-026": {
+    "PACKETLARK-026": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -2461,7 +2461,7 @@
         }
       ]
     },
-    "REA-027": {
+    "PACKETLARK-027": {
       "candidate_phase": "P1",
       "next_review_phase": "P2",
       "workstream": "WS4",
@@ -2514,7 +2514,7 @@
         }
       ]
     },
-    "REA-028": {
+    "PACKETLARK-028": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -2551,7 +2551,7 @@
         }
       ]
     },
-    "REA-029": {
+    "PACKETLARK-029": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS4",
@@ -2581,7 +2581,7 @@
         }
       ]
     },
-    "REA-030": {
+    "PACKETLARK-030": {
       "candidate_phase": "P1",
       "next_review_phase": "P2",
       "workstream": "WS4",
@@ -2639,7 +2639,7 @@
         }
       ]
     },
-    "REA-031": {
+    "PACKETLARK-031": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -2673,7 +2673,7 @@
         }
       ]
     },
-    "REA-032": {
+    "PACKETLARK-032": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS5",
@@ -2703,7 +2703,7 @@
         }
       ]
     },
-    "REA-033": {
+    "PACKETLARK-033": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS5",
@@ -2733,7 +2733,7 @@
         }
       ]
     },
-    "REA-034": {
+    "PACKETLARK-034": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS5",
@@ -2763,7 +2763,7 @@
         }
       ]
     },
-    "REA-035": {
+    "PACKETLARK-035": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS5",
@@ -2793,7 +2793,7 @@
         }
       ]
     },
-    "REA-036": {
+    "PACKETLARK-036": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS5",
@@ -2823,7 +2823,7 @@
         }
       ]
     },
-    "REA-037": {
+    "PACKETLARK-037": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS5",
@@ -2853,7 +2853,7 @@
         }
       ]
     },
-    "REA-038": {
+    "PACKETLARK-038": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS5",
@@ -2883,7 +2883,7 @@
         }
       ]
     },
-    "REA-039": {
+    "PACKETLARK-039": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS5",
@@ -2913,7 +2913,7 @@
         }
       ]
     },
-    "REA-040": {
+    "PACKETLARK-040": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS6",
@@ -2943,7 +2943,7 @@
         }
       ]
     },
-    "REA-041": {
+    "PACKETLARK-041": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS6",
@@ -2973,12 +2973,12 @@
         }
       ]
     },
-    "REA-042": {
+    "PACKETLARK-042": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS6",
       "feature": "CLI / CI / reports",
-      "required_work": "Do not claim free CLI reporting is exclusive to Rea.",
+      "required_work": "Do not claim free CLI reporting is exclusive to PacketLark.",
       "acceptance_reference": "WS6 acceptance gates in ../IMPLEMENTATION_PLAN.md",
       "status": "pending",
       "task_ids": [
@@ -2992,7 +2992,7 @@
         {
           "phase": "P3",
           "status": "pending",
-          "scope": "Do not claim free CLI reporting is exclusive to Rea.",
+          "scope": "Do not claim free CLI reporting is exclusive to PacketLark.",
           "task_ids": [
             "P3-001",
             "P3-002",
@@ -3003,7 +3003,7 @@
         }
       ]
     },
-    "REA-043": {
+    "PACKETLARK-043": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS6",
@@ -3033,7 +3033,7 @@
         }
       ]
     },
-    "REA-044": {
+    "PACKETLARK-044": {
       "candidate_phase": "P3",
       "next_review_phase": "P3",
       "workstream": "WS6",
@@ -3063,7 +3063,7 @@
         }
       ]
     },
-    "REA-045": {
+    "PACKETLARK-045": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS6",
@@ -3093,7 +3093,7 @@
         }
       ]
     },
-    "REA-046": {
+    "PACKETLARK-046": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS6",
@@ -3123,7 +3123,7 @@
         }
       ]
     },
-    "REA-047": {
+    "PACKETLARK-047": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS6",
@@ -3153,7 +3153,7 @@
         }
       ]
     },
-    "REA-048": {
+    "PACKETLARK-048": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS7",
@@ -3183,7 +3183,7 @@
         }
       ]
     },
-    "REA-049": {
+    "PACKETLARK-049": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS7",
@@ -3213,7 +3213,7 @@
         }
       ]
     },
-    "REA-050": {
+    "PACKETLARK-050": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS7",
@@ -3243,7 +3243,7 @@
         }
       ]
     },
-    "REA-051": {
+    "PACKETLARK-051": {
       "candidate_phase": "P0",
       "next_review_phase": "P4",
       "workstream": "WS7",
@@ -3273,7 +3273,7 @@
         }
       ]
     },
-    "REA-052": {
+    "PACKETLARK-052": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS7",
@@ -3303,7 +3303,7 @@
         }
       ]
     },
-    "REA-053": {
+    "PACKETLARK-053": {
       "candidate_phase": "P0",
       "next_review_phase": "P4",
       "workstream": "WS7",
@@ -3333,7 +3333,7 @@
         }
       ]
     },
-    "REA-054": {
+    "PACKETLARK-054": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS8",
@@ -3363,7 +3363,7 @@
         }
       ]
     },
-    "REA-055": {
+    "PACKETLARK-055": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS8",
@@ -3393,7 +3393,7 @@
         }
       ]
     },
-    "REA-056": {
+    "PACKETLARK-056": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS8",
@@ -3423,7 +3423,7 @@
         }
       ]
     },
-    "REA-057": {
+    "PACKETLARK-057": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS8",
@@ -3453,7 +3453,7 @@
         }
       ]
     },
-    "REA-058": {
+    "PACKETLARK-058": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS8",
@@ -3483,7 +3483,7 @@
         }
       ]
     },
-    "REA-059": {
+    "PACKETLARK-059": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS8",
@@ -3513,7 +3513,7 @@
         }
       ]
     },
-    "REA-060": {
+    "PACKETLARK-060": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS8",
@@ -3543,7 +3543,7 @@
         }
       ]
     },
-    "REA-061": {
+    "PACKETLARK-061": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS8",
@@ -3573,7 +3573,7 @@
         }
       ]
     },
-    "REA-062": {
+    "PACKETLARK-062": {
       "candidate_phase": "P9",
       "next_review_phase": "P9",
       "workstream": "WS9",
@@ -3603,7 +3603,7 @@
         }
       ]
     },
-    "REA-063": {
+    "PACKETLARK-063": {
       "candidate_phase": "P9",
       "next_review_phase": "P9",
       "workstream": "WS9",
@@ -3633,7 +3633,7 @@
         }
       ]
     },
-    "REA-064": {
+    "PACKETLARK-064": {
       "candidate_phase": "P9",
       "next_review_phase": "P9",
       "workstream": "WS9",
@@ -3663,7 +3663,7 @@
         }
       ]
     },
-    "REA-065": {
+    "PACKETLARK-065": {
       "candidate_phase": "P10",
       "next_review_phase": "P10",
       "workstream": "WS9",
@@ -3691,7 +3691,7 @@
         }
       ]
     },
-    "REA-066": {
+    "PACKETLARK-066": {
       "candidate_phase": "P10",
       "next_review_phase": "P10",
       "workstream": "WS9",
@@ -3719,7 +3719,7 @@
         }
       ]
     },
-    "REA-067": {
+    "PACKETLARK-067": {
       "candidate_phase": "P9",
       "next_review_phase": "P9",
       "workstream": "WS9",
@@ -3749,7 +3749,7 @@
         }
       ]
     },
-    "REA-068": {
+    "PACKETLARK-068": {
       "candidate_phase": "P2",
       "next_review_phase": "P5",
       "workstream": "WS9",
@@ -3796,7 +3796,7 @@
         }
       ]
     },
-    "REA-069": {
+    "PACKETLARK-069": {
       "candidate_phase": "P10",
       "next_review_phase": "P10",
       "workstream": "WS9",
@@ -3824,7 +3824,7 @@
         }
       ]
     },
-    "REA-070": {
+    "PACKETLARK-070": {
       "candidate_phase": "P0",
       "next_review_phase": "P2",
       "workstream": "WS9",
@@ -3862,7 +3862,7 @@
         }
       ]
     },
-    "REA-071": {
+    "PACKETLARK-071": {
       "candidate_phase": "P0",
       "next_review_phase": "P5",
       "workstream": "WS9",
@@ -3892,7 +3892,7 @@
         }
       ]
     },
-    "REA-072": {
+    "PACKETLARK-072": {
       "candidate_phase": "P0",
       "next_review_phase": "P5",
       "workstream": "WS9",
@@ -3948,7 +3948,7 @@
         }
       ]
     },
-    "REA-073": {
+    "PACKETLARK-073": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -3978,7 +3978,7 @@
         }
       ]
     },
-    "REA-074": {
+    "PACKETLARK-074": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4008,7 +4008,7 @@
         }
       ]
     },
-    "REA-075": {
+    "PACKETLARK-075": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4038,7 +4038,7 @@
         }
       ]
     },
-    "REA-076": {
+    "PACKETLARK-076": {
       "candidate_phase": "P7",
       "next_review_phase": "P7",
       "workstream": "WS10",
@@ -4068,7 +4068,7 @@
         }
       ]
     },
-    "REA-077": {
+    "PACKETLARK-077": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4098,7 +4098,7 @@
         }
       ]
     },
-    "REA-078": {
+    "PACKETLARK-078": {
       "candidate_phase": "P10",
       "next_review_phase": "P10",
       "workstream": "WS10",
@@ -4126,7 +4126,7 @@
         }
       ]
     },
-    "REA-079": {
+    "PACKETLARK-079": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4156,7 +4156,7 @@
         }
       ]
     },
-    "REA-080": {
+    "PACKETLARK-080": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4186,7 +4186,7 @@
         }
       ]
     },
-    "REA-081": {
+    "PACKETLARK-081": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4235,7 +4235,7 @@
         }
       ]
     },
-    "REA-082": {
+    "PACKETLARK-082": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4265,7 +4265,7 @@
         }
       ]
     },
-    "REA-083": {
+    "PACKETLARK-083": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4295,7 +4295,7 @@
         }
       ]
     },
-    "REA-084": {
+    "PACKETLARK-084": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS1",
@@ -4325,7 +4325,7 @@
         }
       ]
     },
-    "REA-085": {
+    "PACKETLARK-085": {
       "candidate_phase": "P4",
       "next_review_phase": "P4",
       "workstream": "WS1",
@@ -4370,7 +4370,7 @@
         }
       ]
     },
-    "REA-086": {
+    "PACKETLARK-086": {
       "candidate_phase": "P2",
       "next_review_phase": "P2",
       "workstream": "WS1",
@@ -4406,7 +4406,7 @@
         }
       ]
     },
-    "REA-087": {
+    "PACKETLARK-087": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -4445,7 +4445,7 @@
         }
       ]
     },
-    "REA-088": {
+    "PACKETLARK-088": {
       "candidate_phase": "P1",
       "next_review_phase": "P1",
       "workstream": "WS4",
@@ -4479,7 +4479,7 @@
         }
       ]
     },
-    "REA-089": {
+    "PACKETLARK-089": {
       "candidate_phase": "P10",
       "next_review_phase": "P10",
       "workstream": "WS9",
@@ -4507,7 +4507,7 @@
         }
       ]
     },
-    "REA-090": {
+    "PACKETLARK-090": {
       "candidate_phase": "P10",
       "next_review_phase": "P10",
       "workstream": "WS9",
@@ -4535,7 +4535,7 @@
         }
       ]
     },
-    "REA-091": {
+    "PACKETLARK-091": {
       "candidate_phase": "P8",
       "next_review_phase": "P8",
       "workstream": "WS8",
@@ -4565,7 +4565,7 @@
         }
       ]
     },
-    "REA-092": {
+    "PACKETLARK-092": {
       "candidate_phase": "P5",
       "next_review_phase": "P5",
       "workstream": "WS10",
@@ -4599,7 +4599,7 @@
   "update_rules": [
     "Update this JSON in the same change as implementation status/evidence; regenerate TASK_TRACKER.md.",
     "A done task needs acceptance evidence after its last relevant mutation. Historical evidence must be named as historical.",
-    "Do not mark a broad REA requirement accepted from a partial increment or from its old current_status label.",
+    "Do not mark a broad PACKETLARK requirement accepted from a partial increment or from its old current_status label.",
     "A phase closes only when its tasks, scoped requirement dispositions and phase gate are verified.",
     "Newly discovered work receives a stable task ID and requirement link; do not silently drop or renumber tasks.",
     "Counts measure tasks, not effort; do not turn them into a product readiness percentage."

@@ -18,7 +18,7 @@ export class ResponseArtifactStore {
   async create(){
     if(this.#closed||this.#entries.size>=this.maxArtifacts)throw new Error('Response artifact count exceeded');
     const id=randomUUID();
-    this.#directory??=mkdtemp(join(tmpdir(),'rea-responses-')).then(path=>{this.#path=path;return path;});
+    this.#directory??=mkdtemp(join(tmpdir(),'packetlark-responses-')).then(path=>{this.#path=path;return path;});
     const entry:Entry={size:0,complete:false,removed:false,ready:this.#directory.then(directory=>open(join(directory,id),'wx',0o600)),queue:Promise.resolve(),readers:new Set()};
     this.#entries.set(id,entry);
     try{await entry.ready;if(this.#closed||entry.removed)throw new Error('Artifact store closed');}

@@ -38,7 +38,7 @@ function refreshIcons() {
 }
 
 /* ==========================================================================
-       ReaAPI Studio Core Interactive State & Runtime
+       PacketLark Core Interactive State & Runtime
        ========================================================================== */
 let collections = [];
 let environments = [];
@@ -56,7 +56,7 @@ let workspaceAuthoring;
 let workbenchActivity;
 let credentialControls;
 let httpControls;
-const workbenchState = new window.ReaWorkbenchState();
+const workbenchState = new window.PacketLarkWorkbenchState();
 const requestDrafts = new Map();
 const collectionSaves = new Map();
 const environmentSaves = new Map();
@@ -93,7 +93,7 @@ window.addEventListener("beforeunload", (event) => {
 
 async function init() {
   refreshIcons();
-  collectionTree = new window.ReaCollectionTree(
+  collectionTree = new window.PacketLarkCollectionTree(
     document.getElementById("collection-tree"),
     {
       collections: () => collections,
@@ -113,7 +113,7 @@ async function init() {
       decorateRow: (row, node) => workspaceAuthoring?.decorateRow(row, node),
     },
   );
-  workspaceSync = new window.ReaWorkspaceSync({
+  workspaceSync = new window.PacketLarkWorkspaceSync({
     syncFields: syncCurrentFieldsToActiveRequest,
     model: () => ({
       collections,
@@ -134,7 +134,7 @@ async function init() {
     closeModal,
   });
 
-  workspaceAuthoring = new window.ReaWorkspaceAuthoring({
+  workspaceAuthoring = new window.PacketLarkWorkspaceAuthoring({
     model: () => ({ collections, drafts: [...requestDrafts.values()], collectionSaves }),
     syncFields: syncCurrentFieldsToActiveRequest,
     commit: commitAuthoringCollection,
@@ -142,29 +142,29 @@ async function init() {
     moved: rehomeMovedRequests,
     openModal, closeModal,
   });
-  credentialControls = new window.ReaCredentialControls({ getRequest: () => activeRequest, changed: markDirty });
-  httpControls = new window.ReaHttpControls({ getRequest: () => activeRequest, changed: markOwnedRequestDirty, ownsRequest: request => [...requestDrafts.values()].some(draft => draft.request === request) });
+  credentialControls = new window.PacketLarkCredentialControls({ getRequest: () => activeRequest, changed: markDirty });
+  httpControls = new window.PacketLarkHttpControls({ getRequest: () => activeRequest, changed: markOwnedRequestDirty, ownsRequest: request => [...requestDrafts.values()].some(draft => draft.request === request) });
   document.getElementById('btn-credentials').onclick = () => credentialControls.openManager();
   document.getElementById('btn-oauth').onclick = () => credentialControls.openOAuth();
   document.getElementById('btn-cookies').onclick = () => httpControls.openCookies();
   document.getElementById('btn-tls').onclick = () => { if (activeRequest) httpControls.openTls(); };
   await loadEnvironments();
   await loadCollections();
-  draftRecovery = new window.ReaDraftRecovery({
+  draftRecovery = new window.PacketLarkDraftRecovery({
     snapshot: recoverySnapshot,
     restore: restoreDraftRecovery,
     openModal,
     closeModal,
   });
   await draftRecovery.init();
-  workbenchActivity = new window.ReaWorkbenchActivity({
+  workbenchActivity = new window.PacketLarkWorkbenchActivity({
     workspace: draftRecovery.workspace, state: workbenchState, openModal, closeModal,
     current: () => activeDraft?.exampleInput,
     reopen: reopenHistoryRequest,
   });
   await workbenchActivity.init();
   await updateHealth();
-  performance.mark("rea:studio-ready");
+  performance.mark("packetlark:studio-ready");
   workspaceSync.refresh();
   setInterval(() => {
     if (!document.hidden) workspaceSync.refresh();
@@ -221,7 +221,7 @@ async function loadEnvironments() {
         (await res.json()).error?.message || "Environment load failed",
       );
     const loaded = await res.json();
-    environments = window.ReaWorkspaceSync.merge(
+    environments = window.PacketLarkWorkspaceSync.merge(
       loaded,
       environments,
       (id) => dirtyEnvironments.has(id) || environmentSaves.has(id),
@@ -266,7 +266,7 @@ async function loadCollections() {
       throw new Error(
         (await res.json()).error?.message || "Collection load failed",
       );
-    collections = window.ReaWorkspaceSync.merge(
+    collections = window.PacketLarkWorkspaceSync.merge(
       await res.json(),
       collections,
       (id) =>
@@ -284,7 +284,7 @@ async function loadCollections() {
       const firstReqItem = findFirstRequestItem(collections[0].items);
       if (firstReqItem) {
         selectRequest(
-          window.ReaCollectionTree.requestForItem(firstReqItem),
+          window.PacketLarkCollectionTree.requestForItem(firstReqItem),
           collections[0],
         );
       }
@@ -309,7 +309,7 @@ function findWorkspaceRequest(collection, id) {
   const visit = (items) => {
     for (const item of items || []) {
       if (item.request && (item.request.id || item.id) === id)
-        return window.ReaCollectionTree.requestForItem(item);
+        return window.PacketLarkCollectionTree.requestForItem(item);
       const nested = item.isFolder && visit(item.items);
       if (nested) return nested;
     }
@@ -341,7 +341,7 @@ async function restoreDraftRecovery(snapshot) {
   if ([...requestDrafts.values()].some((draft) => draft.dirty || draft.saving || draft.controller) || dirtyEnvironments.size || collectionSaves.size || environmentSaves.size)
     throw new Error("Save or explicitly resolve this page's current edits before restoring another recovery.");
   const revision = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
-  if (new TextEncoder().encode(JSON.stringify(snapshot)).length > 8 * 1024 * 1024 || snapshot?.version !== 1 || !Array.isArray(snapshot.collections) || snapshot.collections.length > 1000 || !Array.isArray(snapshot.drafts) || snapshot.drafts.length > 10000 || !Array.isArray(snapshot.environments) || snapshot.environments.length > 1000 || !snapshot.collections.every((col) => revision(col.revision) && window.ReaValidWorkspaceResource(col, "collections")) || !snapshot.environments.every((env) => revision(env.revision) && window.ReaValidWorkspaceResource(env, "environments")))
+  if (new TextEncoder().encode(JSON.stringify(snapshot)).length > 8 * 1024 * 1024 || snapshot?.version !== 1 || !Array.isArray(snapshot.collections) || snapshot.collections.length > 1000 || !Array.isArray(snapshot.drafts) || snapshot.drafts.length > 10000 || !Array.isArray(snapshot.environments) || snapshot.environments.length > 1000 || !snapshot.collections.every((col) => revision(col.revision) && window.PacketLarkValidWorkspaceResource(col, "collections")) || !snapshot.environments.every((env) => revision(env.revision) && window.PacketLarkValidWorkspaceResource(env, "environments")))
     throw new Error("This recovery has an unsupported or malformed format; it was preserved.");
   const restored = new Map();
   const recoveredCollections = new Map(snapshot.collections.map((col) => [col.id, col]));
@@ -1294,7 +1294,7 @@ async function sendActiveRequest() {
     )?.revision;
     const executionCollection = collections.find((col) => col.id === owner.collectionId);
     let effective = { request: payload.request, variables: executionCollection?.variables || [] };
-    try { if (executionCollection) effective = window.ReaResolveCollectionRequest(executionCollection, payload.request); } catch {}
+    try { if (executionCollection) effective = window.PacketLarkResolveCollectionRequest(executionCollection, payload.request); } catch {}
     const executionVariables = structuredClone([...(environments.find((env) => env.id === environmentId)?.values || []), ...effective.variables]);
     const effectiveRequest = structuredClone(effective.request);
     const streamed = payload.request.streamResponse === true || payload.request.body?.mode === 'binary' || payload.request.body?.formData?.some(field => field.fileId);
@@ -1308,7 +1308,7 @@ async function sendActiveRequest() {
     }
     if (workbenchState.finish(ownerKey, token, data)) {
       if (previousArtifactId && previousArtifactId !== data.artifactId) fetch(`/api/responses/${encodeURIComponent(previousArtifactId)}`, { method: 'DELETE' }).catch(() => {});
-      const entry = { ...(data.example || window.ReaSanitizeExample(effectiveRequest, workbenchState.tabs.get(ownerKey).response, executionVariables)), collectionId: owner.collectionId, at: new Date().toISOString() };
+      const entry = { ...(data.example || window.PacketLarkSanitizeExample(effectiveRequest, workbenchState.tabs.get(ownerKey).response, executionVariables)), collectionId: owner.collectionId, at: new Date().toISOString() };
       owner.exampleInput = entry;
       if (!workbenchState.addHistory(entry) && activeDraft === owner) document.getElementById("save-status").textContent = "Response omitted from page history: entry exceeds 512 KiB.";
       if (activeDraft === owner) renderOwnedResponse(workbenchState.tabs.get(ownerKey).response);
@@ -2353,7 +2353,7 @@ function downloadRunReport() {
   );
   const a = document.createElement("a");
   a.href = url;
-  a.download = "rea-run-summary.json";
+  a.download = "packetlark-run-summary.json";
   a.click();
   URL.revokeObjectURL(url);
 }

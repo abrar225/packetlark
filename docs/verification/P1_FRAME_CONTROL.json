@@ -1,5 +1,5 @@
 {
-  "methodology": "Same Ego Page API, 30 separate DOM-event-to-frame evaluations in an about:blank control with one input and no Rea code. No samples discarded.",
+  "methodology": "Same Ego Page API, 30 separate DOM-event-to-frame evaluations in an about:blank control with one input and no PacketLark code. No samples discarded.",
   "samples": [
     {
       "ms": 0.7999999998137355,

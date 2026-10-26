@@ -156,7 +156,7 @@ describe("ScriptSandbox", () => {
         pm.expect("hello").to.be.a("string");
         pm.expect([1, 2, 3]).to.have.length(3);
         pm.expect([]).to.be.empty;
-        pm.expect({ name: "Rea" }).to.have.property("name", "Rea");
+        pm.expect({ name: "PacketLark" }).to.have.property("name", "PacketLark");
       });
     `;
 

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { StudioServer } from '../dist/server/StudioServer.js';
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'rea-p2-browser-'));
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'packetlark-p2-browser-'));
 const filePath=path.join(root,'chosen.bin'); fs.writeFileSync(filePath,Buffer.from([0,1,255,127,65,66,10]));
 const tokens=new Map();
 const peer=http.createServer(async(req,res)=>{

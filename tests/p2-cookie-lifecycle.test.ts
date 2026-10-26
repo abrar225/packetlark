@@ -4,7 +4,7 @@ import {WorkspaceExecution} from '../src/core/engine/WorkspaceExecution.js';
 import {P2Api} from '../src/server/P2Api.js';
 describe('P2 secure cookie operation ownership',()=>{
  it.skipIf(process.platform==='win32')('bounds stalled writes, forbids blind retry, serializes later disable and holds native work through close',async()=>{
-  const root=fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()),'rea-cookie-lifecycle-'));
+  const root=fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()),'packetlark-cookie-lifecycle-'));
   let release!:()=>void,started!:()=>void;const entered=new Promise<void>(r=>started=r),gate=new Promise<void>(r=>release=r);const values=new Map<string,string>();
   const context=new WorkspaceExecution(root,{credentialProvider:{get:async(n,id)=>values.get(n+id)!,set:async(n,id,value)=>{started();await gate;values.set(n+id,value);},delete:async(n,id)=>{values.delete(n+id);}}});
   const api=new P2Api(context,'http://127.0.0.1:4040',{assertOwned(){},snapshot:()=>({collections:[],environments:[]}),commit(){}},30);

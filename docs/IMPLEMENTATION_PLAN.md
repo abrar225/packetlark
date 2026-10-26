@@ -1,15 +1,15 @@
-# Rea implementation program: local reliability to broader platform capability
+# PacketLark implementation program: local reliability to broader platform capability
 
 Status: **approved; scoped P0, P1 and supported local P2 acceptance gates passed, P3 queued**. The trust-foundation implementation and baseline evidence are recorded in [P0_GATE.json](P0_GATE.json). See [P0 progress and remaining gates](P0_PROGRESS.md); this roadmap is not a statement of completed parity. P1 delivery, acceptance evidence and cross-phase limitations are recorded in [P1_PROGRESS.md](P1_PROGRESS.md). P2 evidence and platform boundaries are recorded in [P2_PROGRESS.md](P2_PROGRESS.md).
 
 Execution tracking: [P1–P10 task checklist](TASK_TRACKER.md) and its [machine-readable source](roadmap/task-tracker.json) retain task acceptance criteria, dependencies, evidence and all 92 requirement dispositions. Finish P1 before P2; a phase is complete only after its acceptance gate passes. Run `npm run roadmap:check` to check coverage and generated-summary consistency.
 
-Date: 25 October 2026. Baseline: `c25e02ca2415dd7b2e2826c96ea4ff0df34de311` (Rea 1.1 preview). Capacity: one maintainer assisted by coding agents. Scope: all ten comparison areas, delivered in stages. This document describes intended work, not completed capabilities or a new product rating.
+Date: 25 October 2026. Baseline: `c25e02ca2415dd7b2e2826c96ea4ff0df34de311` (PacketLark 1.1 preview). Capacity: one maintainer assisted by coding agents. Scope: all ten comparison areas, delivered in stages. This document describes intended work, not completed capabilities or a new product rating.
 
 ## 1. Product decisions settled with the user
 
 1. First audience: individual developers and small teams using local APIs, editor/agent workflows and CI. Enterprise/cloud capabilities remain on the full roadmap.
-2. Commercial boundary: free/open-source local core; optional self-hosted collaboration and monitoring. Any Rea-operated cloud or AI service needs a separate funded operating plan.
+2. Commercial boundary: free/open-source local core; optional self-hosted collaboration and monitoring. Any PacketLark-operated cloud or AI service needs a separate funded operating plan.
 3. Planning capacity: one maintainer plus agents. Estimates are engineer-week ranges, not calendar commitments or an assumed AI productivity multiplier.
 4. First stable release: dependable HTTP, OAuth 2/PKCE, secure local secrets, complete collection editing, migration checks and CLI/CI. Dedicated GraphQL/WebSocket/gRPC/MQTT clients follow.
 5. Signature workflow: **capture → redact → infer a reviewable contract → generate regression fixtures → validate generated clients**, with evidence/provenance and uncertainty visible.
@@ -27,7 +27,7 @@ The previous 5.5/10 broad-readiness assessment remains a subjective baseline. A 
 
 ### Traceability
 
-[requirements.json](roadmap/requirements.json) preserves **all 92 rows** from the reviewed comparison. Each has a unique `REA-001`…`REA-092` ID, current evidence, documented comparator, workstream, candidate phase and source links. Existing features require revalidation, not automatic green status. Broad rows may require several releases; candidate phase means first increment, not full completion.
+[requirements.json](roadmap/requirements.json) preserves **all 92 rows** from the reviewed comparison. Each has a unique `PACKETLARK-001`…`PACKETLARK-092` ID, current evidence, documented comparator, workstream, candidate phase and source links. Existing features require revalidation, not automatic green status. Broad rows may require several releases; candidate phase means first increment, not full completion.
 
 Additional immediate defect tickets are in section 5. The inventory covers major reviewed capabilities, not every private Postman implementation detail. Expand it when verified user workflows reveal omissions.
 
@@ -67,7 +67,7 @@ Proposed modules (names are design proposals, not existing implementations):
 
 ### Storage design
 
-Use versioned per-request/collection/environment files plus a resource manifest for user-authored portable data. Choose the exact Rea schema through an ADR and retain v2.1 import/export; do not pretend it is Postman's v3 YAML. Preserve unsupported source fields in a quarantine/round-trip envelope with explicit warnings.
+Use versioned per-request/collection/environment files plus a resource manifest for user-authored portable data. Choose the exact PacketLark schema through an ADR and retain v2.1 import/export; do not pretend it is Postman's v3 YAML. Preserve unsupported source fields in a quarantine/round-trip envelope with explicit warnings.
 
 Use a rebuildable local index/history/job store, potentially SQLite behind an adapter, for operational data. It must not become a second authoritative collection database. Select a Node 22/24-compatible implementation after packaging/crash tests; do not depend on an unstable runtime API accidentally.
 
@@ -198,7 +198,7 @@ Treat the following as **proposed budgets to ratify against a recorded reference
 - After warm-up, repeated 1,000-request batches should plateau within a documented retained-data budget. Use heap profiles and resource counts; do not assert a universal leak threshold from one noisy RSS sample.
 - No hot-path ornamental animation; JSON formatting/inference/large diff work runs off the main event loop or is incremental. UI consumes progress events rather than repeatedly polling/copying entire response sets when event streaming is justified.
 
-Benchmark harness: pin Node, OS, CPU/RAM, Rea and reference-tool versions; use the same payloads/auth/scripts and loopback fixture; randomized paired runs, warm-up and at least 30 repeated samples per scenario (more for tail estimates), export raw results plus methodology. Include startup, 1 KiB/1 MiB/binary bodies, OAuth refresh, one assertion, 100-request runs, 10k-item editing and long capture. Never benchmark production writes without authorization.
+Benchmark harness: pin Node, OS, CPU/RAM, PacketLark and reference-tool versions; use the same payloads/auth/scripts and loopback fixture; randomized paired runs, warm-up and at least 30 repeated samples per scenario (more for tail estimates), export raw results plus methodology. Include startup, 1 KiB/1 MiB/binary bodies, OAuth refresh, one assertion, 100-request runs, 10k-item editing and long capture. Never benchmark production writes without authorization.
 
 Use Node performance marks, event-loop delay/utilization, CPU/heap profiles and process-tree RSS. CI on shared runners initially reports trends; dedicated repeatable runs enforce regressions. A >10% repeatable change triggers investigation, not automatic refusal to improve correctness. A “faster than Postman” claim needs matched task results and statistical uncertainty, not a visual impression. Primary reference: [Node 22 performance APIs](https://nodejs.org/docs/latest-v22.x/api/perf_hooks.html).
 
@@ -234,7 +234,7 @@ Selected supporting skills, installed and inspected:
 
 Repository reputation was checked: the live GitHub responses showed roughly 302,591 stars for mattpocock/skills, 183,538 for anthropics/skills and 40,375 for github/awesome-copilot. Popularity is a discovery signal, not proof of safety/correctness. Source content and fit still determine usage. Search results for Azure, Go, Lark and low-evidence performance skills were not installed merely because they ranked highly. New skills become discoverable on the next agent turn; their files were read directly in this session.
 
-The supplied reverse-engineering folder remains available. Its current skill says ordinary complete source analysis should use repository tools; reserve REA for behavior depending on a shipped package/binary or runtime evidence. Future differential research pins artifact version/hash, captures explicit scope/provenance/limitations, and uses sanitized fixtures. Existing published-runtime analysis is documented in [POSTMAN_RESEARCH.md](POSTMAN_RESEARCH.md); it does not establish whole-platform coverage. No proprietary service reconstruction, bypassing accounts, hidden endpoint access or unapproved certificate installation is needed for the first release.
+The supplied reverse-engineering folder remains available. Its current skill says ordinary complete source analysis should use repository tools; reserve PACKETLARK for behavior depending on a shipped package/binary or runtime evidence. Future differential research pins artifact version/hash, captures explicit scope/provenance/limitations, and uses sanitized fixtures. Existing published-runtime analysis is documented in [POSTMAN_RESEARCH.md](POSTMAN_RESEARCH.md); it does not establish whole-platform coverage. No proprietary service reconstruction, bypassing accounts, hidden endpoint access or unapproved certificate installation is needed for the first release.
 
 Library selection gate: official maintenance/docs, license compatibility, dependency/advisory review, Node 22/24 and OS packaging tests, memory/latency fit, cancellation semantics, replacement cost. Evaluate protocol/auth/schema libraries per workstream; do not install a large speculative dependency set now. Pin selected versions and record an ADR. Reuse standards implementations and generators where they reduce risk; own the integration and policy tests.
 
@@ -246,7 +246,7 @@ These are proposed observable test surfaces (called “seams” by the TDD skill
 2. **Workspace command/API plus restart:** create/edit/delete with revision tokens, inject filesystem faults through a storage adapter, then restart and read through the public interface. Catches durability, conflicts and recovery. Does not prove arbitrary disk hardware failure recovery.
 3. **Browser UI workflows:** interact with tabs, drafts, delayed saves/executions, dialogs and imports. Catches ownership/focus/accessibility/task regressions. Does not prove physical-device accessibility or all OS/browser versions.
 4. **Headless CLI process:** real subprocesses, output artifacts, cancellation and exit codes with fixture collections/providers. Catches packaging, real process behavior and CI usability. Does not prove cloud scheduler reliability.
-5. **Script/collection compatibility:** pinned reference runtime and Rea execute the same sanitized cases; compare allowed wire bytes, events, scope deltas and assertions. Catches semantic differences in the declared subset. Does not prove full desktop/cloud conformance.
+5. **Script/collection compatibility:** pinned reference runtime and PacketLark execute the same sanitized cases; compare allowed wire bytes, events, scope deltas and assertions. Catches semantic differences in the declared subset. Does not prove full desktop/cloud conformance.
 6. **MCP/editor integration:** actual stdio/HTTP clients and VS Code extension host invoke real public commands and denial/cancellation paths. Catches integration/permissions/tool contract behavior. Does not prove every third-party client/version.
 7. **Contract/client pipeline:** independent schema validator and generated client execute against the fixture that produced the approved contract. Catches export/client runtime mismatch. Does not infer business truth from traffic.
 8. **Performance/resource harness:** fixed fixtures and recorded process tree. Catches repeatable overhead/leaks/regressions within that environment. Does not establish global speed superiority.
@@ -283,7 +283,7 @@ Risks and responses:
 - **Compatibility versus safety:** explicit mode/grants and documented differences; never silently disable safety to pass a fixture.
 - **Secrets/keychain portability:** verify OS providers; session-only fallback; recovery UX before credential migration.
 - **Native dependencies/signing:** packaging spikes early, signing/publisher credentials tracked separately, no unsafe postinstall downloads.
-- **Data migration/conflicts:** backups, revision checks and fault injection before changing format; never test against live `.rea-api`.
+- **Data migration/conflicts:** backups, revision checks and fault injection before changing format; never test against live `.packetlark`.
 - **Protocol/library churn:** per-adapter contracts, pinned dependencies and limited optional loading.
 - **Hosted costs/abuse:** self-host first; budget, quotas, auth and abuse controls before any free hosted offer.
 - **Agent-generated false confidence:** independent validators, real fixtures and measured claims; skill installation is not security certification.

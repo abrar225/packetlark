@@ -17,7 +17,7 @@ assert.equal(tracker.phases.length, phaseIds.size, "Duplicate phase IDs");
 for (let i = 1; i <= 10; i++) assert(phaseIds.has(`P${i}`));
 assert.equal(ids.size, tracker.tasks.length, "Task IDs must be unique");
 assert.equal(requirementIds.size, 92, "Preserve the 92 reviewed requirement IDs");
-for (let i = 1; i <= 92; i++) assert(requirementIds.has(`REA-${String(i).padStart(3, "0")}`), "Preserve the original requirement identities");
+for (let i = 1; i <= 92; i++) assert(requirementIds.has(`PACKETLARK-${String(i).padStart(3, "0")}`), "Preserve the original requirement identities");
 assert(fs.statSync(path.join(root, tracker.source_plan)).isFile(), "Missing source plan");
 assert.deepEqual(Object.keys(tracker.requirements).sort(), [...requirementIds].sort());
 assert.equal(tracker.current_phase, tracker.phases.find((p) => p.status === "in_progress")?.id ?? null);

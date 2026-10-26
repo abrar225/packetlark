@@ -32,7 +32,7 @@ export class CredentialStore {
   #path: string; #provider: CredentialProvider; #session = new Map<string, string>(); #memoryMetadata: CredentialMetadata[] = []; #queue: Promise<unknown> = Promise.resolve();
   constructor(options: { workspaceId: string; metadataPath: string; provider?: CredentialProvider }) {
     if (!options.workspaceId || !path.isAbsolute(options.metadataPath)) throw fail();
-    this.namespace = `rea-api-studio:${createHash('sha256').update(options.workspaceId).digest('hex')}`;
+    this.namespace = `packetlark:${createHash('sha256').update(options.workspaceId).digest('hex')}`;
     this.#path = options.metadataPath; this.#provider = options.provider ?? new NativeKeychainProvider();
   }
   /** Keep the workspace writer lease until native mutations have settled. */

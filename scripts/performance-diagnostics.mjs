@@ -4,7 +4,7 @@ export async function diagnoseFrames(page, baseUrl, samples = 30) {
   const rows = [];
   for (let index = 0; index < samples; index++) {
     await page.goto(`${baseUrl}/studio?frame_diagnostic=${index}`);
-    await page.waitForFunction(() => performance.getEntriesByName('rea:studio-ready').length > 0 && document.getElementById('req-url').value !== '');
+    await page.waitForFunction(() => performance.getEntriesByName('packetlark:studio-ready').length > 0 && document.getElementById('req-url').value !== '');
     await page.click('#collection-search');
     const row = await page.evaluate((index) => new Promise((resolve) => {
       const longTasks = [];
@@ -24,7 +24,7 @@ export async function diagnoseFrames(page, baseUrl, samples = 30) {
         requestAnimationFrame((secondTimestamp) => {
           const second = performance.now();
           observer.disconnect();
-          resolve({ index, start, ready: performance.getEntriesByName('rea:studio-ready')[0].startTime, work_ms: work, first_frame_ms: first - start, second_frame_ms: second - start, first_timestamp: timestamp, second_timestamp: secondTimestamp, zero_timer_ms: timerMs, long_tasks: longTasks.filter((task) => task.start + task.duration >= start), visibility: document.visibilityState, focused: document.hasFocus(), rendered_requests: document.querySelectorAll('.req-main-info').length });
+          resolve({ index, start, ready: performance.getEntriesByName('packetlark:studio-ready')[0].startTime, work_ms: work, first_frame_ms: first - start, second_frame_ms: second - start, first_timestamp: timestamp, second_timestamp: secondTimestamp, zero_timer_ms: timerMs, long_tasks: longTasks.filter((task) => task.start + task.duration >= start), visibility: document.visibilityState, focused: document.hasFocus(), rendered_requests: document.querySelectorAll('.req-main-info').length });
         });
       });
     }), index);

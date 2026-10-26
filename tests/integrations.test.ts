@@ -24,7 +24,7 @@ const collection = (url: string, script: string) => ({
 async function cli(args: string[]) {
   return new Promise<{ code: number | null; stdout: string; stderr: string }>(
     (resolve, reject) => {
-      const p = spawn(process.execPath, ["bin/rea-api.js", ...args]);
+      const p = spawn(process.execPath, ["bin/packetlark.js", ...args]);
       let stdout = "",
         stderr = "";
       p.stdout.on("data", (d) => (stdout += d));
@@ -51,7 +51,7 @@ describe("packaged entry points", () => {
     expect(result.testResults[0].passed).toBe(false);
   });
   it("runs real CLI subprocesses with JSON/JUnit and useful exit codes", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "rea-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "packetlark-cli-"));
     const server = createServer((req, res) => {
       res.setHeader("Content-Type", "application/json");
       res.end('{"ok":true}');
@@ -96,18 +96,18 @@ describe("packaged entry points", () => {
     }
   });
   it("negotiates actual stdio MCP, lists collections and rejects path traversal", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "rea-mcp-"));
-    await mkdir(path.join(root, ".rea-api/collections"), { recursive: true });
+    const root = await mkdtemp(path.join(tmpdir(), "packetlark-mcp-"));
+    await mkdir(path.join(root, ".packetlark/collections"), { recursive: true });
     await writeFile(
-      path.join(root, ".rea-api/collections/demo.json"),
+      path.join(root, ".packetlark/collections/demo.json"),
       JSON.stringify({ id: "demo", name: "Demo", variables: [], items: [] }),
     );
     const transport = new StdioClientTransport({
       command: process.execPath,
-      args: [path.resolve("bin/rea-api.js"), "mcp", "--workspace", root],
+      args: [path.resolve("bin/packetlark.js"), "mcp", "--workspace", root],
       stderr: "pipe",
     });
-    const client = new Client({ name: "rea-test", version: "1" });
+    const client = new Client({ name: "packetlark-test", version: "1" });
     try {
       await client.connect(transport);
       const list = await client.listTools();
@@ -134,7 +134,7 @@ describe("packaged entry points", () => {
     }
   });
   it("redacts initial and intermediate rotated marked secrets in real CLI JSON and JUnit reports", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "rea-cli-rotations-"));
+    const root = await mkdtemp(path.join(tmpdir(), "packetlark-cli-rotations-"));
     const server = createServer((_req, res) => res.end("ok"));
     await new Promise<void>((resolve) =>
       server.listen(0, "127.0.0.1", resolve),
@@ -192,22 +192,22 @@ describe("packaged entry points", () => {
   });
 
   it("returns valid MCP reports for short secrets and redacts intermediate rotations", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "rea-mcp-secrets-"));
-    await mkdir(path.join(root, ".rea-api/collections"), { recursive: true });
-    await mkdir(path.join(root, ".rea-api/environments"), { recursive: true });
+    const root = await mkdtemp(path.join(tmpdir(), "packetlark-mcp-secrets-"));
+    await mkdir(path.join(root, ".packetlark/collections"), { recursive: true });
+    await mkdir(path.join(root, ".packetlark/environments"), { recursive: true });
     const server = createServer((_req, res) => res.end("ok"));
     await new Promise<void>((resolve) =>
       server.listen(0, "127.0.0.1", resolve),
     );
     const transport = new StdioClientTransport({
       command: process.execPath,
-      args: [path.resolve("bin/rea-api.js"), "mcp", "--workspace", root],
+      args: [path.resolve("bin/packetlark.js"), "mcp", "--workspace", root],
       stderr: "pipe",
     });
-    const client = new Client({ name: "rea-secret-test", version: "1" });
+    const client = new Client({ name: "packetlark-secret-test", version: "1" });
     try {
       await writeFile(
-        path.join(root, ".rea-api/collections/demo.json"),
+        path.join(root, ".packetlark/collections/demo.json"),
         JSON.stringify({
           id: "demo",
           name: "Demo",
@@ -233,7 +233,7 @@ describe("packaged entry points", () => {
       await client.connect(transport);
       for (const value of ["1", ":", "[edge]+(secret)\\path"]) {
         await writeFile(
-          path.join(root, ".rea-api/environments/private.json"),
+          path.join(root, ".packetlark/environments/private.json"),
           JSON.stringify({
             id: "private",
             name: "Private",
@@ -260,7 +260,7 @@ describe("packaged entry points", () => {
   });
 
   it("does not echo malformed input contents through CLI diagnostics", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "rea-json-errors-"));
+    const root = await mkdtemp(path.join(tmpdir(), "packetlark-json-errors-"));
     try {
       const file = path.join(root, "invalid.json");
       await writeFile(file, "KEYSEED");

@@ -1,14 +1,14 @@
 {
-  "name": "rea-api-studio",
+  "name": "packetlark",
   "version": "1.1.0",
   "description": "Local API workbench with HTTP traffic capture and inferred OpenAPI exports",
   "type": "module",
   "bin": {
-    "rea-api": "./bin/rea-api.js"
+    "packetlark": "./bin/packetlark.js"
   },
   "scripts": {
     "build": "node scripts/build-sandbox.mjs && tsc && node scripts/build-web.mjs",
-    "start": "node bin/rea-api.js studio",
+    "start": "node bin/packetlark.js studio",
     "start:build": "npm run build && npm start",
     "dev": "npm run build && node --watch dist/server/index.js",
     "test": "npm run check",
@@ -59,7 +59,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/abrar225/rea-api-studio.git"
+    "url": "https://github.com/abrar225/packetlark.git"
   },
   "optionalDependencies": {
     "@napi-rs/keyring": "2.1.2"

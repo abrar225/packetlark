@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import assert from "node:assert/strict";
-const dir = await mkdtemp(path.join(tmpdir(), "rea-package-"));
+const dir = await mkdtemp(path.join(tmpdir(), "packetlark-package-"));
 function run(command, args, cwd = dir) {
   return new Promise((resolve, reject) => {
     const p = spawn(command, args, { cwd });
@@ -29,10 +29,10 @@ try {
   await run("npm", ["install", "--omit=dev", "--ignore-scripts", tarball]);
   assert.match(
     await run(process.execPath, [
-      "node_modules/rea-api-studio/bin/rea-api.js",
+      "node_modules/packetlark/bin/packetlark.js",
       "--help",
     ]),
-    /rea-api run/,
+    /packetlark run/,
   );
   await writeFile(
     path.join(dir, "collection.json"),
@@ -53,7 +53,7 @@ try {
   );
   const report = JSON.parse(
     await run(process.execPath, [
-      "node_modules/rea-api-studio/bin/rea-api.js",
+      "node_modules/packetlark/bin/packetlark.js",
       "run",
       "collection.json",
       "--reporter",

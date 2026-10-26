@@ -101,7 +101,7 @@ export class WorkspaceLease {
     )
       throw leaseError(
         "ERR_WORKSPACE_LEASE_RETENTION",
-        "Recovery journal limit reached. Stop all Rea processes and archive recovered-lock directories offline.",
+        "Recovery journal limit reached. Stop all PacketLark processes and archive recovered-lock directories offline.",
       );
     const lock = path.join(root, lockName);
     const tombstone = path.join(root, `.writer-recovered-${expectedToken}`);
@@ -143,7 +143,7 @@ export class WorkspaceLease {
       const current = WorkspaceLease.readOwner(lock);
       throw leaseError(
         "ERR_WORKSPACE_LOCKED",
-        `Workspace is owned by process ${current.pid}. Stop its Studio first; after a crash run rea-api workspace recover --workspace <directory>.`,
+        `Workspace is owned by process ${current.pid}. Stop its Studio first; after a crash run packetlark workspace recover --workspace <directory>.`,
       );
     };
     if (fs.existsSync(lock)) occupied();

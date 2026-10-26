@@ -6,10 +6,10 @@ This is a cooperating-process protocol for a local filesystem and one host/PID n
 
 ## Inspect and recover
 
-Use the project directory, exactly as for `rea-api studio --workspace`; Rea manages its `.rea-api` child directory:
+Use the project directory, exactly as for `packetlark studio --workspace`; PacketLark manages its `.packetlark` child directory:
 
 ```sh
-rea-api workspace status --workspace /path/to/project
+packetlark workspace status --workspace /path/to/project
 ```
 
 Status is read-only. It reports whether a lock exists, its PID/hostname/creation time/token, and whether that same-host process is known to have exited. It does not create a missing workspace, execute scripts or remove metadata.
@@ -17,13 +17,13 @@ Status is read-only. It reports whether a lock exists, its PID/hostname/creation
 After reviewing the status, an exited owner can be recovered explicitly:
 
 ```sh
-rea-api workspace recover --workspace /path/to/project --token TOKEN_FROM_STATUS
-rea-api studio --workspace /path/to/project
+packetlark workspace recover --workspace /path/to/project --token TOKEN_FROM_STATUS
+packetlark studio --workspace /path/to/project
 ```
 
 Recovery requires the exact reviewed token and a same-host PID existence check that reports the owner absent. A running, paused, permission-denied, unknown or foreign-host owner is refused. There is no time expiry and no force flag. PID reuse can conservatively refuse a stale lock; hostname changes can also require offline repair. Do not kill an unrelated process to make recovery pass.
 
-Malformed or linked owner metadata is preserved and reported, not automatically deleted. For offline repair, stop all Rea instances and recovery commands, preserve the metadata and back up the workspace before investigating. Ordinary process crashes are covered by the token recovery command; arbitrary damaged filesystems require separate diagnosis.
+Malformed or linked owner metadata is preserved and reported, not automatically deleted. For offline repair, stop all PacketLark instances and recovery commands, preserve the metadata and back up the workspace before investigating. Ordinary process crashes are covered by the token recovery command; arbitrary damaged filesystems require separate diagnosis.
 
 ## Publication, release and recovery
 
@@ -33,7 +33,7 @@ Startup and shutdown share explicit lifecycle promises. Concurrent starts share 
 
 Release atomically renames the owned directory to `.writer-released-TOKEN` before cleanup. Interrupted cleanup leaves a non-owning artifact rather than an empty active lock. Unpublished `.writer-pending-TOKEN` artifacts also do not own the workspace. Their cleanup may require offline maintenance after unusual crashes or filesystem failures.
 
-Explicit recovery renames the exited owner's directory to the **fixed**, nonempty `.writer-recovered-TOKEN` path. That directory is retained: a delayed recovery for the same token cannot rename a newly acquired owner's directory over the existing nonempty target. Never edit or remove these recovery directories while Rea instances or recovery commands may still reference the workspace. Recovery refuses at 128 retained recovery directories; archive them only during offline maintenance with all those processes stopped.
+Explicit recovery renames the exited owner's directory to the **fixed**, nonempty `.writer-recovered-TOKEN` path. That directory is retained: a delayed recovery for the same token cannot rename a newly acquired owner's directory over the existing nonempty target. Never edit or remove these recovery directories while PacketLark instances or recovery commands may still reference the workspace. Recovery refuses at 128 retained recovery directories; archive them only during offline maintenance with all those processes stopped.
 
 The rename design relies on the documented nonempty-directory exclusion and atomic rename semantics in [POSIX rename](https://pubs.opengroup.org/onlinepubs/9799919799/functions/rename.html). Process existence uses the documented zero-signal behavior of [Node's process.kill](https://nodejs.org/docs/latest-v22.x/api/process.html#processkillpid-signal), with every result other than a known absent process treated conservatively. These references do not establish Windows or network-filesystem execution results; supported-OS validation remains a P5 gate.
 

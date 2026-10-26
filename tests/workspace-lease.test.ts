@@ -8,7 +8,7 @@ import net from "node:net";
 
 function launch(
   args: string[],
-  entry = "bin/rea-api.js",
+  entry = "bin/packetlark.js",
   options: { cwd?: string; env?: NodeJS.ProcessEnv } = {},
 ) {
   const child = spawn(
@@ -70,7 +70,7 @@ async function command(args: string[]) {
 }
 
 it("refuses a second workspace writer and releases ownership after stopping", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-"));
   let first: StudioServer, second: StudioServer, replacement: StudioServer;
   try {
     first = new StudioServer(0, 0, root);
@@ -100,7 +100,7 @@ it("refuses a second workspace writer and releases ownership after stopping", as
 });
 
 it("releases ownership when startup fails before the HTTP server can listen", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-start-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-start-"));
   const failed = new StudioServer(-1, 0, root);
   let replacement: StudioServer;
   try {
@@ -116,7 +116,7 @@ it("releases ownership when startup fails before the HTTP server can listen", as
 });
 
 it("admits exactly one of two competing real CLI writers", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-race-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-race-"));
   const args = [
     "studio",
     "--port",
@@ -149,7 +149,7 @@ it("admits exactly one of two competing real CLI writers", async () => {
 }, 10000);
 
 it("cannot start after shutdown has begun and shares concurrent startup", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-lifecycle-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-lifecycle-"));
   const stopped = new StudioServer(0, 0, root);
   let running: StudioServer;
   try {
@@ -175,7 +175,7 @@ it("cannot start after shutdown has begun and shares concurrent startup", async 
 });
 
 it("frees the writer slot even when retired-lock cleanup fails", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-cleanup-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-cleanup-"));
   const first = new StudioServer(0, 0, root);
   const unlink = fs.unlinkSync,
     remove = fs.rmSync;
@@ -212,7 +212,7 @@ it("frees the writer slot even when retired-lock cleanup fails", async () => {
 });
 
 it("cleans up ownership when the last TCP port is occupied", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-port-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-port-"));
   const holder = net.createServer();
   await new Promise<void>((resolve, reject) => {
     holder.once("error", (error) =>
@@ -253,7 +253,7 @@ it("cleans up ownership when the last TCP port is occupied", async () => {
 }, 10000);
 
 it("reports the live workspace owner through the CLI without permitting recovery", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-status-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-status-"));
   const owner = launch([
     "studio",
     "--port",
@@ -299,7 +299,7 @@ it("reports the live workspace owner through the CLI without permitting recovery
 }, 10000);
 
 it("requires reviewed-token recovery after a killed owner and preserves saved collections", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-recovery-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-recovery-"));
   const args = [
     "studio",
     "--port",
@@ -381,7 +381,7 @@ it("requires reviewed-token recovery after a killed owner and preserves saved co
 }, 10000);
 
 it("a delayed recovery cannot rename a newly acquired writer's lease", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-delayed-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-delayed-"));
   const args = [
     "studio",
     "--port",
@@ -465,7 +465,7 @@ it("a delayed recovery cannot rename a newly acquired writer's lease", async () 
 }, 15000);
 
 it("the legacy dev entry uses the same graceful workspace lifecycle", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-dev-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-dev-"));
   const legacy = launch([], "dist/server/index.js", {
     cwd: root,
     env: { ...process.env, PORT: "0", SNIFFER_PORT: "0" },
@@ -499,7 +499,7 @@ it("the legacy dev entry uses the same graceful workspace lifecycle", async () =
 }, 10000);
 
 it("an old instance cannot write or remove a replacement owner's lock after losing ownership", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-lost-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-lost-"));
   const first = new StudioServer(0, 0, root);
   let replacement: StudioServer;
   try {
@@ -544,8 +544,8 @@ it("an old instance cannot write or remove a replacement owner's lock after losi
 });
 
 it("preserves malformed lease metadata and does not seed an unlocked replacement", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-malformed-"));
-  const lock = path.join(root, ".rea-api", ".writer-lock");
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-malformed-"));
+  const lock = path.join(root, ".packetlark", ".writer-lock");
   fs.mkdirSync(lock, { recursive: true });
   const file = path.join(lock, "owner.json"),
     data = '{"pid":"seed-must-not-appear-in-errors"}';
@@ -568,7 +568,7 @@ it("preserves malformed lease metadata and does not seed an unlocked replacement
       expect(result.stderr).not.toContain("seed-must-not-appear-in-errors");
     }
     expect(fs.readFileSync(file, "utf8")).toBe(data);
-    expect(fs.existsSync(path.join(root, ".rea-api", "collections"))).toBe(
+    expect(fs.existsSync(path.join(root, ".packetlark", "collections"))).toBe(
       false,
     );
   } finally {
@@ -577,7 +577,7 @@ it("preserves malformed lease metadata and does not seed an unlocked replacement
 }, 10000);
 
 it("refuses to recover an exited owner recorded on another host", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-lease-host-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-lease-host-"));
   const owner = launch([
     "studio",
     "--port",
@@ -595,7 +595,7 @@ it("refuses to recover an exited owner recorded on another host", async () => {
       }),
     ]);
     await terminate(owner, "SIGKILL");
-    const file = path.join(root, ".rea-api", ".writer-lock", "owner.json");
+    const file = path.join(root, ".packetlark", ".writer-lock", "owner.json");
     const metadata = JSON.parse(fs.readFileSync(file, "utf8"));
     metadata.hostname = "different-host.invalid";
     const data = JSON.stringify(metadata);

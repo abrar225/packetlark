@@ -23,11 +23,11 @@ export async function measureBrowser(page, baseUrl, samples = 30, options = {}) 
     await page.goto(`${baseUrl}/studio?benchmark_round=${i}`);
     await page.waitForFunction(
       () =>
-        performance.getEntriesByName("rea:studio-ready").length > 0 &&
+        performance.getEntriesByName("packetlark:studio-ready").length > 0 &&
         document.getElementById("req-url").value !== "",
     );
     const state = await page.evaluate(() => ({
-      ready_ms: performance.getEntriesByName("rea:studio-ready")[0].startTime,
+      ready_ms: performance.getEntriesByName("packetlark:studio-ready")[0].startTime,
       rendered_requests: document.querySelectorAll(".req-main-info").length,
       viewport: [innerWidth, innerHeight],
       visibility: document.visibilityState,

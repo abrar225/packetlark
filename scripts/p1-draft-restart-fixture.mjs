@@ -1,5 +1,5 @@
 // Disposable parent owns the target/root; the real Studio CLI child can restart
-// on the same origin without deleting the workspace. Never uses live .rea-api.
+// on the same origin without deleting the workspace. Never uses live .packetlark.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -7,13 +7,13 @@ import http from "node:http";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import readline from "node:readline";
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-draft-restart-"));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-draft-restart-"));
 const target = http.createServer((req, res) => res.end(JSON.stringify({ path: req.url })));
 target.listen(0, "127.0.0.1");
 await once(target, "listening");
 let child, port = 0;
 async function start() {
-  child = spawn(process.execPath, ["bin/rea-api.js", "studio", "--workspace", root, "--port", String(port), "--sniffer-port", "0"], { stdio: ["ignore", "pipe", "pipe"] });
+  child = spawn(process.execPath, ["bin/packetlark.js", "studio", "--workspace", root, "--port", String(port), "--sniffer-port", "0"], { stdio: ["ignore", "pipe", "pipe"] });
   const pid = child.pid;
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("CLI startup timed out")), 10000);

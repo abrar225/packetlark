@@ -5,7 +5,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 it("refuses skipped phase prerequisites, unresolved requirement scopes, cycles and duplicate phases", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "rea-roadmap-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "packetlark-roadmap-"));
   try {
     fs.mkdirSync(path.join(root, "scripts"));
     fs.copyFileSync("scripts/roadmap-tracker.mjs", path.join(root, "scripts/roadmap-tracker.mjs"));
@@ -35,8 +35,8 @@ it("refuses skipped phase prerequisites, unresolved requirement scopes, cycles a
       t.phases[0].status = "done";
       t.phases[1].status = "in_progress";
       t.current_phase = "P2";
-      t.requirements["REA-023"].status = "in_progress";
-      t.requirements["REA-023"].scopes.find((scope: any) => scope.phase === "P1").status = "pending";
+      t.requirements["PACKETLARK-023"].status = "in_progress";
+      t.requirements["PACKETLARK-023"].scopes.find((scope: any) => scope.phase === "P1").status = "pending";
       for (const task of t.tasks.filter((task: any) => task.phase === "P1")) {
         task.status = "done";
         task.evidence = ["docs/P1_PROGRESS.md"];
@@ -46,7 +46,7 @@ it("refuses skipped phase prerequisites, unresolved requirement scopes, cycles a
     expect(unresolved.stderr).toContain("Unresolved requirement at phase closure");
     expect(check((t) => t.phases.push(t.phases[0])).stderr).toContain("Duplicate phase IDs");
     expect(check((t) => t.tasks[4].depends_on.push(t.tasks[4].id)).stderr).toContain("Dependency cycle");
-    expect(check((t) => { t.requirements["REA-010"].task_ids = ["P1-007"]; }).stderr).toContain("Scope task mismatch");
+    expect(check((t) => { t.requirements["PACKETLARK-010"].task_ids = ["P1-007"]; }).stderr).toContain("Scope task mismatch");
     const allPhasesDone = (t: any) => {
       t.current_phase = null;
       for (const phase of t.phases) phase.status = "done";

@@ -90,7 +90,7 @@ describe('import compatibility reports and runtime boundaries', () => {
     });
   }
   it.each([false, true])('preserves corpus through public import, durable restart and public export (migration=%s)', async (migrate) => {
-    const root = fs.mkdtempSync(path.join(tmpdir(), 'rea-import-corpus-'));
+    const root = fs.mkdtempSync(path.join(tmpdir(), 'packetlark-import-corpus-'));
     let server: StudioServer | undefined;
     try {
       server = new StudioServer(0, 0, root);

@@ -6,7 +6,7 @@ async function storage(page, action = "read", value) {
   return page.evaluate(async ({ action, value }) => {
     const { id } = await (await fetch("/api/workspace/identity")).json();
     const database = await new Promise((resolve, reject) => {
-      const request = indexedDB.open("rea-draft-recovery-v1", 1);
+      const request = indexedDB.open("packetlark-draft-recovery-v1", 1);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -31,7 +31,7 @@ async function storage(page, action = "read", value) {
 
 async function ready(page, baseUrl) {
   await page.goto(baseUrl + "/studio");
-  await page.waitForFunction(() => performance.getEntriesByName("rea:studio-ready").length > 0);
+  await page.waitForFunction(() => performance.getEntriesByName("packetlark:studio-ready").length > 0);
   await page.evaluate(() => {
     window.confirm = () => true;
     window.__recoveryAlerts = [];

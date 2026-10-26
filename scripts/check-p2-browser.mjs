@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 // Network doubles below verify browser ownership and privacy without retaining secrets.
 export async function verifyP2Controls(page, baseUrl) {
   await page.goto(baseUrl + '/studio');
-  await page.waitForFunction(() => Boolean(window.ReaCredentialControls && window.ReaHttpControls));
+  await page.waitForFunction(() => Boolean(window.PacketLarkCredentialControls && window.PacketLarkHttpControls));
   const result = await page.evaluate(async () => {
     const check = (condition, message) => { if (!condition) throw new Error(message); };
     const cases = [];
@@ -18,8 +18,8 @@ export async function verifyP2Controls(page, baseUrl) {
       const data = path === '/api/credentials' && options.method === 'POST' ? { id: '00000000-0000-4000-8000-000000000001', reference: secretReference } : path === '/api/oauth/start' ? { flowId: 'p2-flow', authorizationUrl: 'https://provider.example.test/authorize?state=opaque' } : path === '/api/files' ? { id: 'p2-selected-file', name: 'chosen.bin', size: 3, contentType: 'application/octet-stream' } : [];
       return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
     };
-    const auth = new window.ReaCredentialControls({ getRequest: () => request, changed: () => changes++, fetch: transport });
-    const http = new window.ReaHttpControls({ getRequest: () => request, changed: () => changes++, fetch: transport });
+    const auth = new window.PacketLarkCredentialControls({ getRequest: () => request, changed: () => changes++, fetch: transport });
+    const http = new window.PacketLarkHttpControls({ getRequest: () => request, changed: () => changes++, fetch: transport });
     const host = document.createElement('section'); host.id = 'p2-browser-fixture'; document.body.append(host);
     const button = (node, text) => [...node.querySelectorAll('button')].find(item => item.textContent === text);
     const wait = async predicate => { for (let attempt = 0; attempt < 100; attempt++) { if (predicate()) return; await new Promise(resolve => setTimeout(resolve, 10)); } throw new Error('Timed out waiting for P2 UI.'); };
@@ -41,14 +41,14 @@ export async function verifyP2Controls(page, baseUrl) {
       request.auth = { type: 'inherit' }; auth.renderAuth(host);
       check(host.textContent.includes('nearest parent'), 'Inherited authorization explanation missing.');
       cases.push('inherited authorization preserved');
-      const failing = new window.ReaCredentialControls({ getRequest: () => request, changed: () => changes++, fetch: async () => new Response(JSON.stringify({ error: 'Keychain unavailable' }), { status: 503 }) });
+      const failing = new window.PacketLarkCredentialControls({ getRequest: () => request, changed: () => changes++, fetch: async () => new Response(JSON.stringify({ error: 'Keychain unavailable' }), { status: 503 }) });
       modal = failing.openManager(); await wait(() => modal.status.textContent.includes('Keychain unavailable'));
       const secret = modal.content.querySelector('input[type=password]'); secret.value = 'retained-on-error';
       modal.status.textContent = ''; button(modal.node, 'Store credential').click(); await wait(() => modal.status.textContent.includes('Keychain unavailable'));
       check(secret.value === 'retained-on-error', 'Failed save erased input.'); modal.node.close();
       cases.push('service failure retains credential input');
       const migrationCalls = [];
-      const migrator = new window.ReaCredentialControls({ getRequest: () => request, changed: () => changes++, fetch: async (path, options = {}) => {
+      const migrator = new window.PacketLarkCredentialControls({ getRequest: () => request, changed: () => changes++, fetch: async (path, options = {}) => {
         migrationCalls.push({ path, options });
         const data = path.endsWith('/preview') ? { planId: 'reviewed-plan', fields: [{ pointer: '/items/0/request/auth/bearerToken', value: 'must-not-display' }] } : [];
         return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
@@ -105,7 +105,7 @@ export async function verifyP2Controls(page, baseUrl) {
       await wait(() => modal.content.textContent.includes('exceeds 256 KiB'));
       check(!request.tls.ca, 'Oversized certificate changed TLS settings.'); modal.node.close();
       cases.push('TLS private keys require credential references');
-      const stream = new window.ReaHttpControls({ getRequest: () => request, changed: () => {}, fetch: async () => new Response(new ReadableStream({ start(controller) { const encoder = new TextEncoder(); controller.enqueue(encoder.encode('{"type":"progress","receivedBytes":3}\n{"type":"complete","res')); controller.enqueue(encoder.encode('ponse":{"status":200,"artifactId":"p2-artifact"}}\n')); controller.close(); } })) });
+      const stream = new window.PacketLarkHttpControls({ getRequest: () => request, changed: () => {}, fetch: async () => new Response(new ReadableStream({ start(controller) { const encoder = new TextEncoder(); controller.enqueue(encoder.encode('{"type":"progress","receivedBytes":3}\n{"type":"complete","res')); controller.enqueue(encoder.encode('ponse":{"status":200,"artifactId":"p2-artifact"}}\n')); controller.close(); } })) });
       const events = []; const response = await stream.execute(request, { onEvent: event => events.push(event.type) });
       check(response.status === 200 && events.join(',') === 'progress,complete', 'Split NDJSON event handling failed.');
       http.renderInspector(host, response);
@@ -161,7 +161,7 @@ export async function verifyP2RealWorkflow(page, baseUrl, targetUrl, fixtureFile
     assert.equal(response.status, 200, `${method} ${route}: ${response.body}`);
     return JSON.parse(response.body || '{}');
   };
-  const ready = async () => { await page.goto(baseUrl + '/studio'); await page.waitForFunction(() => performance.getEntriesByName('rea:studio-ready').length > 0); };
+  const ready = async () => { await page.goto(baseUrl + '/studio'); await page.waitForFunction(() => performance.getEntriesByName('packetlark:studio-ready').length > 0); };
   const closeNative = async () => { await page.click('dialog.p2-dialog[open] > button'); await page.waitForFunction(() => !document.querySelector('dialog.p2-dialog[open]')); };
   // Ego supports terminal text selectors; identify labelled descendants in the
   // DOM first so the actual fill/click operations use plain CSS selectors.
@@ -276,11 +276,11 @@ export async function verifyP2RealWorkflow(page, baseUrl, targetUrl, fixtureFile
 export async function verifyP2OAuthWorkflow(task, page, baseUrl, providerUrl) {
   const suffix=Date.now(),id='p2_oauth_'+suffix,label='P2 OAuth '+suffix;
   const call=async(route,method='GET',body)=>{const response=await page.fetch('/api/'+route,{method,headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});assert.equal(response.status,200,route+': '+response.body);return JSON.parse(response.body);};
-  await page.goto(baseUrl+'/studio');await page.waitForFunction(()=>performance.getEntriesByName('rea:studio-ready').length);
+  await page.goto(baseUrl+'/studio');await page.waitForFunction(()=>performance.getEntriesByName('packetlark:studio-ready').length);
   await call('collections','POST',{id,name:label,variables:[],items:[{id,name:label,request:{id,name:label,url:providerUrl+'/echo',method:'GET',headers:[],queryParams:[],auth:{type:'none'},body:{mode:'none'}}}]});
   let connection,popup;
   try{
-    await page.reload();await page.waitForFunction(()=>performance.getEntriesByName('rea:studio-ready').length);await page.fill('#collection-search',label);await page.click(`[aria-label="GET ${label}"]`);await page.click('#btn-oauth');
+    await page.reload();await page.waitForFunction(()=>performance.getEntriesByName('packetlark:studio-ready').length);await page.fill('#collection-search',label);await page.click(`[aria-label="GET ${label}"]`);await page.click('#btn-oauth');
     await page.waitForFunction(()=>![...document.querySelectorAll('dialog[open] button')].find(x=>x.textContent==='Connect').disabled);
     const fill=async(label,value)=>{await page.evaluate(label=>{const el=[...document.querySelectorAll('dialog[open] label')].find(x=>x.querySelector('span')?.textContent===label)?.querySelector('input');if(!el)throw Error('Missing '+label);el.id='p2-oauth-field';},label);await page.fill('#p2-oauth-field',value);await page.evaluate(()=>document.getElementById('p2-oauth-field').removeAttribute('id'));};
     for(const [name,value] of [['Connection name',label],['Issuer URL',providerUrl],['Authorization endpoint',providerUrl+'/authorize'],['Token endpoint',providerUrl+'/token'],['Revocation endpoint (optional)',providerUrl+'/revoke'],['Client ID','p2-public-client'],['Resource origins (comma separated)',providerUrl]])await fill(name,value);

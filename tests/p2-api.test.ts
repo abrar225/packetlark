@@ -7,7 +7,7 @@ import { StudioServer } from '../src/server/StudioServer.js';
 import type { CredentialProvider } from '../src/core/security/CredentialStore.js';
 
 async function fixture() {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rea-p2-api-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'packetlark-p2-api-'));
   const values = new Map<string,string>();
   const provider: CredentialProvider = { get: async (n,id) => { const value=values.get(n+id); if(value===undefined)throw Error('Missing');return value; }, set:async(n,id,value)=>{values.set(n+id,value);}, delete:async(n,id)=>{values.delete(n+id);} };
   const peer = http.createServer(async (req,res) => {

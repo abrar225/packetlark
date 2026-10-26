@@ -12,7 +12,7 @@ describe('StudioServer Environment Management & Request Persistence', () => {
   beforeAll(async()=>{target=await startHttpFixture();});
   afterAll(async()=>{await target.stop();});
   let server: StudioServer;
-  const testWorkspace = mkdtempSync(join(tmpdir(), 'rea-test-'));
+  const testWorkspace = mkdtempSync(join(tmpdir(), 'packetlark-test-'));
   const serverPort = 4288;
   const snifferPort = 8288;
 

@@ -28,7 +28,7 @@ async function fixture(timeout = 300000) {
   await new Promise<void>(r => server.listen(0, '127.0.0.1', r));
   cleanup.push(() => new Promise<void>(r => server.close(() => r())));
   const base = `http://127.0.0.1:${(server.address() as any).port}`;
-  const dir = await realpath(await mkdtemp(path.join(os.tmpdir(), 'rea-oauth-'))); cleanup.push(() => rm(dir, { recursive: true, force: true }));
+  const dir = await realpath(await mkdtemp(path.join(os.tmpdir(), 'packetlark-oauth-'))); cleanup.push(() => rm(dir, { recursive: true, force: true }));
   const metadataPath = path.join(dir, 'metadata.json'); const store = new CredentialStore({ workspaceId: dir, metadataPath });
   const service = new OAuthService(store, { callbackUrl: 'http://127.0.0.1:7777/api/oauth/callback', allowInsecureLoopbackForTests: true, flowTimeoutMs: timeout }); cleanup.push(async () => service.dispose());
   const secret = await store.create({ label: 'client', value: 'SEEDED-CLIENT-SECRET', origins: [base], storage: 'session', kind: 'oauth-client-secret' });

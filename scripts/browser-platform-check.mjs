@@ -1,5 +1,5 @@
 // Run using Ego nodejs; requires scripts/test-server.mjs (isolated workspace).
-const task = await taskSpace("Rea platform compatibility 2026-10-25");
+const task = await taskSpace("PacketLark platform compatibility 2026-10-25");
 const page = task.page("p1");
 const assert = (await import("node:assert/strict")).default;
 const collection = {
@@ -78,7 +78,7 @@ console.log(
 );
 const fs = await import("node:fs/promises");
 const axe = await fs.readFile(
-  "/Users/abrarakhunji/Desktop/Rea-API-Studio/node_modules/axe-core/axe.min.js",
+  "/Users/abrarakhunji/Desktop/PacketLark/node_modules/axe-core/axe.min.js",
   "utf8",
 );
 await page.evaluate((source) => {

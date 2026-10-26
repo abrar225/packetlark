@@ -5,7 +5,7 @@ main(["studio"]).then(
     process.exitCode = code;
   },
   (error) => {
-    console.error("Rea: " + error.message);
+    console.error("PacketLark: " + error.message);
     process.exitCode = 2;
   },
 );

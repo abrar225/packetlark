@@ -19,7 +19,7 @@ const identifier = z
   .max(200);
 export function createMcpServer(workspace: string): McpServer {
   const server = new McpServer(
-    { name: "rea-api-studio", version: "1.1.0" },
+    { name: "packetlark", version: "1.1.0" },
     {
       instructions:
         "Local API development tools. Executing requests/collections can change remote services. Use only within the user-authorized API scope; collection scripts can send additional HTTP requests. No arbitrary file paths are accepted.",
@@ -28,7 +28,7 @@ export function createMcpServer(workspace: string): McpServer {
   let execution:WorkspaceExecution|undefined;
   let pendingContext:Promise<WorkspaceExecution>|undefined;
   const context=async()=>{
-    pendingContext??=import("../core/engine/WorkspaceExecution.js").then(({WorkspaceExecution})=>execution=new WorkspaceExecution(path.join(workspace,".rea-api")));
+    pendingContext??=import("../core/engine/WorkspaceExecution.js").then(({WorkspaceExecution})=>execution=new WorkspaceExecution(path.join(workspace,".packetlark")));
     return (await pendingContext).options();
   };
   const executionOptions:ExecutionOptions={
@@ -48,7 +48,7 @@ export function createMcpServer(workspace: string): McpServer {
     isError,
   });
   function snapshot() {
-    const repository = new WorkspaceRepository(path.join(workspace, ".rea-api"), { readOnly: true });
+    const repository = new WorkspaceRepository(path.join(workspace, ".packetlark"), { readOnly: true });
     try { return repository.snapshot(); } finally { repository.close(); }
   }
   async function read(kind: "collections", id: string): Promise<import("../core/models/types.js").ApiCollection>;

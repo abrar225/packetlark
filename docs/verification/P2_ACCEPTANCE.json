@@ -8,7 +8,7 @@
     "file": "docs/verification/P2_TEST_RESULTS.json",
     "passed": 309,
     "files": 35,
-    "sha256": "58d6938a8c3d1edd816f206587a90aa78d6d95909ed4804f5fc83908c6e9ceb1"
+    "sha256": "2f727f63ed3d84e153153086979441662dda87a1ac097e6a9a220977e75395b6"
   },
   "browser": [
     {
@@ -156,5 +156,9 @@
     "web/workspace-authoring.js": "71e289e647963498922b53804e453b022c2e905db497c05ce4d36010c1b658d0",
     "web/workspace-sync.js": "245ae2180a89299d39ff770f710da5c5448ca273350f23c6951e67e25dd9413d"
   },
-  "historical_policy": "Preserve this snapshot when later phases change sources; current-source validation then intentionally no longer describes the new phase."
+  "historical_policy": "Preserve this snapshot when later phases change sources; current-source validation then intentionally no longer describes the new phase.",
+  "branding_normalization": {
+    "date": "2026-10-27",
+    "note": "Historical records retain their original test dates and source hashes. Display names, requirement prefixes and recorded paths were normalized to PacketLark; the test artifact checksum reflects those text-only changes. Fresh rebrand verification is recorded separately in PACKETLARK_REBRAND.md."
+  }
 }

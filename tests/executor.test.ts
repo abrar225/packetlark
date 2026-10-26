@@ -26,7 +26,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
   it('normalizes DNS and network failures into clean structured errors without stack traces', async () => {
     const req: HttpRequest = {
       method: 'GET',
-      url: 'http://rea-executor-fixture.invalid',
+      url: 'http://packetlark-executor-fixture.invalid',
       headers: [],
       queryParams: [],
       body: { mode: 'none' },
@@ -69,7 +69,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
       body: {
         mode: 'x-www-form-urlencoded',
         formData: [
-          { key: 'username', value: 'rea_user', enabled: true },
+          { key: 'username', value: 'packetlark_user', enabled: true },
           { key: 'disabledField', value: 'skip_me', enabled: false }
         ]
       },
@@ -79,7 +79,7 @@ describe('HttpExecutor Hardening & Error Normalization', () => {
     const urlEncodedRes = await HttpExecutor.execute(urlEncodedReq);
     expect(urlEncodedRes.status).toBe(200);
     const urlBody = JSON.parse(urlEncodedRes.body);
-    expect(urlBody.form.username).toBe('rea_user');
+    expect(urlBody.form.username).toBe('packetlark_user');
     expect(urlBody.form.disabledField).toBeUndefined();
 
     // 2. Form data

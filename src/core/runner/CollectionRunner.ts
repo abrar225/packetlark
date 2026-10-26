@@ -408,7 +408,7 @@ export function junitReport(result: RunResult): string {
     cases.push(
       `<testcase name="Run execution"><error message="${xml(result.error)}"/></testcase>`,
     );
-  return `<?xml version="1.0" encoding="UTF-8"?><testsuites><testsuite name="Rea API Studio" tests="${cases.length}" failures="${result.summary.failed}" errors="${result.summary.errors + (result.error ? 1 : 0)}" skipped="${result.summary.skipped}" time="${result.durationMs / 1000}">${cases.join("")}</testsuite></testsuites>`;
+  return `<?xml version="1.0" encoding="UTF-8"?><testsuites><testsuite name="PacketLark" tests="${cases.length}" failures="${result.summary.failed}" errors="${result.summary.errors + (result.error ? 1 : 0)}" skipped="${result.summary.skipped}" time="${result.durationMs / 1000}">${cases.join("")}</testsuite></testsuites>`;
 }
 export function reportWithoutBodies(result: RunResult) {
   const report = {

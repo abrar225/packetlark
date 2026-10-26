@@ -65,7 +65,7 @@ try {
   assert.throws(() => OpenApiGenerator.generate(records), /origin/i);
   const spec = OpenApiGenerator.generate(
     records,
-    "Rea inferred API",
+    "PacketLark inferred API",
     "1.0.0",
     "https://a.example",
   );

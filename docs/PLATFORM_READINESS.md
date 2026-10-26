@@ -62,4 +62,4 @@ These are proposed acceptance criteria, not achieved metrics. Broad enterprise-p
 
 See [research provenance](POSTMAN_RESEARCH.md), [usage/integrations](INTEGRATIONS.md), and [verification](VERIFICATION.md).
 
-Additional public platform surfaces—visual Flows, AI-assisted authoring/agent workflows, published documentation, API security/governance integrations, webhook handling and SDK distribution—also require separate scope and validation. None is implied by Rea's MCP adapter, inferred OpenAPI document or TypeScript draft.
+Additional public platform surfaces—visual Flows, AI-assisted authoring/agent workflows, published documentation, API security/governance integrations, webhook handling and SDK distribution—also require separate scope and validation. None is implied by PacketLark's MCP adapter, inferred OpenAPI document or TypeScript draft.

@@ -18,7 +18,7 @@ Disabling recovery stops future writes after pending work settles. Existing reco
 
 ## Identity, retention and boundaries
 
-- Database: `rea-draft-recovery-v1`, browser origin storage, partitioned by workspace through an IndexedDB index.
+- Database: `packetlark-draft-recovery-v1`, browser origin storage, partitioned by workspace through an IndexedDB index.
 - Workspace identity: an opaque hash of the canonical root path and its directory identity. It remains stable across normal Studio/CLI restarts and distinguishes different roots without returning the filesystem path.
 - Limits: 8 MiB of serialized snapshot data per page record; 16 records and 32 MiB of serialized snapshot data per workspace. A snapshot includes the original collection context for its dirty requests. There is no silent eviction to make room; discard older records explicitly.
 - These counters exclude IndexedDB/JavaScript object overhead. They do not impose an OS/browser memory quota or cap the number of different workspaces stored in a browser profile.
