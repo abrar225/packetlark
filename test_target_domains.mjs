@@ -43,7 +43,7 @@ async function testDomain(domain, extraPaths = []) {
         console.log(`  -> Redirect Location: ${execData.headers.location}`);
       }
 
-      // 2. Intercept via PacketLarkAPI Sniffer Proxy to capture into OpenAPI & SDK pipeline
+      // 2. Intercept via PacketLark traffic proxy to capture into OpenAPI & SDK pipeline
       const sniffRes = await fetch(`http://localhost:8085/${fullUrl}`, {
         headers: {
           'User-Agent': 'PacketLark-Sniffer/1.0',
